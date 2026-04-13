@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pour toi — un espace à nous</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts : Cormorant Garamond (élégant, chaleureux) + Lato (lisible, doux) -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ============================================================
+       SECTION 1 — ACCUEIL
+  ============================================================ -->
+  <section id="accueil" class="page active" aria-label="Page d'accueil">
+    <div class="accueil-inner">
+      <!-- Particules légères (canvas en arrière-plan) -->
+      <canvas id="particules-canvas" aria-hidden="true"></canvas>
+
+      <div class="accueil-texte fade-in">
+        <p class="accueil-sous-titre">pour toi,</p>
+        <h1 class="accueil-titre">J'ai créé cet espace pour nous.</h1>
+        <p class="accueil-description">
+          Un endroit doux, rien qu'à nous deux.<br/>
+          Tu peux avancer à ton rythme.
+        </p>
+        <button class="btn-entrer" onclick="naviguer('galerie')" aria-label="Entrer dans l'espace">
+          Entrer doucement →
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       NAVIGATION FLOTTANTE
+  ============================================================ -->
+  <nav id="nav-principale" aria-label="Navigation principale" hidden>
+    <button onclick="naviguer('galerie')"    data-page="galerie"    aria-label="Galerie">✦ Galerie</button>
+    <button onclick="naviguer('comprendre')" data-page="comprendre" aria-label="Comprendre">✦ Comprendre</button>
+    <button onclick="naviguer('univers')"    data-page="univers"    aria-label="Univers">✦ Univers</button>
+    <button onclick="naviguer('dessin')"     data-page="dessin"     aria-label="Dessiner">✦ Dessiner</button>
+    <button onclick="naviguer('emotions')"   data-page="emotions"   aria-label="Émotions">✦ Émotions</button>
+    <button onclick="naviguer('oeuvre')"     data-page="oeuvre"     aria-label="Œuvre finale">✦ Œuvre</button>
+    <button onclick="naviguer('accueil')"    class="btn-retour"     aria-label="Retour accueil">⌂</button>
+  </nav>
+
+  <!-- ============================================================
+       SECTION 2 — GALERIE DE LA RELATION
+       ✏️  MODIFIER : voir script.js → gallerieData[]
+  ============================================================ -->
+  <section id="galerie" class="page" aria-label="Galerie de notre relation">
+    <div class="section-inner">
+      <h2 class="section-titre">Notre galerie</h2>
+      <p class="section-sous-titre">Des instants que je veux garder précieusement.</p>
+
+      <!-- Filtres catégories -->
+      <div class="galerie-filtres" role="group" aria-label="Filtrer par catégorie">
+        <button class="filtre actif" data-cat="tous" onclick="filtrerGalerie('tous')">Tout voir</button>
+        <button class="filtre" data-cat="debut"   onclick="filtrerGalerie('debut')">Notre début</button>
+        <button class="filtre" data-cat="calme"   onclick="filtrerGalerie('calme')">Moments calmes</button>
+        <button class="filtre" data-cat="aimer"   onclick="filtrerGalerie('aimer')">Ce que j'aime</button>
+        <button class="filtre" data-cat="voir"    onclick="filtrerGalerie('voir')">Ce que je vois</button>
+      </div>
+
+      <!-- Grille de cartes (générée par JS) -->
+      <div id="galerie-grille" class="galerie-grille" role="list" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Modal galerie -->
+  <div id="modal-galerie" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titre" hidden>
+    <div class="modal-fond" onclick="fermerModal()"></div>
+    <div class="modal-contenu">
+      <button class="modal-fermer" onclick="fermerModal()" aria-label="Fermer">✕</button>
+      <img id="modal-image" src="" alt="" />
+      <h3 id="modal-titre"></h3>
+      <p id="modal-texte"></p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 3 — COMPRÉHENSION
+       ✏️  MODIFIER : voir script.js → comprendreData[]
+  ============================================================ -->
+  <section id="comprendre" class="page" aria-label="Les choses que je comprends de toi">
+    <div class="section-inner comprendre-inner">
+      <h2 class="section-titre">Les choses que je comprends de toi</h2>
+      <p class="section-sous-titre">Pas des suppositions. Des observations avec amour.</p>
+      <div id="comprendre-liste" class="comprendre-liste"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 4 — UNIVERS INTERACTIF (Ciel étoilé)
+  ============================================================ -->
+  <section id="univers" class="page" aria-label="Univers interactif — ciel étoilé">
+    <div class="univers-inner">
+      <canvas id="ciel-canvas" aria-hidden="true"></canvas>
+
+      <!-- Objets cliquables -->
+      <div id="univers-objets" aria-label="Objets interactifs dans le ciel">
+        <!-- Générés par JS via universObjets[] -->
+      </div>
+
+      <!-- Bulle de message -->
+      <div id="univers-message" class="univers-message" role="status" aria-live="polite" hidden>
+        <p id="univers-message-texte"></p>
+        <button onclick="fermerUniversMessage()" aria-label="Fermer le message">Fermer doucement</button>
+      </div>
+
+      <p class="univers-indice" aria-label="Indication">Clique sur une étoile pour découvrir quelque chose…</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 5 — DESSIN INTERACTIF
+  ============================================================ -->
+  <section id="dessin" class="page" aria-label="Espace de dessin">
+    <div class="section-inner dessin-inner">
+      <h2 class="section-titre">Ton espace de dessin</h2>
+      <p class="section-sous-titre">Dessine ce que tu veux. Je serai là quand tu auras fini.</p>
+
+      <div class="dessin-outils" role="toolbar" aria-label="Outils de dessin">
+        <!-- Couleurs -->
+        <div class="dessin-couleurs" role="group" aria-label="Couleurs">
+          <button class="couleur-btn actif" style="background:#c9a8d4" data-couleur="#c9a8d4" onclick="choisirCouleur(this)" aria-label="Lavande"></button>
+          <button class="couleur-btn" style="background:#a8c8d4" data-couleur="#a8c8d4" onclick="choisirCouleur(this)" aria-label="Bleu doux"></button>
+          <button class="couleur-btn" style="background:#d4c4a8" data-couleur="#d4c4a8" onclick="choisirCouleur(this)" aria-label="Sable"></button>
+          <button class="couleur-btn" style="background:#a8d4b8" data-couleur="#a8d4b8" onclick="choisirCouleur(this)" aria-label="Vert doux"></button>
+          <button class="couleur-btn" style="background:#d4a8b8" data-couleur="#d4a8b8" onclick="choisirCouleur(this)" aria-label="Rose poudré"></button>
+          <button class="couleur-btn" style="background:#e8e0d0" data-couleur="#e8e0d0" onclick="choisirCouleur(this)" aria-label="Crème"></button>
+          <button class="couleur-btn" style="background:#2d2d2d" data-couleur="#2d2d2d" onclick="choisirCouleur(this)" aria-label="Charbon"></button>
+        </div>
+
+        <!-- Taille pinceau -->
+        <label class="dessin-label" for="taille-pinceau">Épaisseur</label>
+        <input id="taille-pinceau" type="range" min="1" max="20" value="4"
+               oninput="changerTaille(this.value)" aria-label="Épaisseur du trait" />
+
+        <!-- Actions -->
+        <button class="btn-secondaire" onclick="effacerDessin()" aria-label="Tout effacer">Effacer</button>
+        <button class="btn-secondaire" onclick="telechargerDessin()" aria-label="Télécharger le dessin">Télécharger</button>
+      </div>
+
+      <canvas id="dessin-canvas" aria-label="Zone de dessin"></canvas>
+
+      <!-- Message après dessin -->
+      <div id="message-apres-dessin" class="message-apres-dessin" hidden>
+        <p id="message-apres-texte"></p>
+      </div>
+
+      <button class="btn-primaire" onclick="validerDessin()" aria-label="Partager ton dessin">
+        Montrer ce que j'ai créé ✦
+      </button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 6 — TRADUCTEUR ÉMOTIONNEL
+       ✏️  MODIFIER : voir script.js → emotionsData{}
+  ============================================================ -->
+  <section id="emotions" class="page" aria-label="Traducteur émotionnel">
+    <div class="section-inner emotions-inner">
+      <h2 class="section-titre">Comment tu te sens ?</h2>
+      <p class="section-sous-titre">Il n'y a pas de mauvaise réponse. Juste toi.</p>
+
+      <div id="emotions-boutons" class="emotions-boutons" role="group" aria-label="Choisir une émotion">
+        <!-- Générés par JS via emotionsData{} -->
+      </div>
+
+      <div id="emotions-reponse" class="emotions-reponse" role="status" aria-live="polite" hidden>
+        <p id="emotions-message"></p>
+        <div id="emotions-minis" class="emotions-minis"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 7 — ŒUVRE FINALE
+  ============================================================ -->
+  <section id="oeuvre" class="page" aria-label="Créer ton œuvre finale">
+    <div class="section-inner oeuvre-inner">
+      <h2 class="section-titre">Notre œuvre</h2>
+      <p class="section-sous-titre">Ajoute un dessin, écris quelques mots. Je garderai ça précieusement.</p>
+
+      <div class="oeuvre-form">
+        <!-- Upload image -->
+        <div class="oeuvre-upload">
+          <label for="oeuvre-image-input" class="btn-upload" aria-label="Ajouter un dessin">
+            + Ajouter un dessin ou une image
+          </label>
+          <input id="oeuvre-image-input" type="file" accept="image/*"
+                 onchange="chargerImageOeuvre(event)" aria-label="Choisir une image" />
+          <img id="oeuvre-apercu" src="" alt="Aperçu de ton image" hidden />
+        </div>
+
+        <!-- Message personnel -->
+        <label for="oeuvre-message-input" class="dessin-label">Ton message (facultatif)</label>
+        <textarea id="oeuvre-message-input" placeholder="Ce que tu veux dire, ou rien du tout…"
+                  rows="4" aria-label="Ton message"></textarea>
+
+        <button class="btn-primaire" onclick="genererOeuvre()" aria-label="Créer l'œuvre finale">
+          Créer notre œuvre ✦
+        </button>
+      </div>
+
+      <!-- Rendu final -->
+      <div id="oeuvre-resultat" class="oeuvre-resultat" hidden>
+        <canvas id="oeuvre-canvas" aria-label="Ton œuvre finale"></canvas>
+        <div class="oeuvre-actions">
+          <button class="btn-secondaire" onclick="telechargerOeuvre()" aria-label="Télécharger l'œuvre">
+            Télécharger l'image
+          </button>
+          <button class="btn-secondaire" onclick="telechargerTexte()" aria-label="Télécharger le texte">
+            Télécharger le message
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       INDICATEUR DE CHARGEMENT (transitions de section)
+  ============================================================ -->
+  <div id="loader-transition" class="loader-transition" aria-hidden="true"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

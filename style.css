@@ -1,0 +1,1005 @@
+/* ================================================================
+   STYLE.CSS — Pour toi, un espace à nous
+   ----------------------------------------------------------------
+   Organisation :
+   1. Variables & reset
+   2. Layout général & pages
+   3. Navigation
+   4. Section Accueil
+   5. Section Galerie
+   6. Section Comprendre
+   7. Section Univers
+   8. Section Dessin
+   9. Section Émotions
+   10. Section Œuvre
+   11. Modal
+   12. Composants partagés (boutons, titres…)
+   13. Animations
+   14. Responsive
+================================================================ */
+
+/* ----------------------------------------------------------------
+   1. VARIABLES & RESET
+---------------------------------------------------------------- */
+:root {
+  /* Palette douce, papier crème / aquarelle */
+  --creme:       #f5f0e8;
+  --creme-fonce: #ede5d8;
+  --brun-clair:  #c8b49a;
+  --brun:        #8c7560;
+  --brun-fonce:  #4a3728;
+  --lavande:     #d5c8e8;
+  --lavande-2:   #b8a8d4;
+  --bleu-doux:   #c0d4e8;
+  --rose:        #e8c8d0;
+  --vert-doux:   #c0d8c8;
+  --or:          #d4b896;
+  --texte:       #3a2e26;
+  --texte-clair: #6b5a4e;
+  --blanc-pur:   #fdfaf5;
+
+  /* Typographie */
+  --font-titre:  'Cormorant Garamond', Georgia, serif;
+  --font-corps:  'Lato', 'Helvetica Neue', sans-serif;
+
+  /* Espacements */
+  --gap-sm:  0.75rem;
+  --gap-md:  1.5rem;
+  --gap-lg:  3rem;
+  --gap-xl:  5rem;
+
+  /* Rayons */
+  --r-sm:  6px;
+  --r-md:  14px;
+  --r-lg:  28px;
+
+  /* Transitions douces */
+  --trans-lente: 0.6s ease;
+  --trans-douce: 0.4s ease;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-corps);
+  background-color: var(--creme);
+  color: var(--texte);
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* Texture papier légère via CSS */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-corps);
+  border: none;
+  background: none;
+}
+
+textarea, input {
+  font-family: var(--font-corps);
+}
+
+/* Réduction des animations pour les utilisateurs sensibles */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ----------------------------------------------------------------
+   2. LAYOUT GÉNÉRAL & PAGES
+---------------------------------------------------------------- */
+.page {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--trans-lente);
+  z-index: 1;
+}
+
+.page.active {
+  opacity: 1;
+  pointer-events: all;
+  z-index: 2;
+}
+
+.section-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--gap-xl) var(--gap-md);
+  padding-top: calc(var(--gap-xl) + 60px); /* espace nav */
+}
+
+/* ----------------------------------------------------------------
+   3. NAVIGATION
+---------------------------------------------------------------- */
+#nav-principale {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-sm);
+  padding: 0.6rem var(--gap-md);
+  background: rgba(245, 240, 232, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--brun-clair);
+  flex-wrap: wrap;
+}
+
+#nav-principale button {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--brun);
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--r-sm);
+  transition: background var(--trans-douce), color var(--trans-douce);
+  font-family: var(--font-corps);
+  font-weight: 300;
+}
+
+#nav-principale button:hover,
+#nav-principale button.actif {
+  background: var(--lavande);
+  color: var(--brun-fonce);
+}
+
+.btn-retour {
+  font-size: 1rem !important;
+  color: var(--brun-fonce) !important;
+  opacity: 0.5;
+}
+
+/* ----------------------------------------------------------------
+   4. SECTION ACCUEIL
+---------------------------------------------------------------- */
+#accueil {
+  background: var(--creme);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.accueil-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#particules-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+}
+
+.accueil-texte {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 560px;
+  padding: var(--gap-lg);
+}
+
+.accueil-sous-titre {
+  font-family: var(--font-titre);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--brun);
+  margin-bottom: var(--gap-sm);
+  opacity: 0;
+  animation: monterDouce 1.2s ease 0.3s forwards;
+}
+
+.accueil-titre {
+  font-family: var(--font-titre);
+  font-weight: 300;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: var(--brun-fonce);
+  line-height: 1.3;
+  margin-bottom: var(--gap-md);
+  opacity: 0;
+  animation: monterDouce 1.2s ease 0.6s forwards;
+}
+
+.accueil-description {
+  font-size: 1rem;
+  color: var(--texte-clair);
+  font-weight: 300;
+  margin-bottom: var(--gap-lg);
+  opacity: 0;
+  animation: monterDouce 1.2s ease 0.9s forwards;
+}
+
+.btn-entrer {
+  display: inline-block;
+  padding: 0.85rem 2.2rem;
+  background: var(--lavande-2);
+  color: var(--brun-fonce);
+  border-radius: var(--r-lg);
+  font-family: var(--font-titre);
+  font-style: italic;
+  font-size: 1.1rem;
+  letter-spacing: 0.03em;
+  transition: background var(--trans-douce), transform var(--trans-douce), box-shadow var(--trans-douce);
+  opacity: 0;
+  animation: monterDouce 1.2s ease 1.2s forwards;
+  box-shadow: 0 4px 20px rgba(181, 157, 212, 0.3);
+}
+
+.btn-entrer:hover {
+  background: var(--lavande);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(181, 157, 212, 0.45);
+}
+
+/* ----------------------------------------------------------------
+   5. SECTION GALERIE
+---------------------------------------------------------------- */
+#galerie {
+  background: var(--creme);
+}
+
+.galerie-filtres {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: var(--gap-lg);
+  justify-content: center;
+}
+
+.filtre {
+  padding: 0.45rem 1.1rem;
+  border-radius: var(--r-lg);
+  font-size: 0.82rem;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: var(--brun);
+  border: 1px solid var(--brun-clair);
+  background: transparent;
+  transition: all var(--trans-douce);
+}
+
+.filtre:hover,
+.filtre.actif {
+  background: var(--lavande);
+  border-color: var(--lavande-2);
+  color: var(--brun-fonce);
+}
+
+.galerie-grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--gap-md);
+}
+
+.galerie-carte {
+  background: var(--blanc-pur);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--trans-douce), box-shadow var(--trans-douce);
+  box-shadow: 0 2px 12px rgba(74, 55, 40, 0.07);
+  animation: apparaitre 0.5s ease both;
+}
+
+.galerie-carte:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(74, 55, 40, 0.14);
+}
+
+.galerie-carte-image {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  background: var(--creme-fonce);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.galerie-carte-corps {
+  padding: var(--gap-md);
+}
+
+.galerie-carte-titre {
+  font-family: var(--font-titre);
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--brun-fonce);
+  margin-bottom: 0.4rem;
+}
+
+.galerie-carte-texte {
+  font-size: 0.85rem;
+  color: var(--texte-clair);
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+.galerie-carte-categorie {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brun);
+  opacity: 0.6;
+  margin-bottom: 0.5rem;
+}
+
+/* Placeholder image (si aucune image fournie) */
+.galerie-placeholder {
+  width: 100%;
+  aspect-ratio: 4/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--lavande) 0%, var(--bleu-doux) 100%);
+}
+
+/* ----------------------------------------------------------------
+   6. SECTION COMPRENDRE
+---------------------------------------------------------------- */
+#comprendre {
+  background: var(--creme);
+}
+
+.comprendre-inner {
+  max-width: 700px;
+}
+
+.comprendre-liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  margin-top: var(--gap-lg);
+}
+
+.comprendre-item {
+  padding: var(--gap-md) var(--gap-lg);
+  background: var(--blanc-pur);
+  border-radius: var(--r-md);
+  border-left: 3px solid var(--lavande-2);
+  box-shadow: 0 2px 10px rgba(74, 55, 40, 0.05);
+  animation: monterDouce 0.6s ease both;
+  transition: transform var(--trans-douce);
+}
+
+.comprendre-item:hover {
+  transform: translateX(4px);
+}
+
+.comprendre-item h3 {
+  font-family: var(--font-titre);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--brun-fonce);
+  margin-bottom: 0.5rem;
+}
+
+.comprendre-item p {
+  font-size: 0.9rem;
+  color: var(--texte-clair);
+  font-weight: 300;
+  line-height: 1.7;
+}
+
+/* ----------------------------------------------------------------
+   7. SECTION UNIVERS
+---------------------------------------------------------------- */
+#univers {
+  background: #0d0a1a;
+  overflow: hidden;
+}
+
+.univers-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+}
+
+#ciel-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#univers-objets {
+  position: absolute;
+  inset: 0;
+}
+
+.univers-etoile {
+  position: absolute;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: transform 0.3s ease;
+  outline: none;
+  background: none;
+  border: none;
+}
+
+.univers-etoile:hover .etoile-inner,
+.univers-etoile:focus .etoile-inner {
+  transform: scale(1.6);
+  filter: brightness(1.5);
+}
+
+.etoile-inner {
+  font-size: 1.4rem;
+  transition: transform 0.4s ease, filter 0.4s ease;
+  display: block;
+  filter: drop-shadow(0 0 6px rgba(255, 230, 180, 0.7));
+}
+
+.etoile-label {
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 230, 180, 0.6);
+  text-align: center;
+  margin-top: 0.3rem;
+  font-family: var(--font-titre);
+  font-style: italic;
+}
+
+.univers-message {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(13, 10, 26, 0.88);
+  border: 1px solid rgba(213, 200, 232, 0.3);
+  border-radius: var(--r-md);
+  padding: var(--gap-md) var(--gap-lg);
+  color: #e8e0f0;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+  backdrop-filter: blur(8px);
+  animation: monterDouce 0.5s ease;
+}
+
+.univers-message p {
+  font-family: var(--font-titre);
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: var(--gap-sm);
+}
+
+.univers-message button {
+  font-size: 0.75rem;
+  color: rgba(213, 200, 232, 0.6);
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid rgba(213, 200, 232, 0.3);
+  padding-bottom: 1px;
+  transition: color var(--trans-douce);
+}
+
+.univers-message button:hover {
+  color: rgba(213, 200, 232, 1);
+}
+
+.univers-indice {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  font-size: 0.75rem;
+  color: rgba(255, 230, 180, 0.3);
+  font-style: italic;
+  font-family: var(--font-titre);
+  letter-spacing: 0.05em;
+}
+
+/* ----------------------------------------------------------------
+   8. SECTION DESSIN
+---------------------------------------------------------------- */
+#dessin {
+  background: var(--creme);
+}
+
+.dessin-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-md);
+}
+
+.dessin-outils {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: var(--gap-sm) var(--gap-md);
+  background: var(--blanc-pur);
+  border-radius: var(--r-md);
+  box-shadow: 0 2px 10px rgba(74, 55, 40, 0.06);
+  width: 100%;
+  max-width: 700px;
+}
+
+.dessin-couleurs {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.couleur-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.couleur-btn:hover {
+  transform: scale(1.15);
+}
+
+.couleur-btn.actif {
+  border-color: var(--brun);
+  transform: scale(1.2);
+}
+
+.dessin-label {
+  font-size: 0.78rem;
+  color: var(--texte-clair);
+  letter-spacing: 0.06em;
+}
+
+#taille-pinceau {
+  width: 80px;
+  accent-color: var(--lavande-2);
+}
+
+#dessin-canvas {
+  background: var(--blanc-pur);
+  border-radius: var(--r-md);
+  box-shadow: 0 2px 18px rgba(74, 55, 40, 0.1), inset 0 0 0 1px var(--creme-fonce);
+  cursor: crosshair;
+  touch-action: none;
+  max-width: 700px;
+  width: 100%;
+  aspect-ratio: 4/3;
+}
+
+.message-apres-dessin {
+  background: var(--lavande);
+  border-radius: var(--r-md);
+  padding: var(--gap-md) var(--gap-lg);
+  text-align: center;
+  max-width: 500px;
+  animation: monterDouce 0.6s ease;
+}
+
+.message-apres-dessin p {
+  font-family: var(--font-titre);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--brun-fonce);
+  line-height: 1.7;
+}
+
+/* ----------------------------------------------------------------
+   9. SECTION ÉMOTIONS
+---------------------------------------------------------------- */
+#emotions {
+  background: var(--creme);
+}
+
+.emotions-inner {
+  max-width: 600px;
+}
+
+.emotions-boutons {
+  display: flex;
+  gap: var(--gap-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--gap-lg);
+}
+
+.emotion-btn {
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--r-lg);
+  font-family: var(--font-titre);
+  font-style: italic;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  border: 1.5px solid;
+  transition: all var(--trans-douce);
+}
+
+/* Couleurs par émotion (définies dans JS via data-emotion) */
+.emotion-btn[data-emotion="fatiguee"]   { border-color: #b8c8d4; color: #5a7a8c; background: rgba(184,200,212,0.1); }
+.emotion-btn[data-emotion="fatiguee"]:hover { background: rgba(184,200,212,0.3); }
+
+.emotion-btn[data-emotion="submergee"]  { border-color: #d4b8b8; color: #8c5a5a; background: rgba(212,184,184,0.1); }
+.emotion-btn[data-emotion="submergee"]:hover { background: rgba(212,184,184,0.3); }
+
+.emotion-btn[data-emotion="heureuse"]   { border-color: #c8d4b8; color: #6a8c5a; background: rgba(200,212,184,0.1); }
+.emotion-btn[data-emotion="heureuse"]:hover { background: rgba(200,212,184,0.3); }
+
+.emotion-btn[data-emotion="doute"]      { border-color: #d4c8b8; color: #8c7a5a; background: rgba(212,200,184,0.1); }
+.emotion-btn[data-emotion="doute"]:hover { background: rgba(212,200,184,0.3); }
+
+.emotion-btn[data-emotion="colere"]     { border-color: #d4b8c8; color: #8c5a6a; background: rgba(212,184,200,0.1); }
+.emotion-btn[data-emotion="colere"]:hover { background: rgba(212,184,200,0.3); }
+
+.emotion-btn[data-emotion="joie"]       { border-color: #d4d0b8; color: #8c8a5a; background: rgba(212,208,184,0.1); }
+.emotion-btn[data-emotion="joie"]:hover { background: rgba(212,208,184,0.3); }
+
+.emotions-reponse {
+  margin-top: var(--gap-lg);
+  background: var(--blanc-pur);
+  border-radius: var(--r-md);
+  padding: var(--gap-lg);
+  box-shadow: 0 2px 12px rgba(74, 55, 40, 0.06);
+  animation: monterDouce 0.5s ease;
+}
+
+#emotions-message {
+  font-family: var(--font-titre);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--brun-fonce);
+  line-height: 1.8;
+  text-align: center;
+  margin-bottom: var(--gap-md);
+}
+
+.emotions-minis {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.emotions-mini-item {
+  font-size: 0.88rem;
+  color: var(--texte-clair);
+  font-weight: 300;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--r-sm);
+  background: var(--creme);
+  line-height: 1.6;
+}
+
+/* ----------------------------------------------------------------
+   10. SECTION ŒUVRE
+---------------------------------------------------------------- */
+#oeuvre {
+  background: var(--creme);
+}
+
+.oeuvre-inner {
+  max-width: 700px;
+}
+
+.oeuvre-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  margin-top: var(--gap-lg);
+}
+
+.oeuvre-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
+.btn-upload {
+  display: inline-block;
+  padding: 0.75rem 1.8rem;
+  border: 1.5px dashed var(--brun-clair);
+  border-radius: var(--r-md);
+  font-size: 0.9rem;
+  color: var(--brun);
+  cursor: pointer;
+  transition: border-color var(--trans-douce), background var(--trans-douce);
+}
+
+.btn-upload:hover {
+  border-color: var(--lavande-2);
+  background: rgba(213, 200, 232, 0.15);
+}
+
+#oeuvre-image-input {
+  display: none;
+}
+
+#oeuvre-apercu {
+  max-height: 200px;
+  border-radius: var(--r-sm);
+  box-shadow: 0 2px 10px rgba(74, 55, 40, 0.1);
+}
+
+textarea {
+  width: 100%;
+  padding: var(--gap-sm) var(--gap-md);
+  background: var(--blanc-pur);
+  border: 1px solid var(--creme-fonce);
+  border-radius: var(--r-md);
+  font-size: 0.95rem;
+  color: var(--texte);
+  font-weight: 300;
+  resize: vertical;
+  transition: border-color var(--trans-douce);
+  outline: none;
+}
+
+textarea:focus {
+  border-color: var(--lavande-2);
+}
+
+.oeuvre-resultat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-md);
+  margin-top: var(--gap-lg);
+  animation: monterDouce 0.6s ease;
+}
+
+#oeuvre-canvas {
+  border-radius: var(--r-md);
+  box-shadow: 0 4px 24px rgba(74, 55, 40, 0.12);
+  max-width: 100%;
+}
+
+.oeuvre-actions {
+  display: flex;
+  gap: var(--gap-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ----------------------------------------------------------------
+   11. MODAL
+---------------------------------------------------------------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-fond {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 20, 12, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.modal-contenu {
+  position: relative;
+  z-index: 2;
+  background: var(--blanc-pur);
+  border-radius: var(--r-md);
+  padding: var(--gap-lg);
+  max-width: 560px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: monterDouce 0.4s ease;
+  box-shadow: 0 20px 60px rgba(30, 20, 12, 0.2);
+}
+
+.modal-fermer {
+  position: absolute;
+  top: var(--gap-sm);
+  right: var(--gap-sm);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--creme);
+  color: var(--brun);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--trans-douce);
+}
+
+.modal-fermer:hover {
+  background: var(--lavande);
+}
+
+.modal-contenu img {
+  width: 100%;
+  border-radius: var(--r-sm);
+  margin-bottom: var(--gap-md);
+  max-height: 280px;
+  object-fit: cover;
+}
+
+.modal-contenu h3 {
+  font-family: var(--font-titre);
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--brun-fonce);
+  margin-bottom: var(--gap-sm);
+}
+
+.modal-contenu p {
+  font-size: 0.95rem;
+  color: var(--texte-clair);
+  font-weight: 300;
+  line-height: 1.8;
+}
+
+/* ----------------------------------------------------------------
+   12. COMPOSANTS PARTAGÉS
+---------------------------------------------------------------- */
+.section-titre {
+  font-family: var(--font-titre);
+  font-weight: 300;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: var(--brun-fonce);
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.section-sous-titre {
+  font-size: 0.95rem;
+  color: var(--texte-clair);
+  font-weight: 300;
+  margin-bottom: var(--gap-lg);
+  font-style: italic;
+}
+
+.btn-primaire {
+  display: inline-block;
+  padding: 0.85rem 2rem;
+  background: var(--lavande-2);
+  color: var(--brun-fonce);
+  border-radius: var(--r-lg);
+  font-family: var(--font-titre);
+  font-style: italic;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  transition: all var(--trans-douce);
+  box-shadow: 0 4px 16px rgba(181, 157, 212, 0.3);
+}
+
+.btn-primaire:hover {
+  background: var(--lavande);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(181, 157, 212, 0.4);
+}
+
+.btn-secondaire {
+  padding: 0.6rem 1.4rem;
+  border: 1px solid var(--brun-clair);
+  border-radius: var(--r-lg);
+  font-size: 0.85rem;
+  color: var(--brun);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  transition: all var(--trans-douce);
+}
+
+.btn-secondaire:hover {
+  border-color: var(--lavande-2);
+  background: rgba(213, 200, 232, 0.2);
+  color: var(--brun-fonce);
+}
+
+/* Loader de transition entre sections */
+.loader-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: var(--creme);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.loader-transition.visible {
+  opacity: 1;
+}
+
+/* ----------------------------------------------------------------
+   13. ANIMATIONS
+---------------------------------------------------------------- */
+@keyframes monterDouce {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scintiller {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.1); }
+}
+
+.fade-in {
+  animation: monterDouce 1s ease forwards;
+}
+
+/* ----------------------------------------------------------------
+   14. RESPONSIVE
+---------------------------------------------------------------- */
+@media (max-width: 600px) {
+  #nav-principale {
+    gap: 0.3rem;
+  }
+
+  #nav-principale button {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .section-inner {
+    padding: calc(var(--gap-xl) + 50px) var(--gap-sm) var(--gap-lg);
+  }
+
+  .galerie-grille {
+    grid-template-columns: 1fr;
+  }
+
+  .dessin-outils {
+    gap: 0.3rem;
+  }
+
+  #taille-pinceau {
+    width: 60px;
+  }
+
+  .emotions-boutons {
+    gap: 0.5rem;
+  }
+}
