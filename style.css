@@ -800,6 +800,10 @@ textarea:focus {
   justify-content: center;
 }
 
+.modal[hidden] {
+  display: none !important;
+}
+
 .modal-fond {
   position: absolute;
   inset: 0;
