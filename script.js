@@ -357,6 +357,11 @@ function naviguer(cible) {
     if (cible === "univers")   initUnivers();
     if (cible === "dessin")    initDessin();
     if (cible === "emotions")  initEmotions();
+    if (cible === "photos")    initPhotos();
+    if (cible === "capsules")  initCapsules();
+    if (cible === "albums")    initAlbums();
+    if (cible === "voyages")   initVoyages();
+    if (cible === "souhaits")  initSouhaits();
 
     loader.classList.remove("visible");
   }, 300);
@@ -918,9 +923,1216 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
   };
 }
 
-// ── Initialisation au chargement ─────────────────────────────────
+// ── Initialisation gérée en bas du fichier ──
+
+/* ================================================================
+   ✏️  MODIFIER ICI — PHOTOS DE NOUS
+   ----------------------------------------------------------------
+   Chaque photo contient :
+   - legende  : texte affiché sur la photo au survol et en modal
+   - date     : date de la photo (texte libre, ex: "Juillet 2023")
+   - image    : chemin vers l'image (ex: "assets/photo1.jpg")
+                Si null → un placeholder coloré s'affiche
+   - emoji    : emoji du placeholder si pas d'image
+   - hero     : true = cette photo s'affiche en grand en haut
+                (une seule photo hero à la fois)
+   ----------------------------------------------------------------
+   ➕ POUR AJOUTER : copier un bloc { } dans le tableau
+================================================================ */
+const photosData = [
+  {
+    legende: "Notre premier souvenir ensemble",
+    date: "Le début",
+    image: null,
+    emoji: "🌸",
+    hero: true
+  },
+  {
+    legende: "Un moment doux",
+    date: "Un jour précieux",
+    image: null,
+    emoji: "☀️",
+    hero: false
+  },
+  {
+    legende: "Quand on riait",
+    date: "Un soir qu'on oubliera pas",
+    image: null,
+    emoji: "✨",
+    hero: false
+  },
+  {
+    legende: "Nos mains",
+    date: "Quelque part, ensemble",
+    image: null,
+    emoji: "🤝",
+    hero: false
+  },
+  {
+    legende: "Un endroit à nous",
+    date: "À compléter",
+    image: null,
+    emoji: "🏡",
+    hero: false
+  },
+  {
+    legende: "Ajoute une photo ici",
+    date: "assets/votre-photo.jpg dans script.js",
+    image: null,
+    emoji: "📷",
+    hero: false
+  }
+];
+
+/* ================================================================
+   ✏️  MODIFIER ICI — CAPSULES TEMPORELLES
+   ----------------------------------------------------------------
+   Chaque capsule contient :
+   - id         : identifiant unique
+   - titre      : nom de la capsule
+   - dateOuvert : date de déverrouillage au format ISO "YYYY-MM-DD"
+   - icone      : emoji affiché
+   - contenu    : tableau de paragraphes (visibles après déverouillage)
+   ----------------------------------------------------------------
+   Les 3 capsules préconfigurées :
+   • "anniversaire" → 15 février (chaque année, s'ouvre au 15/02)
+   • "5ans"         → 5 ans après aujourd'hui
+   • "10ans"        → 10 ans après aujourd'hui
+   ----------------------------------------------------------------
+   ⚠️  Pour la capsule anniversaire, la date se recalcule chaque
+       année automatiquement — tu n'as rien à changer.
+   ⚠️  Pour les capsules 5 ans / 10 ans, change les dates manuellement
+       selon votre date de début de relation.
+================================================================ */
+
+// Date de début de votre relation (format: YYYY-MM-DD)
+// ✏️ MODIFIER CETTE DATE selon votre vrai anniversaire de couple
+const DEBUT_RELATION = "2024-02-15";
+
+function calculerDateCapsule(annees) {
+  const d = new Date(DEBUT_RELATION);
+  d.setFullYear(d.getFullYear() + annees);
+  return d.toISOString().split("T")[0];
+}
+
+function prochainAnniversaire() {
+  const maintenant = new Date();
+  const annee = maintenant.getFullYear();
+  let prochain = new Date(`${annee}-02-15`);
+  if (prochain <= maintenant) {
+    prochain = new Date(`${annee + 1}-02-15`);
+  }
+  return prochain.toISOString().split("T")[0];
+}
+
+const capsulesData = [
+  {
+    id: "anniversaire",
+    titre: "Pour notre anniversaire",
+    icone: "💌",
+    dateOuvert: prochainAnniversaire(), // S'ouvre chaque 15 février
+    contenu: [
+      "Joyeux anniversaire, mon amour.",
+      "Un an de plus. Un an de douceur, de silences partagés, de moments où j'ai su — encore une fois — que c'est toi.",
+      "Je ne sais pas toujours trouver les mots au bon moment. Alors je les écris ici, à l'avance, pour être sûr·e qu'ils arrivent.",
+      "Merci d'être toi. Merci d'être là. Merci de me laisser être moi à côté de toi.",
+      "Cette année encore, je veux apprendre. Apprendre à mieux te connaître. Apprendre à mieux t'aimer.",
+      "Bonne année à nous deux. ✦"
+    ]
+  },
+  {
+    id: "5ans",
+    titre: "Dans 5 ans",
+    icone: "🌿",
+    dateOuvert: calculerDateCapsule(5),
+    contenu: [
+      "Si tu lis ça, c'est qu'on a fait cinq ans ensemble. Cinq ans.",
+      "Je t'écris depuis ce moment-là, ce début, où tout était encore nouveau et un peu tremblant.",
+      "J'espère qu'on a voyagé. J'espère qu'on a ri. J'espère qu'on a surmonté des choses difficiles et que ça nous a rapprochés plutôt qu'éloignés.",
+      "J'espère que tu dessines encore. J'espère que tu sais à quel point ton art me touche.",
+      "J'espère qu'on a appris à se disputer doucement, et à se réconcilier encore plus doucement.",
+      "Dans 5 ans, je ne sais pas encore où on sera. Mais je voulais te dire, depuis maintenant : je t'aime. Et je t'aimerai dans 5 ans aussi.",
+      "✦ À toi, dans le futur."
+    ]
+  },
+  {
+    id: "10ans",
+    titre: "Dans 10 ans",
+    icone: "🌳",
+    dateOuvert: calculerDateCapsule(10),
+    contenu: [
+      "Dix ans.",
+      "Je n'arrive pas vraiment à imaginer ce que sera notre vie à ce moment-là. Peut-être qu'on a déménagé. Peut-être qu'on a construit quelque chose de grand. Peut-être que les choses ont changé d'une façon que je ne pourrais pas deviner aujourd'hui.",
+      "Mais ce que je sais, c'est que je t'écris ça depuis un endroit où je t'aime profondément. Et cet amour-là, il ne disparaît pas. Il se transforme, il grandit, il apprend — mais il reste.",
+      "Je voulais qu'il y ait une trace. Quelque chose qui dise : à ce moment précis, j'ai choisi de t'écrire une lettre pour dans dix ans. Parce que tu en valais la peine.",
+      "Tu en vaux toujours la peine.",
+      "Joyeux anniversaire de nous deux. ✦"
+    ]
+  }
+];
+
+/* ================================================================
+   LOGIQUE — PHOTOS
+================================================================ */
+function initPhotos() {
+  const grille = document.getElementById("photos-grille");
+  if (grille.children.length > 0) return;
+
+  // Photo hero
+  const heroData = photosData.find(p => p.hero);
+  if (heroData) {
+    const heroDiv = document.getElementById("photos-hero");
+    const heroImg = document.getElementById("photos-hero-img");
+    const heroLeg = document.getElementById("photos-hero-legende");
+    if (heroData.image) {
+      heroImg.src = heroData.image;
+      heroImg.alt = heroData.legende;
+      heroDiv.hidden = false;
+    }
+    heroLeg.textContent = heroData.legende;
+    heroDiv.addEventListener("click", () => ouvrirModalPhoto(heroData));
+  }
+
+  // Grille
+  photosData.forEach((photo, i) => {
+    const carte = document.createElement("div");
+    carte.className = "photo-carte";
+    carte.setAttribute("role", "listitem");
+    carte.setAttribute("tabindex", "0");
+    carte.setAttribute("aria-label", photo.legende);
+    carte.style.animationDelay = `${i * 0.06}s`;
+
+    if (photo.image) {
+      carte.innerHTML = `
+        <img src="${photo.image}" alt="${photo.legende}" loading="lazy" />
+        <div class="photo-carte-overlay">
+          <p class="photo-carte-legende">${photo.legende}</p>
+        </div>`;
+    } else {
+      carte.innerHTML = `
+        <div class="photo-carte-placeholder">
+          <span>${photo.emoji || "📷"}</span>
+          <span>${photo.legende}</span>
+        </div>`;
+    }
+
+    carte.addEventListener("click", () => ouvrirModalPhoto(photo));
+    carte.addEventListener("keydown", e => { if (e.key === "Enter") ouvrirModalPhoto(photo); });
+    grille.appendChild(carte);
+  });
+}
+
+function ouvrirModalPhoto(photo) {
+  const modal = document.getElementById("modal-photo");
+  const img   = document.getElementById("modal-photo-img");
+  const leg   = document.getElementById("modal-photo-legende");
+  const date  = document.getElementById("modal-photo-date");
+
+  if (photo.image) {
+    img.src    = photo.image;
+    img.alt    = photo.legende;
+    img.hidden = false;
+  } else {
+    img.hidden = true;
+  }
+
+  leg.textContent  = photo.legende;
+  date.textContent = photo.date || "";
+  modal.hidden = false;
+  modal.querySelector(".modal-fermer").focus();
+}
+
+function fermerModalPhoto() {
+  document.getElementById("modal-photo").hidden = true;
+}
+
+/* ================================================================
+   LOGIQUE — CAPSULES TEMPORELLES
+================================================================ */
+function initCapsules() {
+  const liste = document.getElementById("capsules-liste");
+  if (liste.children.length > 0) return;
+
+  const maintenant = new Date();
+  maintenant.setHours(0, 0, 0, 0);
+
+  capsulesData.forEach((capsule, i) => {
+    const dateOuverture = new Date(capsule.dateOuvert);
+    dateOuverture.setHours(0, 0, 0, 0);
+    const estOuverte = maintenant >= dateOuverture;
+
+    const div = document.createElement("div");
+    div.className = "capsule";
+    div.style.animationDelay = `${i * 0.15}s`;
+
+    if (estOuverte) {
+      // Capsule déverrouillée
+      const paragraphes = capsule.contenu.map(p => `<p>${p}</p>`).join("");
+      const dateStr = dateOuverture.toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
+      div.innerHTML = `
+        <div class="capsule-ouverte">
+          <div class="capsule-ouverte-header">
+            <span class="capsule-verrou-icone">${capsule.icone}</span>
+            <h3>${capsule.titre}</h3>
+            <span class="capsule-ouverte-sstitre">Ouvert le ${dateStr}</span>
+          </div>
+          <div class="capsule-ouverte-corps">
+            ${paragraphes}
+            <span class="capsule-badge-ouvert">✓ Déverrouillé</span>
+          </div>
+        </div>`;
+    } else {
+      // Capsule verrouillée avec compte à rebours
+      const dateStr = dateOuverture.toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
+      div.innerHTML = `
+        <div class="capsule-verrou">
+          <span class="capsule-verrou-icone">🔒</span>
+          <h3 class="capsule-verrou-titre">${capsule.titre}</h3>
+          <p class="capsule-verrou-date">S'ouvrira le ${dateStr}</p>
+          <div class="capsule-compte-rebours" id="rebours-${capsule.id}">
+            <div class="capsule-rebours-unite">
+              <span class="capsule-rebours-nombre" id="rb-j-${capsule.id}">--</span>
+              <span class="capsule-rebours-label">jours</span>
+            </div>
+            <div class="capsule-rebours-unite">
+              <span class="capsule-rebours-nombre" id="rb-h-${capsule.id}">--</span>
+              <span class="capsule-rebours-label">heures</span>
+            </div>
+            <div class="capsule-rebours-unite">
+              <span class="capsule-rebours-nombre" id="rb-m-${capsule.id}">--</span>
+              <span class="capsule-rebours-label">minutes</span>
+            </div>
+          </div>
+        </div>`;
+
+      // Démarrer le compte à rebours
+      mettreAJourRebours(capsule.id, dateOuverture);
+      setInterval(() => mettreAJourRebours(capsule.id, dateOuverture), 60000);
+    }
+
+    liste.appendChild(div);
+  });
+}
+
+function mettreAJourRebours(id, dateCible) {
+  const maintenant = new Date();
+  const diff = dateCible - maintenant;
+
+  if (diff <= 0) {
+    // Recharger la section pour afficher la capsule ouverte
+    document.getElementById("capsules-liste").innerHTML = "";
+    initCapsules();
+    return;
+  }
+
+  const jours   = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const heures  = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+  const elJ = document.getElementById(`rb-j-${id}`);
+  const elH = document.getElementById(`rb-h-${id}`);
+  const elM = document.getElementById(`rb-m-${id}`);
+
+  if (elJ) elJ.textContent = jours;
+  if (elH) elH.textContent = String(heures).padStart(2, "0");
+  if (elM) elM.textContent = String(minutes).padStart(2, "0");
+}
+
+
+/* ================================================================
+   ✏️  MODIFIER ICI — ALBUMS PHOTOS
+   ----------------------------------------------------------------
+   Structure : un album par voyage/thème, chaque album contient
+   des dossiers de photos organisés par thème.
+
+   - id       : identifiant unique (slug, pas d'espaces)
+   - titre    : nom de l'album
+   - lieu     : destination ou contexte
+   - date     : date ou période (texte libre)
+   - couverture : image de couverture (null = emoji)
+   - emoji    : emoji si pas de couverture
+   - couleur  : couleur d'accent de l'album (CSS hex)
+   - themes   : tableau de thèmes dans l'album
+       - nom    : nom du thème
+       - emoji  : icône du thème
+       - photos : tableau de photos { src, legende }
+   ----------------------------------------------------------------
+   ➕ POUR AJOUTER UN ALBUM : copier un bloc complet { id, ... }
+   ➕ POUR AJOUTER UN THÈME : copier un bloc { nom, emoji, photos }
+   ➕ POUR AJOUTER UNE PHOTO : { src: "assets/voyages/xxx.jpg", legende: "..." }
+================================================================ */
+const albumsData = [
+  {
+    id: "barcelone",
+    titre: "Barcelone",
+    lieu: "Espagne",
+    date: "À compléter",
+    couverture: null,
+    emoji: "🇪🇸",
+    couleur: "#e8a87c",
+    themes: [
+      { nom: "Paysages", emoji: "🏙️", photos: [
+        { src: null, legende: "La Sagrada Família" },
+        { src: null, legende: "Les toits depuis le Parc Güell" }
+      ]},
+      { nom: "Nous deux", emoji: "💑", photos: [
+        { src: null, legende: "Notre premier selfie là-bas" }
+      ]},
+      { nom: "Repas & saveurs", emoji: "🥘", photos: [
+        { src: null, legende: "Les tapas du premier soir" }
+      ]}
+    ]
+  },
+  {
+    id: "malte",
+    titre: "Malte",
+    lieu: "Malte",
+    date: "À compléter",
+    couverture: null,
+    emoji: "🇲🇹",
+    couleur: "#c8a8d4",
+    themes: [
+      { nom: "Paysages", emoji: "🌊", photos: [
+        { src: null, legende: "La mer turquoise" },
+        { src: null, legende: "La vieille ville de La Valette" }
+      ]},
+      { nom: "Nous deux", emoji: "💑", photos: [
+        { src: null, legende: "Ensemble à Malte" }
+      ]}
+    ]
+  },
+  {
+    id: "mali",
+    titre: "Mali",
+    lieu: "Mali",
+    date: "À compléter",
+    couverture: null,
+    emoji: "🇲🇱",
+    couleur: "#d4b87c",
+    themes: [
+      { nom: "Paysages", emoji: "🌅", photos: [
+        { src: null, legende: "Un coucher de soleil sur le fleuve" }
+      ]},
+      { nom: "Rencontres", emoji: "🤝", photos: [
+        { src: null, legende: "Les visages croisés" }
+      ]},
+      { nom: "Nous deux", emoji: "💑", photos: [
+        { src: null, legende: "Notre séjour au Mali" }
+      ]}
+    ]
+  },
+  {
+    id: "sainte-lucie",
+    titre: "Sainte-Lucie",
+    lieu: "Caraïbes",
+    date: "À compléter",
+    couverture: null,
+    emoji: "🌴",
+    couleur: "#7cc8a8",
+    themes: [
+      { nom: "Plages", emoji: "🏖️", photos: [
+        { src: null, legende: "La plage de Sainte-Lucie" }
+      ]},
+      { nom: "Nous deux", emoji: "💑", photos: [
+        { src: null, legende: "Sous les cocotiers" }
+      ]}
+    ]
+  },
+  {
+    id: "martinique",
+    titre: "Martinique",
+    lieu: "Antilles françaises",
+    date: "À compléter",
+    couverture: null,
+    emoji: "🌺",
+    couleur: "#d4a8b8",
+    themes: [
+      { nom: "Paysages", emoji: "🌋", photos: [
+        { src: null, legende: "La Montagne Pelée" }
+      ]},
+      { nom: "Plages", emoji: "🏖️", photos: [
+        { src: null, legende: "Les eaux claires" }
+      ]},
+      { nom: "Nous deux", emoji: "💑", photos: [
+        { src: null, legende: "En Martinique ensemble" }
+      ]}
+    ]
+  },
+  {
+    id: "monaco",
+    titre: "Monaco",
+    lieu: "Principauté de Monaco",
+    date: "À compléter",
+    couverture: null,
+    emoji: "🎲",
+    couleur: "#a8c0d4",
+    themes: [
+      { nom: "Paysages", emoji: "🌆", photos: [
+        { src: null, legende: "Le port de Monaco" }
+      ]},
+      { nom: "Nous deux", emoji: "💑", photos: [
+        { src: null, legende: "Notre journée à Monaco" }
+      ]}
+    ]
+  },
+  {
+    id: "portugal",
+    titre: "Portugal",
+    lieu: "Portugal",
+    date: "À compléter",
+    couverture: null,
+    emoji: "🇵🇹",
+    couleur: "#c8d4a8",
+    themes: [
+      { nom: "Paysages", emoji: "🏛️", photos: [
+        { src: null, legende: "Lisbonne et ses ruelles" }
+      ]},
+      { nom: "Nous deux", emoji: "💑", photos: [
+        { src: null, legende: "Au Portugal ensemble" }
+      ]}
+    ]
+  },
+  {
+    id: "nice",
+    titre: "Nice",
+    lieu: "Côte d'Azur, France",
+    date: "À compléter",
+    couverture: null,
+    emoji: "☀️",
+    couleur: "#d4c87c",
+    themes: [
+      { nom: "Promenade", emoji: "🌊", photos: [
+        { src: null, legende: "La Promenade des Anglais" }
+      ]},
+      { nom: "Nous deux", emoji: "💑", photos: [
+        { src: null, legende: "Notre séjour à Nice" }
+      ]}
+    ]
+  },
+  {
+    id: "togo",
+    titre: "Togo",
+    lieu: "Lomé, Togo",
+    date: "À compléter",
+    couverture: null,
+    emoji: "🇹🇬",
+    couleur: "#a8d4b8",
+    themes: [
+      { nom: "Paysages", emoji: "🌍", photos: [
+        { src: null, legende: "Lomé et ses couleurs" }
+      ]},
+      { nom: "Nous deux", emoji: "💑", photos: [
+        { src: null, legende: "Notre temps au Togo" }
+      ]}
+    ]
+  },
+  {
+    id: "angleterre",
+    titre: "Angleterre",
+    lieu: "Londres, Royaume-Uni",
+    date: "À compléter",
+    couverture: null,
+    emoji: "🇬🇧",
+    couleur: "#b8c4d4",
+    themes: [
+      { nom: "Londres", emoji: "🎡", photos: [
+        { src: null, legende: "Big Ben et la Tamise" }
+      ]},
+      { nom: "Nous deux", emoji: "💑", photos: [
+        { src: null, legende: "Notre séjour à Londres" }
+      ]}
+    ]
+  }
+];
+
+/* ================================================================
+   ✏️  MODIFIER ICI — VOYAGES INTERACTIFS
+   ----------------------------------------------------------------
+   Chaque voyage contient :
+   - id        : identifiant (même que dans albumsData si lié)
+   - nom       : nom affiché
+   - pays      : pays
+   - coords    : { lat, lng } pour la carte du monde
+   - fait      : true = voyage fait, false = voyage rêvé
+   - annee     : année (texte libre)
+   - resume    : texte court de présentation
+   - momentsForts : tableau de moments marquants (texte)
+   - video     : lien YouTube embed (null si pas de vidéo)
+                 Format : "https://www.youtube.com/embed/IDENTIFIANT"
+   - photos    : tableau { src, legende } (quelques photos clés)
+   - emoji     : emoji destination
+   ----------------------------------------------------------------
+   ➕ POUR AJOUTER UN VOYAGE : copier un bloc complet
+================================================================ */
+const voyagesData = [
+  {
+    id: "barcelone", nom: "Barcelone", pays: "Espagne",
+    coords: { lat: 41.38, lng: 2.17 }, fait: true, annee: "À compléter",
+    emoji: "🇪🇸",
+    resume: "La ville de Gaudí, des tapas, et nous deux perdus dans le labyrinthe de ruelles du Barri Gòtic.",
+    momentsForts: [
+      "La Sagrada Família au coucher du soleil",
+      "Notre premier verre de sangria ensemble",
+      "Se perdre dans les ruelles du Barri Gòtic"
+    ],
+    video: null,
+    photos: []
+  },
+  {
+    id: "malte", nom: "Malte", pays: "Malte",
+    coords: { lat: 35.93, lng: 14.37 }, fait: true, annee: "À compléter",
+    emoji: "🇲🇹",
+    resume: "Une île hors du temps, des eaux turquoise, et des couchers de soleil qu'on n'oubliera pas.",
+    momentsForts: [
+      "La vieille ville de La Valette",
+      "La mer turquoise de Comino",
+      "Les temples mégalithiques"
+    ],
+    video: null,
+    photos: []
+  },
+  {
+    id: "mali", nom: "Mali", pays: "Mali",
+    coords: { lat: 12.65, lng: -8.0 }, fait: true, annee: "À compléter",
+    emoji: "🇲🇱",
+    resume: "Un voyage qui marque. La chaleur des gens, la lumière du fleuve Niger, des instants gravés.",
+    momentsForts: [
+      "Le fleuve Niger au coucher du soleil",
+      "Les marchés colorés de Bamako",
+      "Les rencontres inoubliables"
+    ],
+    video: null,
+    photos: []
+  },
+  {
+    id: "sainte-lucie", nom: "Sainte-Lucie", pays: "Caraïbes",
+    coords: { lat: 13.9, lng: -60.98 }, fait: true, annee: "À compléter",
+    emoji: "🌴",
+    resume: "Les Pitons, les plages de sable noir, et une douceur de vivre qu'on a voulu garder avec nous.",
+    momentsForts: [
+      "Les Pitons vus depuis la mer",
+      "Une plage de sable noir rien qu'à nous",
+      "La végétation tropicale luxuriante"
+    ],
+    video: null,
+    photos: []
+  },
+  {
+    id: "martinique", nom: "Martinique", pays: "Antilles françaises",
+    coords: { lat: 14.64, lng: -61.02 }, fait: true, annee: "À compléter",
+    emoji: "🌺",
+    resume: "L'île aux fleurs. Le rhum, la Montagne Pelée, et des eaux cristallines.",
+    momentsForts: [
+      "La route de la Trace en forêt tropicale",
+      "Les couleurs de Saint-Pierre",
+      "Nager dans les eaux claires"
+    ],
+    video: null,
+    photos: []
+  },
+  {
+    id: "monaco", nom: "Monaco", pays: "Monaco",
+    coords: { lat: 43.74, lng: 7.43 }, fait: true, annee: "À compléter",
+    emoji: "🎲",
+    resume: "Le plus petit grand pays. Les yachts, les jardins exotiques, et nous deux dans ce décor.",
+    momentsForts: [
+      "Le port Hercule et ses yachts",
+      "Les Jardins exotiques",
+      "La vue sur la Méditerranée"
+    ],
+    video: null,
+    photos: []
+  },
+  {
+    id: "portugal", nom: "Portugal", pays: "Portugal",
+    coords: { lat: 38.72, lng: -9.14 }, fait: true, annee: "À compléter",
+    emoji: "🇵🇹",
+    resume: "Lisbonne et ses trams, Porto et son vin. Le fado dans une ruelle et les pastéis de nata.",
+    momentsForts: [
+      "Les tramways de Lisbonne",
+      "Un verre de porto à Porto",
+      "Les azulejos bleus partout"
+    ],
+    video: null,
+    photos: []
+  },
+  {
+    id: "nice", nom: "Nice", pays: "France",
+    coords: { lat: 43.71, lng: 7.26 }, fait: true, annee: "À compléter",
+    emoji: "☀️",
+    resume: "La lumière du Sud, la Promenade des Anglais, les marchés du Cours Saleya.",
+    momentsForts: [
+      "La Promenade des Anglais au soleil",
+      "Le marché des fleurs",
+      "La vieille ville et ses couleurs"
+    ],
+    video: null,
+    photos: []
+  },
+  {
+    id: "togo", nom: "Togo", pays: "Togo",
+    coords: { lat: 6.14, lng: 1.22 }, fait: true, annee: "À compléter",
+    emoji: "🇹🇬",
+    resume: "Lomé, ses plages, son marché des fétiches, et cette chaleur humaine incomparable.",
+    momentsForts: [
+      "Les plages de Lomé",
+      "Le marché des fétiches",
+      "La route des pêcheurs"
+    ],
+    video: null,
+    photos: []
+  },
+  {
+    id: "angleterre", nom: "Angleterre", pays: "Royaume-Uni",
+    coords: { lat: 51.51, lng: -0.12 }, fait: true, annee: "À compléter",
+    emoji: "🇬🇧",
+    resume: "Londres et ses mille visages. Les parcs, les musées gratuits, et le chaos magnifique de Piccadilly.",
+    momentsForts: [
+      "Hyde Park un dimanche matin",
+      "Les musées de South Kensington",
+      "Un fish & chips sur un banc"
+    ],
+    video: null,
+    photos: []
+  }
+];
+
+/* ================================================================
+   ✏️  MODIFIER ICI — LISTE DE SOUHAITS (voyages rêvés)
+   ----------------------------------------------------------------
+   Elle peut modifier cette liste directement sur le site.
+   Mais tu peux aussi pré-remplir ici des destinations.
+
+   - id     : identifiant unique
+   - nom    : nom du pays/ville
+   - emoji  : drapeau ou emoji
+   - note   : pourquoi ce voyage (optionnel)
+   - fait   : true si déjà visité (se coche automatiquement)
+================================================================ */
+const souhaitsPreremplis = [
+  { id: "japon",     nom: "Japon",          emoji: "🇯🇵", note: "Les cerisiers, Tokyo, la culture", fait: false },
+  { id: "islande",   nom: "Islande",         emoji: "🇮🇸", note: "Les aurores boréales", fait: false },
+  { id: "maroc",     nom: "Maroc",           emoji: "🇲🇦", note: "Marrakech et le désert", fait: false },
+  { id: "new-york",  nom: "New York",        emoji: "🗽", note: "La ville qui ne dort jamais", fait: false },
+  { id: "thailande", nom: "Thaïlande",       emoji: "🇹🇭", note: "Les temples et les plages", fait: false },
+  { id: "grece",     nom: "Grèce",           emoji: "🇬🇷", note: "Santorin et ses maisons blanches", fait: false },
+  { id: "perou",     nom: "Pérou",           emoji: "🇵🇪", note: "Le Machu Picchu", fait: false },
+  { id: "australie", nom: "Australie",       emoji: "🇦🇺", note: "L'immensité et la faune", fait: false },
+  { id: "maldives",  nom: "Maldives",        emoji: "🏝️", note: "Les bungalows sur l'eau", fait: false },
+  { id: "canada",    nom: "Canada",          emoji: "🇨🇦", note: "Les forêts, le Québec", fait: false }
+];
+
+/* ================================================================
+   LOGIQUE — ALBUMS PHOTOS
+================================================================ */
+let albumActuel = null;
+let albumThemeActuel = null;
+
+function initAlbums() {
+  const grille = document.getElementById("albums-grille");
+  if (!grille) return;
+  if (grille.children.length > 0 && !albumActuel) return;
+  afficherListeAlbums();
+}
+
+function afficherListeAlbums() {
+  albumActuel = null;
+  document.getElementById("albums-detail").hidden = true;
+  document.getElementById("albums-liste-vue").hidden = false;
+
+  const grille = document.getElementById("albums-grille");
+  grille.innerHTML = "";
+
+  albumsData.forEach((album, i) => {
+    const total = album.themes.reduce((acc, t) => acc + t.photos.length, 0);
+    const card = document.createElement("div");
+    card.className = "album-carte";
+    card.style.setProperty("--album-couleur", album.couleur);
+    card.style.animationDelay = `${i * 0.07}s`;
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-label", `Album ${album.titre}`);
+
+    card.innerHTML = `
+      <div class="album-couverture" style="background: linear-gradient(135deg, ${album.couleur}40, ${album.couleur}20)">
+        ${album.couverture
+          ? `<img src="${album.couverture}" alt="${album.titre}" />`
+          : `<span class="album-emoji">${album.emoji}</span>`}
+      </div>
+      <div class="album-info">
+        <h3 class="album-titre">${album.titre}</h3>
+        <p class="album-lieu">${album.lieu} · ${album.date}</p>
+        <p class="album-compteur">${album.themes.length} thème${album.themes.length > 1 ? "s" : ""} · ${total} photo${total > 1 ? "s" : ""}</p>
+      </div>`;
+
+    card.addEventListener("click",   () => ouvrirAlbum(album.id));
+    card.addEventListener("keydown", e => { if (e.key === "Enter") ouvrirAlbum(album.id); });
+    grille.appendChild(card);
+  });
+}
+
+function ouvrirAlbum(id) {
+  albumActuel = albumsData.find(a => a.id === id);
+  if (!albumActuel) return;
+
+  document.getElementById("albums-liste-vue").hidden = true;
+  const detail = document.getElementById("albums-detail");
+  detail.hidden = false;
+
+  document.getElementById("album-detail-titre").textContent = albumActuel.titre;
+  document.getElementById("album-detail-lieu").textContent  = `${albumActuel.lieu} · ${albumActuel.date}`;
+
+  // Onglets thèmes
+  const onglets = document.getElementById("album-themes-onglets");
+  onglets.innerHTML = "";
+  albumActuel.themes.forEach((theme, i) => {
+    const btn = document.createElement("button");
+    btn.className = "album-theme-onglet" + (i === 0 ? " actif" : "");
+    btn.innerHTML = `${theme.emoji} ${theme.nom}`;
+    btn.addEventListener("click", () => afficherTheme(theme, btn));
+    onglets.appendChild(btn);
+  });
+
+  // Afficher premier thème
+  if (albumActuel.themes.length > 0) afficherTheme(albumActuel.themes[0], onglets.children[0]);
+  detail.scrollIntoView({ behavior: "smooth" });
+}
+
+function afficherTheme(theme, btnActif) {
+  albumThemeActuel = theme;
+  document.querySelectorAll(".album-theme-onglet").forEach(b => b.classList.remove("actif"));
+  if (btnActif) btnActif.classList.add("actif");
+
+  const grille = document.getElementById("album-photos-grille");
+  grille.innerHTML = "";
+
+  if (theme.photos.length === 0) {
+    grille.innerHTML = `<p class="album-vide">Aucune photo encore — ajoute-en dans script.js !</p>`;
+    return;
+  }
+
+  theme.photos.forEach((photo, i) => {
+    const div = document.createElement("div");
+    div.className = "album-photo-item";
+    div.style.animationDelay = `${i * 0.06}s`;
+
+    if (photo.src) {
+      div.innerHTML = `
+        <img src="${photo.src}" alt="${photo.legende}" loading="lazy" />
+        <div class="album-photo-overlay"><p>${photo.legende}</p></div>`;
+      div.style.cursor = "pointer";
+      div.addEventListener("click", () => ouvrirPhotoPleine(photo));
+    } else {
+      div.innerHTML = `
+        <div class="album-photo-placeholder">
+          <span>${albumActuel.emoji}</span>
+          <span>${photo.legende}</span>
+        </div>`;
+    }
+    grille.appendChild(div);
+  });
+}
+
+let photoPleineSrc = null;
+function ouvrirPhotoPleine(photo) {
+  const modal = document.getElementById("modal-photo-pleine");
+  document.getElementById("modal-photo-pleine-img").src = photo.src;
+  document.getElementById("modal-photo-pleine-leg").textContent = photo.legende;
+  modal.hidden = false;
+}
+function fermerPhotoPleine() {
+  document.getElementById("modal-photo-pleine").hidden = true;
+}
+
+/* ================================================================
+   LOGIQUE — VOYAGES INTERACTIFS
+================================================================ */
+let voyageActuel = null;
+let carteInitialisee = false;
+
+function initVoyages() {
+  if (!carteInitialisee) {
+    dessinerCarteMonde();
+    carteInitialisee = true;
+  }
+  afficherListeCartePostales();
+}
+
+function dessinerCarteMonde() {
+  const canvas = document.getElementById("carte-monde-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  canvas.width  = canvas.offsetWidth  || 800;
+  canvas.height = canvas.offsetHeight || 400;
+
+  // Fond océan doux
+  ctx.fillStyle = "#c8dce8";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Continents simplifiés (formes approximatives)
+  ctx.fillStyle = "#d4c8b0";
+
+  // Projection simple : lon/lat → x/y
+  function proj(lat, lng) {
+    const x = (lng + 180) / 360 * canvas.width;
+    const y = (90 - lat)  / 180 * canvas.height;
+    return { x, y };
+  }
+
+  // Dessiner un continent à partir de points lat/lng
+  function continent(points) {
+    ctx.beginPath();
+    points.forEach(([lat, lng], i) => {
+      const p = proj(lat, lng);
+      i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+    });
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "#c0b49a";
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  // Europe
+  continent([[71,30],[71,50],[60,50],[55,25],[48,2],[43,-9],[36,-9],[36,36],[42,36],[48,40],[60,30],[70,30]]);
+  // Afrique
+  continent([[37,10],[37,55],[26,55],[15,42],[0,42],[-35,20],[-35,17],[0,-18],[15,-17],[26,15],[37,10]]);
+  // Amérique du Nord
+  continent([[70,-140],[70,-60],[50,-55],[45,-60],[25,-80],[20,-87],[15,-85],[25,-105],[32,-117],[48,-125],[70,-140]]);
+  // Amérique du Sud
+  continent([[12,-72],[12,-62],[0,-50],[-10,-37],[-35,-57],[-55,-68],[-55,-64],[-18,-70],[-5,-80],[12,-80],[12,-72]]);
+  // Asie
+  continent([[71,30],[71,180],[50,180],[40,145],[35,140],[25,122],[10,105],[5,100],[20,60],[30,50],[42,36],[48,40],[60,30],[71,30]]);
+  // Australie
+  continent([[-15,130],[-15,145],[-22,153],[-38,146],[-38,140],[-32,116],[-22,113],[-15,130]]);
+  // Antilles (point)
+  const antilles = proj(15, -65);
+  ctx.beginPath(); ctx.arc(antilles.x, antilles.y, 4, 0, Math.PI*2);
+  ctx.fillStyle = "#d4c8b0"; ctx.fill();
+
+  // Points de voyage
+  voyagesData.filter(v => v.fait).forEach(v => {
+    const p = proj(v.coords.lat, v.coords.lng);
+    // Halo
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(180, 120, 80, 0.2)";
+    ctx.fill();
+    // Point
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = "#c87840";
+    ctx.fill();
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  // Rendre la carte cliquable
+  canvas.addEventListener("click", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const my = (e.clientY - rect.top)  * (canvas.height / rect.height);
+
+    let plusProche = null, distMin = 30;
+    voyagesData.filter(v => v.fait).forEach(v => {
+      const p = proj(v.coords.lat, v.coords.lng);
+      const dist = Math.hypot(p.x - mx, p.y - my);
+      if (dist < distMin) { distMin = dist; plusProche = v; }
+    });
+
+    if (plusProche) ouvrirCartePostale(plusProche.id);
+  });
+
+  // Curseur pointer sur les points
+  canvas.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const my = (e.clientY - rect.top)  * (canvas.height / rect.height);
+    let proche = false;
+    voyagesData.filter(v => v.fait).forEach(v => {
+      const p = proj(v.coords.lat, v.coords.lng);
+      if (Math.hypot(p.x - mx, p.y - my) < 20) proche = true;
+    });
+    canvas.style.cursor = proche ? "pointer" : "default";
+  });
+}
+
+function afficherListeCartePostales() {
+  const grille = document.getElementById("voyages-cartes-grille");
+  if (!grille || grille.children.length > 0) return;
+
+  voyagesData.filter(v => v.fait).forEach((v, i) => {
+    const card = document.createElement("div");
+    card.className = "carte-postale-mini";
+    card.style.animationDelay = `${i * 0.08}s`;
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-label", `Voyage à ${v.nom}`);
+    card.innerHTML = `
+      <span class="cp-emoji">${v.emoji}</span>
+      <div class="cp-info">
+        <strong>${v.nom}</strong>
+        <span>${v.pays} · ${v.annee}</span>
+      </div>
+      <span class="cp-fleche">→</span>`;
+    card.addEventListener("click",   () => ouvrirCartePostale(v.id));
+    card.addEventListener("keydown", e => { if (e.key === "Enter") ouvrirCartePostale(v.id); });
+    grille.appendChild(card);
+  });
+}
+
+function ouvrirCartePostale(id) {
+  voyageActuel = voyagesData.find(v => v.id === id);
+  if (!voyageActuel) return;
+
+  const modal = document.getElementById("modal-voyage");
+  document.getElementById("mv-emoji").textContent   = voyageActuel.emoji;
+  document.getElementById("mv-titre").textContent   = voyageActuel.nom;
+  document.getElementById("mv-pays").textContent    = `${voyageActuel.pays} · ${voyageActuel.annee}`;
+  document.getElementById("mv-resume").textContent  = voyageActuel.resume;
+
+  // Moments forts
+  const mf = document.getElementById("mv-moments");
+  mf.innerHTML = voyageActuel.momentsForts.map(m => `<li>✦ ${m}</li>`).join("");
+
+  // Vidéo
+  const videoZone = document.getElementById("mv-video-zone");
+  if (voyageActuel.video) {
+    videoZone.hidden = false;
+    document.getElementById("mv-video-iframe").src = voyageActuel.video;
+  } else {
+    videoZone.hidden = true;
+  }
+
+  // Photos
+  const photosGrille = document.getElementById("mv-photos-grille");
+  photosGrille.innerHTML = "";
+  if (voyageActuel.photos && voyageActuel.photos.length > 0) {
+    voyageActuel.photos.forEach(p => {
+      const img = document.createElement("img");
+      img.src = p.src; img.alt = p.legende;
+      img.className = "mv-photo";
+      photosGrille.appendChild(img);
+    });
+    document.getElementById("mv-photos-section").hidden = false;
+  } else {
+    document.getElementById("mv-photos-section").hidden = true;
+  }
+
+  // Lien vers album
+  const lienAlbum = document.getElementById("mv-lien-album");
+  const albumLie = albumsData.find(a => a.id === id);
+  if (albumLie) {
+    lienAlbum.hidden = false;
+    lienAlbum.onclick = () => { fermerModalVoyage(); naviguer("albums"); setTimeout(() => ouvrirAlbum(id), 400); };
+  } else {
+    lienAlbum.hidden = true;
+  }
+
+  modal.hidden = false;
+}
+
+function fermerModalVoyage() {
+  const iframe = document.getElementById("mv-video-iframe");
+  if (iframe) iframe.src = "";
+  document.getElementById("modal-voyage").hidden = true;
+}
+
+/* ================================================================
+   LOGIQUE — LISTE DE SOUHAITS
+================================================================ */
+const SOUHAITS_KEY = "souhaits_voyages_v1";
+
+function chargerSouhaits() {
+  try {
+    const saved = localStorage.getItem(SOUHAITS_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(souhaitsPreremplis));
+}
+
+function sauvegarderSouhaits(liste) {
+  try { localStorage.setItem(SOUHAITS_KEY, JSON.stringify(liste)); } catch(e) {}
+}
+
+function initSouhaits() {
+  afficherSouhaits();
+}
+
+function afficherSouhaits() {
+  const liste = chargerSouhaits();
+  const conteneur = document.getElementById("souhaits-liste");
+  if (!conteneur) return;
+  conteneur.innerHTML = "";
+
+  const faits   = liste.filter(s => s.fait);
+  const aFaire  = liste.filter(s => !s.fait);
+
+  // Compteur
+  document.getElementById("souhaits-compteur").textContent =
+    `${faits.length} visité${faits.length > 1 ? "s" : ""} · ${aFaire.length} à découvrir`;
+
+  [...aFaire, ...faits].forEach((souhait, i) => {
+    const div = document.createElement("div");
+    div.className = "souhait-item" + (souhait.fait ? " souhait-fait" : "");
+    div.style.animationDelay = `${i * 0.05}s`;
+    div.innerHTML = `
+      <button class="souhait-check" onclick="toggleSouhait('${souhait.id}')"
+              aria-label="${souhait.fait ? "Marquer comme non visité" : "Marquer comme visité"}"
+              title="${souhait.fait ? "Déjà visité ✓" : "Pas encore visité"}">
+        ${souhait.fait ? "✓" : "○"}
+      </button>
+      <span class="souhait-emoji">${souhait.emoji}</span>
+      <div class="souhait-texte">
+        <strong>${souhait.nom}</strong>
+        ${souhait.note ? `<span>${souhait.note}</span>` : ""}
+      </div>
+      <button class="souhait-suppr" onclick="supprimerSouhait('${souhait.id}')" aria-label="Supprimer">✕</button>`;
+    conteneur.appendChild(div);
+  });
+}
+
+function toggleSouhait(id) {
+  const liste = chargerSouhaits();
+  const item  = liste.find(s => s.id === id);
+  if (item) { item.fait = !item.fait; sauvegarderSouhaits(liste); afficherSouhaits(); }
+}
+
+function supprimerSouhait(id) {
+  const liste = chargerSouhaits().filter(s => s.id !== id);
+  sauvegarderSouhaits(liste);
+  afficherSouhaits();
+}
+
+function ajouterSouhait() {
+  const nomInput   = document.getElementById("souhait-input-nom");
+  const emojiInput = document.getElementById("souhait-input-emoji");
+  const noteInput  = document.getElementById("souhait-input-note");
+
+  const nom = nomInput.value.trim();
+  if (!nom) { nomInput.focus(); return; }
+
+  const liste = chargerSouhaits();
+  liste.push({
+    id:    "custom-" + Date.now(),
+    nom:   nom,
+    emoji: emojiInput.value.trim() || "✈️",
+    note:  noteInput.value.trim(),
+    fait:  false
+  });
+
+  sauvegarderSouhaits(liste);
+  nomInput.value   = "";
+  emojiInput.value = "";
+  noteInput.value  = "";
+  afficherSouhaits();
+}
+
+
+/* ================================================================
+   ✏️  MODIFIER ICI — TEXTE DU POP-UP D'ACCUEIL
+   ----------------------------------------------------------------
+   - titre      : phrase principale en grand
+   - paragraphes: tableau de textes (chaque item = un §)
+                  ajoute "accent: true" pour mettre en italique
+   - signature  : phrase finale signée
+   ----------------------------------------------------------------
+   Le pop-up s'affiche UNE SEULE FOIS (mémorisé dans le navigateur).
+   Pour le remettre à zéro (le revoir), vide le localStorage :
+   dans la console du navigateur → localStorage.removeItem("popup_vu")
+================================================================ */
+const textePopupAccueil = {
+  titre: "Ce site est né parce que je t'aime.",
+
+  paragraphes: [
+    {
+      texte: "Je l'ai créé pour notre anniversaire. Mais surtout parce que je voulais qu'il existe quelque chose de permanent — un endroit où nos moments ne disparaissent pas.",
+      accent: false
+    },
+    {
+      texte: "séparateur"
+    },
+    {
+      texte: "Ici, tu trouveras nos souvenirs, nos voyages, nos petits riens. Des choses que j'ai voulu garder, et te montrer.",
+      accent: false
+    },
+    {
+      texte: "Tu peux explorer à ton rythme. Il n'y a rien à faire, rien à comprendre vite. Juste toi, moi, et ce qu'on a construit.",
+      accent: true
+    },
+    {
+      texte: "séparateur"
+    },
+    {
+      texte: "Ce site est aussi pour toi, dans tes moments difficiles. Pour te rappeler qu'il y a un endroit doux, qui t'attend.",
+      accent: false
+    }
+  ],
+
+  // ✏️ Change ça par ta façon de signer
+  signature: "— avec tout mon amour"
+};
+
+/* ================================================================
+   LOGIQUE — POP-UP
+================================================================ */
+const POPUP_KEY = "popup_vu_v1";
+
+function afficherPopupAccueil() {
+  // Ne pas afficher si déjà vu
+  if (localStorage.getItem(POPUP_KEY)) return;
+
+  const popup    = document.getElementById("popup-accueil");
+  const titreEl  = document.getElementById("popup-titre");
+  const corpsEl  = document.getElementById("popup-corps");
+  const signEl   = document.getElementById("popup-signature");
+
+  titreEl.textContent = textePopupAccueil.titre;
+  signEl.textContent  = textePopupAccueil.signature;
+
+  corpsEl.innerHTML = "";
+  textePopupAccueil.paragraphes.forEach(item => {
+    if (item.texte === "séparateur") {
+      const sep = document.createElement("div");
+      sep.className = "popup-separateur";
+      corpsEl.appendChild(sep);
+    } else {
+      const p = document.createElement("p");
+      if (item.accent) p.className = "popup-accent";
+      p.textContent = item.texte;
+      corpsEl.appendChild(p);
+    }
+  });
+
+  popup.hidden = false;
+
+  // Trap focus dans le popup
+  const btn = popup.querySelector(".popup-btn");
+  if (btn) setTimeout(() => btn.focus(), 800);
+}
+
+function fermerPopupAccueil() {
+  const popup = document.getElementById("popup-accueil");
+
+  // Animation de sortie douce
+  popup.style.transition = "opacity 0.8s ease";
+  popup.style.opacity = "0";
+
+  setTimeout(() => {
+    popup.hidden = true;
+    popup.style.opacity = "";
+    popup.style.transition = "";
+    // Mémoriser que le popup a été vu
+    try { localStorage.setItem(POPUP_KEY, "1"); } catch(e) {}
+  }, 800);
+}
+
+// ── Lancer le popup au chargement ────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
-  // Section accueil active par défaut
   document.getElementById("accueil").classList.add("active");
   document.getElementById("nav-principale").hidden = true;
+
+  // Afficher le popup après un court délai (laisser la page charger)
+  setTimeout(afficherPopupAccueil, 600);
 });
+

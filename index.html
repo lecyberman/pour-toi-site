@@ -37,11 +37,16 @@
   ============================================================ -->
   <nav id="nav-principale" aria-label="Navigation principale" hidden>
     <button onclick="naviguer('galerie')"    data-page="galerie"    aria-label="Galerie">✦ Galerie</button>
+    <button onclick="naviguer('photos')"     data-page="photos"     aria-label="Photos">✦ Photos</button>
     <button onclick="naviguer('comprendre')" data-page="comprendre" aria-label="Comprendre">✦ Comprendre</button>
     <button onclick="naviguer('univers')"    data-page="univers"    aria-label="Univers">✦ Univers</button>
     <button onclick="naviguer('dessin')"     data-page="dessin"     aria-label="Dessiner">✦ Dessiner</button>
     <button onclick="naviguer('emotions')"   data-page="emotions"   aria-label="Émotions">✦ Émotions</button>
     <button onclick="naviguer('oeuvre')"     data-page="oeuvre"     aria-label="Œuvre finale">✦ Œuvre</button>
+    <button onclick="naviguer('capsules')"   data-page="capsules"   aria-label="Capsules temporelles">✦ Capsules</button>
+    <button onclick="naviguer('albums')"     data-page="albums"     aria-label="Albums photos">✦ Albums</button>
+    <button onclick="naviguer('voyages')"    data-page="voyages"    aria-label="Voyages">✦ Voyages</button>
+    <button onclick="naviguer('souhaits')"   data-page="souhaits"   aria-label="Liste de souhaits">✦ Souhaits</button>
     <button onclick="naviguer('accueil')"    class="btn-retour"     aria-label="Retour accueil">⌂</button>
   </nav>
 
@@ -220,10 +225,216 @@
     </div>
   </section>
 
+
+  <!-- ============================================================
+       SECTION 8 — PHOTOS DE NOUS
+       ✏️  MODIFIER : voir script.js → photosData[]
+  ============================================================ -->
+  <section id="photos" class="page" aria-label="Nos photos">
+    <div class="section-inner">
+      <h2 class="section-titre">Nous deux</h2>
+      <p class="section-sous-titre">Des moments capturés. Des preuves qu'on existe ensemble.</p>
+
+      <!-- Grande photo mise en avant -->
+      <div id="photos-hero" class="photos-hero" hidden>
+        <img id="photos-hero-img" src="" alt="" />
+        <p id="photos-hero-legende"></p>
+      </div>
+
+      <!-- Grille photos -->
+      <div id="photos-grille" class="photos-grille" role="list"></div>
+
+      <!-- Modal photo -->
+      <div id="modal-photo" class="modal" role="dialog" aria-modal="true" hidden>
+        <div class="modal-fond" onclick="fermerModalPhoto()"></div>
+        <div class="modal-contenu modal-photo-contenu">
+          <button class="modal-fermer" onclick="fermerModalPhoto()" aria-label="Fermer">✕</button>
+          <img id="modal-photo-img" src="" alt="" />
+          <p id="modal-photo-legende"></p>
+          <p id="modal-photo-date" class="modal-photo-date"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 9 — CAPSULES TEMPORELLES
+       ✏️  MODIFIER : voir script.js → capsulesData[]
+  ============================================================ -->
+  <section id="capsules" class="page" aria-label="Capsules temporelles">
+    <div class="section-inner capsules-inner">
+      <h2 class="section-titre">Des mots pour plus tard</h2>
+      <p class="section-sous-titre">Certaines choses méritent d'attendre leur moment.</p>
+      <div id="capsules-liste" class="capsules-liste"></div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECTION 10 — ALBUMS PHOTOS (par voyage + thème)
+       ✏️  MODIFIER : voir script.js → albumsData[]
+  ============================================================ -->
+  <section id="albums" class="page" aria-label="Albums photos">
+    <div class="section-inner">
+      <!-- Vue liste des albums -->
+      <div id="albums-liste-vue">
+        <h2 class="section-titre">Albums photos</h2>
+        <p class="section-sous-titre">Nos photos, organisées par voyage et par thème.</p>
+        <div id="albums-grille" class="albums-grille" role="list"></div>
+      </div>
+
+      <!-- Vue détail d'un album -->
+      <div id="albums-detail" hidden>
+        <button class="btn-retour-album" onclick="afficherListeAlbums()" aria-label="Retour aux albums">
+          ← Tous les albums
+        </button>
+        <h2 id="album-detail-titre" class="section-titre"></h2>
+        <p id="album-detail-lieu" class="section-sous-titre"></p>
+
+        <!-- Onglets thèmes -->
+        <div id="album-themes-onglets" class="album-themes-onglets" role="tablist"></div>
+
+        <!-- Grille photos du thème -->
+        <div id="album-photos-grille" class="album-photos-grille" role="list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal photo pleine -->
+  <div id="modal-photo-pleine" class="modal" role="dialog" aria-modal="true" hidden>
+    <div class="modal-fond" onclick="fermerPhotoPleine()"></div>
+    <div class="modal-photo-pleine-contenu">
+      <button class="modal-fermer" onclick="fermerPhotoPleine()" aria-label="Fermer">✕</button>
+      <img id="modal-photo-pleine-img" src="" alt="" />
+      <p id="modal-photo-pleine-leg"></p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 11 — VOYAGES INTERACTIFS
+       ✏️  MODIFIER : voir script.js → voyagesData[]
+  ============================================================ -->
+  <section id="voyages" class="page" aria-label="Nos voyages">
+    <div class="section-inner voyages-inner">
+      <h2 class="section-titre">Nos voyages</h2>
+      <p class="section-sous-titre">Clique sur un point de la carte, ou sur une carte postale.</p>
+
+      <!-- Carte du monde -->
+      <div class="carte-monde-wrapper">
+        <canvas id="carte-monde-canvas" aria-label="Carte du monde avec nos destinations"></canvas>
+        <p class="carte-legende">Clique sur un point orangé pour ouvrir le voyage</p>
+      </div>
+
+      <!-- Cartes postales -->
+      <h3 class="voyages-sous-titre">Nos destinations</h3>
+      <div id="voyages-cartes-grille" class="voyages-cartes-grille" role="list"></div>
+    </div>
+  </section>
+
+  <!-- Modal voyage -->
+  <div id="modal-voyage" class="modal" role="dialog" aria-modal="true" hidden>
+    <div class="modal-fond" onclick="fermerModalVoyage()"></div>
+    <div class="modal-contenu modal-voyage-contenu">
+      <button class="modal-fermer" onclick="fermerModalVoyage()" aria-label="Fermer">✕</button>
+
+      <div class="mv-header">
+        <span id="mv-emoji" class="mv-emoji"></span>
+        <div>
+          <h3 id="mv-titre" class="mv-titre"></h3>
+          <p id="mv-pays" class="mv-pays"></p>
+        </div>
+      </div>
+
+      <p id="mv-resume" class="mv-resume"></p>
+
+      <h4 class="mv-section-titre">Moments forts</h4>
+      <ul id="mv-moments" class="mv-moments"></ul>
+
+      <div id="mv-video-zone" hidden>
+        <h4 class="mv-section-titre">Vidéo souvenir</h4>
+        <iframe id="mv-video-iframe" src="" frameborder="0" allowfullscreen
+                title="Vidéo du voyage" class="mv-video"></iframe>
+      </div>
+
+      <div id="mv-photos-section" hidden>
+        <h4 class="mv-section-titre">Quelques photos</h4>
+        <div id="mv-photos-grille" class="mv-photos-grille"></div>
+      </div>
+
+      <button id="mv-lien-album" class="btn-primaire mv-btn-album" hidden>
+        Voir l'album complet →
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 12 — LISTE DE SOUHAITS
+       ✏️  Elle peut modifier directement sur le site
+  ============================================================ -->
+  <section id="souhaits" class="page" aria-label="Liste de souhaits de voyages">
+    <div class="section-inner souhaits-inner">
+      <h2 class="section-titre">Notre liste de souhaits</h2>
+      <p class="section-sous-titre">Les endroits qu'on rêve de voir ensemble.</p>
+
+      <p id="souhaits-compteur" class="souhaits-compteur" aria-live="polite"></p>
+
+      <!-- Ajouter un souhait -->
+      <div class="souhait-ajouter" role="form" aria-label="Ajouter un souhait">
+        <input id="souhait-input-emoji" type="text" placeholder="🌍" maxlength="4"
+               aria-label="Emoji du pays" class="souhait-input souhait-input-emoji" />
+        <input id="souhait-input-nom" type="text" placeholder="Nom du pays ou de la ville"
+               aria-label="Destination" class="souhait-input souhait-input-nom"
+               onkeydown="if(event.key==='Enter') ajouterSouhait()" />
+        <input id="souhait-input-note" type="text" placeholder="Pourquoi ? (optionnel)"
+               aria-label="Note" class="souhait-input souhait-input-note"
+               onkeydown="if(event.key==='Enter') ajouterSouhait()" />
+        <button class="btn-primaire souhait-btn-ajouter" onclick="ajouterSouhait()"
+                aria-label="Ajouter à la liste">+ Ajouter</button>
+      </div>
+
+      <!-- Liste -->
+      <div id="souhaits-liste" class="souhaits-liste" role="list" aria-live="polite"></div>
+    </div>
+  </section>
+
   <!-- ============================================================
        INDICATEUR DE CHARGEMENT (transitions de section)
   ============================================================ -->
   <div id="loader-transition" class="loader-transition" aria-hidden="true"></div>
+
+
+  <!-- ============================================================
+       POP-UP D'ACCUEIL — S'affiche une seule fois à la première visite
+       ✏️  MODIFIER : voir script.js → textePopupAccueil{}
+  ============================================================ -->
+  <div id="popup-accueil" class="popup-accueil" role="dialog" aria-modal="true"
+       aria-labelledby="popup-titre" hidden>
+    <div class="popup-fond"></div>
+    <div class="popup-contenu">
+      <!-- Ornement -->
+      <div class="popup-ornement" aria-hidden="true">✦</div>
+
+      <!-- Texte -->
+      <p class="popup-pour">pour toi,</p>
+      <h2 id="popup-titre" class="popup-titre"></h2>
+      <div id="popup-corps" class="popup-corps"></div>
+
+      <!-- Signature -->
+      <p id="popup-signature" class="popup-signature"></p>
+
+      <!-- Bouton -->
+      <button class="btn-entrer popup-btn" onclick="fermerPopupAccueil()"
+              aria-label="Entrer dans le site">
+        Je suis prête ✦
+      </button>
+
+      <!-- Option "ne plus afficher" -->
+      <button class="popup-skip" onclick="fermerPopupAccueil()"
+              aria-label="Continuer">
+        Continuer →
+      </button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
