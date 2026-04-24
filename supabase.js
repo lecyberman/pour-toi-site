@@ -14,7 +14,7 @@
  */
 
 // ✏️ REMPLACE CES DEUX VALEURS PAR LES TIENNES
-const SUPABASE_URL  = "https://supabase.com/dashboard/org/quifpgswkqreohhwswpz";
+const SUPABASE_URL  = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
 const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
 
 // ================================================================
