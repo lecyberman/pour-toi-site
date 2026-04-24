@@ -2128,11 +2128,138 @@ function fermerPopupAccueil() {
 }
 
 // ── Lancer le popup au chargement ────────────────────────────────
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("accueil").classList.add("active");
   document.getElementById("nav-principale").hidden = true;
 
-  // Afficher le popup après un court délai (laisser la page charger)
+  // Charger les données depuis Supabase (si configuré)
+  await chargerDepuisSupabase();
+
+  // Afficher le popup après chargement
   setTimeout(afficherPopupAccueil, 600);
 });
+
+
+/* ================================================================
+   CHARGEMENT DEPUIS SUPABASE
+   ----------------------------------------------------------------
+   Ces fonctions remplacent les données statiques par les données
+   de Supabase dès que la connexion est établie.
+   Si Supabase n'est pas configuré, les données statiques sont
+   utilisées en fallback.
+================================================================ */
+
+async function chargerDepuisSupabase() {
+  // Vérifie si Supabase est configuré
+  if (typeof db === "undefined" || SUPABASE_URL.includes("XXXXXXXXXXXX")) {
+    console.info("Supabase non configuré — données statiques utilisées.");
+    return;
+  }
+
+  try {
+    // Popup
+    const popupData = await db.lire("popup");
+    if (popupData?.length > 0) {
+      const p = popupData[0];
+      if (p.titre) textePopupAccueil.titre = p.titre;
+      if (p.signature) textePopupAccueil.signature = p.signature;
+      if (p.paragraphes?.length > 0) {
+        textePopupAccueil.paragraphes = p.paragraphes.map(item =>
+          item.separateur ? { texte: "séparateur" } : { texte: item.texte, accent: !!item.accent }
+        );
+      }
+    }
+
+    // Galerie
+    const galerie = await db.lire("galerie");
+    if (galerie?.length > 0) {
+      gallerieData.length = 0;
+      galerie.forEach((item, i) => gallerieData.push({ ...item, id: i + 1 }));
+    }
+
+    // Comprendre
+    const comprendre = await db.lire("comprendre");
+    if (comprendre?.length > 0) {
+      comprendreData.length = 0;
+      comprendre.forEach(item => comprendreData.push({ titre: item.titre, texte: item.texte }));
+    }
+
+    // Étoiles
+    const etoiles = await db.lire("etoiles");
+    if (etoiles?.length > 0) {
+      universObjets.length = 0;
+      etoiles.forEach(e => universObjets.push({ label: e.label, message: e.message, emoji: e.emoji, x: e.x, y: e.y }));
+    }
+
+    // Voyages
+    const voyages = await db.lire("voyages");
+    if (voyages?.length > 0) {
+      voyagesData.length = 0;
+      voyages.forEach(v => voyagesData.push({
+        id: v.nom.toLowerCase().replace(/\s+/g, "-"),
+        nom: v.nom, pays: v.pays, emoji: v.emoji, annee: v.annee,
+        coords: { lat: v.lat, lng: v.lng },
+        fait: v.fait, resume: v.resume,
+        momentsForts: v.moments_forts || [],
+        video: v.video, photos: []
+      }));
+    }
+
+    // Albums
+    const albums = await db.lire("albums");
+    if (albums?.length > 0) {
+      const albumPhotos = await db.lire("album_photos");
+      albumsData.length = 0;
+      albums.forEach(a => {
+        const photosAlbum = albumPhotos.filter(p => p.album_id === a.id);
+        // Grouper par thème
+        const themesMap = {};
+        photosAlbum.forEach(p => {
+          const k = p.theme || "Général";
+          if (!themesMap[k]) themesMap[k] = { nom: k, emoji: p.theme_emoji || "📷", photos: [] };
+          themesMap[k].photos.push({ src: p.src, legende: p.legende });
+        });
+        albumsData.push({
+          id: a.id, titre: a.titre, lieu: a.lieu, date: a.date,
+          emoji: a.emoji, couleur: a.couleur, couverture: null,
+          themes: Object.values(themesMap).length > 0
+            ? Object.values(themesMap)
+            : [{ nom: "Photos", emoji: "📷", photos: [] }]
+        });
+      });
+    }
+
+    // Photos nous deux
+    const photos = await db.lire("photos");
+    if (photos?.length > 0) {
+      photosData.length = 0;
+      photos.forEach(p => photosData.push({ legende: p.legende, date: p.date, image: p.image, emoji: p.emoji, hero: p.hero }));
+    }
+
+    // Capsules
+    const capsules = await db.lire("capsules");
+    if (capsules?.length > 0) {
+      capsulesData.length = 0;
+      capsules.forEach(c => capsulesData.push({
+        id: c.id, titre: c.titre, icone: c.emoji,
+        dateOuvert: c.date_ouverture?.split("T")[0] || c.date_ouverture,
+        contenu: c.contenu || []
+      }));
+    }
+
+    // Émotions
+    const emotions = await db.lire("emotions");
+    if (emotions?.length > 0) {
+      Object.keys(emotionsData).forEach(k => delete emotionsData[k]);
+      emotions.forEach(e => {
+        emotionsData[e.slug] = { label: e.label, message: e.message, mini: e.mini || [] };
+      });
+    }
+
+    console.info("✓ Données chargées depuis Supabase");
+
+  } catch(err) {
+    console.warn("Supabase non disponible — données statiques utilisées.", err);
+  }
+}
 

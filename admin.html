@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administration — Notre espace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --creme: #f5f0e8; --creme-f: #ede5d8; --brun-c: #c8b49a;
+      --brun: #8c7560; --brun-f: #4a3728; --lavande: #d5c8e8;
+      --lavande-2: #b8a8d4; --rose: #e8c8d0; --vert: #c0d8c8;
+      --blanc: #fdfaf5; --texte: #3a2e26; --texte-c: #6b5a4e;
+      --rouge: #d4a8a8; --font-t: 'Cormorant Garamond',serif;
+      --font-c: 'Lato',sans-serif; --r: 10px; --trans: .3s ease;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:var(--font-c); background:var(--creme); color:var(--texte); min-height:100vh; }
+    button { cursor:pointer; font-family:var(--font-c); border:none; background:none; }
+    input,textarea,select { font-family:var(--font-c); }
+    img { max-width:100%; }
+
+    /* ── Écran de connexion ── */
+    #ecran-connexion {
+      position:fixed; inset:0; background:var(--creme);
+      display:flex; align-items:center; justify-content:center; z-index:999;
+    }
+    #ecran-connexion.cache { display:none; }
+    .connexion-boite {
+      background:var(--blanc); border-radius:var(--r); padding:2.5rem 2rem;
+      max-width:360px; width:90%; text-align:center;
+      box-shadow:0 8px 32px rgba(74,55,40,.12);
+    }
+    .connexion-boite h2 {
+      font-family:var(--font-t); font-weight:300; font-size:1.6rem;
+      color:var(--brun-f); margin-bottom:.4rem;
+    }
+    .connexion-boite p { font-size:.85rem; color:var(--texte-c); margin-bottom:1.5rem; }
+    .champ { width:100%; padding:.7rem 1rem; border:1px solid var(--creme-f);
+      border-radius:var(--r); font-size:.95rem; color:var(--texte);
+      background:var(--creme); outline:none; transition:border-color var(--trans);
+      margin-bottom:1rem; }
+    .champ:focus { border-color:var(--lavande-2); }
+    .btn-connexion {
+      width:100%; padding:.8rem; background:var(--lavande-2); color:var(--brun-f);
+      border-radius:var(--r); font-family:var(--font-t); font-style:italic;
+      font-size:1.05rem; transition:background var(--trans);
+    }
+    .btn-connexion:hover { background:var(--lavande); }
+    .connexion-erreur {
+      font-size:.82rem; color:#8c3a3a; margin-top:.8rem; display:none;
+    }
+
+    /* ── Layout admin ── */
+    #app { display:none; min-height:100vh; }
+    #app.visible { display:flex; }
+
+    /* Sidebar */
+    .sidebar {
+      width:220px; min-height:100vh; background:var(--blanc);
+      border-right:1px solid var(--creme-f); padding:1.5rem 1rem;
+      display:flex; flex-direction:column; gap:.3rem; flex-shrink:0;
+      position:sticky; top:0; height:100vh; overflow-y:auto;
+    }
+    .sidebar-titre {
+      font-family:var(--font-t); font-size:1.1rem; color:var(--brun-f);
+      margin-bottom:1rem; padding-bottom:.8rem;
+      border-bottom:1px solid var(--creme-f);
+    }
+    .sidebar-titre span { font-size:.7rem; display:block; color:var(--brun); opacity:.6; margin-top:.2rem; }
+    .nav-btn {
+      width:100%; text-align:left; padding:.55rem .8rem; border-radius:8px;
+      font-size:.82rem; color:var(--brun); transition:all var(--trans);
+      letter-spacing:.04em;
+    }
+    .nav-btn:hover, .nav-btn.actif { background:var(--lavande); color:var(--brun-f); }
+    .sidebar-sep { height:1px; background:var(--creme-f); margin:.5rem 0; }
+    .btn-deconnexion {
+      margin-top:auto; width:100%; padding:.5rem; font-size:.75rem;
+      color:var(--brun); opacity:.5; border:1px solid var(--creme-f);
+      border-radius:8px; transition:all var(--trans);
+    }
+    .btn-deconnexion:hover { opacity:1; background:var(--rouge); }
+
+    /* Contenu principal */
+    .main { flex:1; padding:2rem; overflow-y:auto; }
+    .panneau { display:none; }
+    .panneau.actif { display:block; }
+
+    /* En-tête section */
+    .section-entete {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;
+    }
+    .section-entete h2 {
+      font-family:var(--font-t); font-weight:300; font-size:1.6rem; color:var(--brun-f);
+    }
+
+    /* Boutons */
+    .btn-prim {
+      padding:.6rem 1.4rem; background:var(--lavande-2); color:var(--brun-f);
+      border-radius:20px; font-size:.85rem; transition:all var(--trans);
+    }
+    .btn-prim:hover { background:var(--lavande); }
+    .btn-sec {
+      padding:.5rem 1rem; border:1px solid var(--brun-c); color:var(--brun);
+      border-radius:20px; font-size:.82rem; transition:all var(--trans);
+    }
+    .btn-sec:hover { background:var(--lavande); border-color:var(--lavande-2); }
+    .btn-danger {
+      padding:.4rem .8rem; background:rgba(212,168,168,.2); color:#7a3a3a;
+      border:1px solid rgba(212,168,168,.5); border-radius:20px; font-size:.78rem;
+      transition:all var(--trans);
+    }
+    .btn-danger:hover { background:rgba(212,168,168,.4); }
+
+    /* Grilles de cartes */
+    .cartes-grille {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+      gap:1rem; margin-bottom:1.5rem;
+    }
+    .carte-admin {
+      background:var(--blanc); border-radius:var(--r); padding:1.2rem;
+      box-shadow:0 2px 10px rgba(74,55,40,.07);
+      border-left:3px solid var(--lavande-2);
+    }
+    .carte-admin-titre {
+      font-family:var(--font-t); font-size:1.05rem; color:var(--brun-f); margin-bottom:.3rem;
+    }
+    .carte-admin-meta { font-size:.75rem; color:var(--texte-c); margin-bottom:.8rem; }
+    .carte-admin-actions { display:flex; gap:.5rem; flex-wrap:wrap; }
+
+    /* Formulaires */
+    .formulaire {
+      background:var(--blanc); border-radius:var(--r); padding:1.5rem;
+      box-shadow:0 2px 10px rgba(74,55,40,.07); margin-bottom:1.5rem;
+    }
+    .formulaire h3 {
+      font-family:var(--font-t); font-size:1.2rem; color:var(--brun-f);
+      margin-bottom:1.2rem; padding-bottom:.6rem; border-bottom:1px solid var(--creme-f);
+    }
+    .form-grille {
+      display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;
+    }
+    .form-grille.une-col { grid-template-columns:1fr; }
+    .form-champ { display:flex; flex-direction:column; gap:.3rem; }
+    .form-champ label { font-size:.78rem; color:var(--texte-c); letter-spacing:.05em; }
+    .form-champ input, .form-champ textarea, .form-champ select {
+      padding:.6rem .9rem; border:1px solid var(--creme-f); border-radius:8px;
+      font-size:.9rem; color:var(--texte); background:var(--creme);
+      outline:none; transition:border-color var(--trans);
+    }
+    .form-champ input:focus, .form-champ textarea:focus, .form-champ select:focus {
+      border-color:var(--lavande-2);
+    }
+    .form-champ textarea { resize:vertical; min-height:80px; }
+    .form-actions { display:flex; gap:.8rem; margin-top:1rem; }
+
+    /* Upload image */
+    .upload-zone {
+      border:2px dashed var(--brun-c); border-radius:var(--r);
+      padding:1.5rem; text-align:center; cursor:pointer;
+      transition:all var(--trans); position:relative;
+    }
+    .upload-zone:hover { border-color:var(--lavande-2); background:rgba(213,200,232,.1); }
+    .upload-zone input[type=file] {
+      position:absolute; inset:0; opacity:0; cursor:pointer;
+    }
+    .upload-zone p { font-size:.85rem; color:var(--brun); }
+    .upload-apercu {
+      display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.8rem;
+    }
+    .upload-apercu img {
+      width:80px; height:80px; object-fit:cover; border-radius:6px;
+    }
+
+    /* Toast notifications */
+    #toast {
+      position:fixed; bottom:2rem; right:2rem; z-index:999;
+      background:var(--brun-f); color:var(--blanc); padding:.8rem 1.4rem;
+      border-radius:20px; font-size:.85rem; opacity:0;
+      transition:opacity .3s ease; pointer-events:none;
+    }
+    #toast.visible { opacity:1; }
+    #toast.succes { background:#4a7a5a; }
+    #toast.erreur { background:#7a3a3a; }
+
+    /* Loader */
+    .loader {
+      display:inline-block; width:16px; height:16px;
+      border:2px solid var(--lavande); border-top-color:var(--lavande-2);
+      border-radius:50%; animation:spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* Liste items (moments forts, paragraphes…) */
+    .liste-items { display:flex; flex-direction:column; gap:.4rem; margin-bottom:.8rem; }
+    .liste-item {
+      display:flex; align-items:center; gap:.5rem;
+      background:var(--creme); border-radius:8px; padding:.5rem .8rem;
+    }
+    .liste-item span { flex:1; font-size:.88rem; }
+    .liste-item button { font-size:.75rem; color:var(--brun); opacity:.5; }
+    .liste-item button:hover { opacity:1; color:#7a3a3a; }
+    .liste-add { display:flex; gap:.5rem; }
+    .liste-add input { flex:1; }
+
+    /* Tableau */
+    .tableau { width:100%; border-collapse:collapse; font-size:.85rem; }
+    .tableau th {
+      text-align:left; padding:.6rem .8rem; background:var(--creme-f);
+      color:var(--brun); font-weight:400; letter-spacing:.05em; font-size:.75rem;
+    }
+    .tableau td { padding:.6rem .8rem; border-bottom:1px solid var(--creme-f); }
+    .tableau tr:hover td { background:rgba(213,200,232,.1); }
+
+    /* Badge statut */
+    .badge {
+      display:inline-block; padding:.2rem .6rem; border-radius:20px; font-size:.7rem;
+      letter-spacing:.05em;
+    }
+    .badge.vert  { background:rgba(192,216,200,.3); color:#4a7a5a; }
+    .badge.gris  { background:var(--creme-f); color:var(--brun); }
+    .badge.bleu  { background:rgba(192,212,232,.3); color:#3a5a7a; }
+
+    @media(max-width:640px) {
+      .sidebar { width:100%; min-height:auto; flex-direction:row; flex-wrap:wrap; }
+      #app { flex-direction:column; }
+      .form-grille { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Écran connexion ── -->
+<div id="ecran-connexion">
+  <div class="connexion-boite">
+    <h2>Notre espace</h2>
+    <p>Administration — accès privé</p>
+    <input id="input-mdp" class="champ" type="password"
+           placeholder="Mot de passe"
+           onkeydown="if(event.key==='Enter') seConnecter()" />
+    <button class="btn-connexion" onclick="seConnecter()">Entrer</button>
+    <p class="connexion-erreur" id="erreur-connexion">Mot de passe incorrect.</p>
+  </div>
+</div>
+
+<!-- ── App admin ── -->
+<div id="app">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-titre">
+      ✦ Admin
+      <span id="admin-user-label"></span>
+    </div>
+    <button class="nav-btn actif" onclick="aller('tableau-bord')">🏠 Tableau de bord</button>
+    <div class="sidebar-sep"></div>
+    <button class="nav-btn" onclick="aller('galerie-admin')">✦ Galerie relation</button>
+    <button class="nav-btn" onclick="aller('comprendre-admin')">✦ Comprendre</button>
+    <button class="nav-btn" onclick="aller('etoiles-admin')">✦ Étoiles univers</button>
+    <button class="nav-btn" onclick="aller('voyages-admin')">✦ Voyages</button>
+    <button class="nav-btn" onclick="aller('albums-admin')">✦ Albums photos</button>
+    <button class="nav-btn" onclick="aller('photos-admin')">✦ Photos "Nous deux"</button>
+    <button class="nav-btn" onclick="aller('capsules-admin')">✦ Capsules temporelles</button>
+    <button class="nav-btn" onclick="aller('emotions-admin')">✦ Émotions</button>
+    <button class="nav-btn" onclick="aller('popup-admin')">✦ Pop-up accueil</button>
+    <div class="sidebar-sep"></div>
+    <button class="btn-deconnexion" onclick="seDeconnecter()">Se déconnecter</button>
+  </nav>
+
+  <!-- Contenu -->
+  <main class="main">
+
+    <!-- Tableau de bord -->
+    <div id="panneau-tableau-bord" class="panneau actif">
+      <div class="section-entete">
+        <h2>Tableau de bord</h2>
+        <a href="index.html" target="_blank" class="btn-sec">Voir le site →</a>
+      </div>
+      <div class="cartes-grille" id="stats-grille"></div>
+      <div class="formulaire">
+        <h3>État de la connexion Supabase</h3>
+        <p id="supabase-statut" style="font-size:.9rem;color:var(--texte-c)">Vérification...</p>
+      </div>
+    </div>
+
+    <!-- Galerie relation -->
+    <div id="panneau-galerie-admin" class="panneau">
+      <div class="section-entete">
+        <h2>Galerie de la relation</h2>
+        <button class="btn-prim" onclick="ouvrirFormulaireGalerie()">+ Ajouter une carte</button>
+      </div>
+      <div id="form-galerie" class="formulaire" style="display:none">
+        <h3 id="form-galerie-titre">Nouvelle carte</h3>
+        <div class="form-grille">
+          <div class="form-champ">
+            <label>Titre</label>
+            <input id="g-titre" type="text" placeholder="Le premier soir…" />
+          </div>
+          <div class="form-champ">
+            <label>Catégorie</label>
+            <select id="g-cat">
+              <option value="debut">Notre début</option>
+              <option value="calme">Moments calmes</option>
+              <option value="aimer">Ce que j'aime</option>
+              <option value="voir">Ce que je vois</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grille une-col">
+          <div class="form-champ">
+            <label>Texte</label>
+            <textarea id="g-texte" placeholder="Ce que tu veux dire…"></textarea>
+          </div>
+          <div class="form-champ">
+            <label>Emoji (si pas d'image)</label>
+            <input id="g-emoji" type="text" placeholder="🌙" maxlength="4" />
+          </div>
+          <div class="form-champ">
+            <label>Image</label>
+            <div class="upload-zone">
+              <input type="file" accept="image/*" onchange="uploadImageAdmin('galerie', this)" />
+              <p>Clique pour choisir une image</p>
+            </div>
+            <input id="g-image" type="text" placeholder="URL générée automatiquement" readonly />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-prim" onclick="sauvegarderGalerie()">Sauvegarder</button>
+          <button class="btn-sec" onclick="fermerFormulaire('form-galerie')">Annuler</button>
+        </div>
+      </div>
+      <div class="cartes-grille" id="liste-galerie"></div>
+    </div>
+
+    <!-- Comprendre -->
+    <div id="panneau-comprendre-admin" class="panneau">
+      <div class="section-entete">
+        <h2>Les choses que je comprends</h2>
+        <button class="btn-prim" onclick="ouvrirFormulaireComprendre()">+ Ajouter</button>
+      </div>
+      <div id="form-comprendre" class="formulaire" style="display:none">
+        <h3>Nouvelle observation</h3>
+        <div class="form-grille une-col">
+          <div class="form-champ">
+            <label>Titre (l'observation)</label>
+            <input id="c-titre" type="text" placeholder="Le monde peut être trop fort" />
+          </div>
+          <div class="form-champ">
+            <label>Texte (l'explication sincère)</label>
+            <textarea id="c-texte" placeholder="Quand tout arrive en même temps…"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-prim" onclick="sauvegarderComprendre()">Sauvegarder</button>
+          <button class="btn-sec" onclick="fermerFormulaire('form-comprendre')">Annuler</button>
+        </div>
+      </div>
+      <div id="liste-comprendre"></div>
+    </div>
+
+    <!-- Étoiles univers -->
+    <div id="panneau-etoiles-admin" class="panneau">
+      <div class="section-entete">
+        <h2>Étoiles de l'univers</h2>
+        <button class="btn-prim" onclick="ouvrirFormulaireEtoile()">+ Ajouter une étoile</button>
+      </div>
+      <div id="form-etoile" class="formulaire" style="display:none">
+        <h3>Nouvelle étoile</h3>
+        <div class="form-grille">
+          <div class="form-champ">
+            <label>Label (sous l'étoile)</label>
+            <input id="e-label" type="text" placeholder="Notre étoile" />
+          </div>
+          <div class="form-champ">
+            <label>Emoji</label>
+            <input id="e-emoji" type="text" placeholder="⭐" maxlength="4" />
+          </div>
+          <div class="form-champ">
+            <label>Position X (0-100)</label>
+            <input id="e-x" type="number" min="5" max="95" value="50" />
+          </div>
+          <div class="form-champ">
+            <label>Position Y (0-100)</label>
+            <input id="e-y" type="number" min="5" max="95" value="50" />
+          </div>
+        </div>
+        <div class="form-grille une-col">
+          <div class="form-champ">
+            <label>Message au clic</label>
+            <textarea id="e-message" placeholder="Si on pouvait choisir une étoile à nous…"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-prim" onclick="sauvegarderEtoile()">Sauvegarder</button>
+          <button class="btn-sec" onclick="fermerFormulaire('form-etoile')">Annuler</button>
+        </div>
+      </div>
+      <div class="cartes-grille" id="liste-etoiles"></div>
+    </div>
+
+    <!-- Voyages -->
+    <div id="panneau-voyages-admin" class="panneau">
+      <div class="section-entete">
+        <h2>Voyages</h2>
+        <button class="btn-prim" onclick="ouvrirFormulaireVoyage()">+ Ajouter un voyage</button>
+      </div>
+      <div id="form-voyage" class="formulaire" style="display:none">
+        <h3 id="form-voyage-titre">Nouveau voyage</h3>
+        <div class="form-grille">
+          <div class="form-champ">
+            <label>Nom de la destination</label>
+            <input id="v-nom" type="text" placeholder="Tokyo" />
+          </div>
+          <div class="form-champ">
+            <label>Pays</label>
+            <input id="v-pays" type="text" placeholder="Japon" />
+          </div>
+          <div class="form-champ">
+            <label>Emoji / drapeau</label>
+            <input id="v-emoji" type="text" placeholder="🇯🇵" maxlength="4" />
+          </div>
+          <div class="form-champ">
+            <label>Année / période</label>
+            <input id="v-annee" type="text" placeholder="Été 2024" />
+          </div>
+          <div class="form-champ">
+            <label>Latitude</label>
+            <input id="v-lat" type="number" step="0.01" placeholder="35.68" />
+          </div>
+          <div class="form-champ">
+            <label>Longitude</label>
+            <input id="v-lng" type="number" step="0.01" placeholder="139.69" />
+          </div>
+        </div>
+        <div class="form-grille une-col">
+          <div class="form-champ">
+            <label>Résumé</label>
+            <textarea id="v-resume" placeholder="Ce voyage en quelques mots…"></textarea>
+          </div>
+        </div>
+        <div class="form-champ" style="margin-bottom:.8rem">
+          <label>Moments forts</label>
+          <div class="liste-items" id="v-moments-liste"></div>
+          <div class="liste-add">
+            <input id="v-moment-input" type="text" class="champ" placeholder="Un moment à retenir…"
+                   onkeydown="if(event.key==='Enter'){ajouterMoment();event.preventDefault()}" />
+            <button class="btn-sec" onclick="ajouterMoment()">+</button>
+          </div>
+        </div>
+        <div class="form-grille">
+          <div class="form-champ">
+            <label>Vidéo YouTube (URL embed)</label>
+            <input id="v-video" type="text" placeholder="https://www.youtube.com/embed/XXX" />
+          </div>
+          <div class="form-champ">
+            <label>Voyage fait ?</label>
+            <select id="v-fait">
+              <option value="true">Oui — voyage fait</option>
+              <option value="false">Non — rêve / projet</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-prim" onclick="sauvegarderVoyage()">Sauvegarder</button>
+          <button class="btn-sec" onclick="fermerFormulaire('form-voyage')">Annuler</button>
+        </div>
+      </div>
+      <div class="cartes-grille" id="liste-voyages"></div>
+    </div>
+
+    <!-- Albums -->
+    <div id="panneau-albums-admin" class="panneau">
+      <div class="section-entete">
+        <h2>Albums photos</h2>
+        <button class="btn-prim" onclick="ouvrirFormulaireAlbum()">+ Créer un album</button>
+      </div>
+      <div id="form-album" class="formulaire" style="display:none">
+        <h3>Nouvel album</h3>
+        <div class="form-grille">
+          <div class="form-champ">
+            <label>Titre de l'album</label>
+            <input id="a-titre" type="text" placeholder="Barcelone" />
+          </div>
+          <div class="form-champ">
+            <label>Lieu / contexte</label>
+            <input id="a-lieu" type="text" placeholder="Espagne" />
+          </div>
+          <div class="form-champ">
+            <label>Date / période</label>
+            <input id="a-date" type="text" placeholder="Été 2024" />
+          </div>
+          <div class="form-champ">
+            <label>Emoji</label>
+            <input id="a-emoji" type="text" placeholder="🇪🇸" maxlength="4" />
+          </div>
+          <div class="form-champ">
+            <label>Couleur d'accent</label>
+            <input id="a-couleur" type="color" value="#c9a8d4" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-prim" onclick="sauvegarderAlbum()">Créer l'album</button>
+          <button class="btn-sec" onclick="fermerFormulaire('form-album')">Annuler</button>
+        </div>
+      </div>
+      <div class="cartes-grille" id="liste-albums"></div>
+
+      <!-- Sous-section : ajouter photo dans album -->
+      <div id="form-photo-album" class="formulaire" style="display:none;margin-top:1.5rem">
+        <h3 id="form-photo-album-titre">Ajouter des photos</h3>
+        <div class="form-grille">
+          <div class="form-champ">
+            <label>Thème</label>
+            <input id="pa-theme" type="text" placeholder="Paysages" />
+          </div>
+          <div class="form-champ">
+            <label>Emoji du thème</label>
+            <input id="pa-theme-emoji" type="text" placeholder="🏙️" maxlength="4" />
+          </div>
+          <div class="form-champ">
+            <label>Légende</label>
+            <input id="pa-legende" type="text" placeholder="La Sagrada Família" />
+          </div>
+        </div>
+        <div class="form-champ" style="margin-bottom:1rem">
+          <label>Image</label>
+          <div class="upload-zone">
+            <input type="file" accept="image/*" multiple
+                   onchange="uploadImagesAlbum(this)" />
+            <p>Clique pour choisir une ou plusieurs photos</p>
+          </div>
+          <div class="upload-apercu" id="apercu-album"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-prim" onclick="sauvegarderPhotoAlbum()">Ajouter la photo</button>
+          <button class="btn-sec" onclick="fermerFormulaire('form-photo-album')">Fermer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Photos nous deux -->
+    <div id="panneau-photos-admin" class="panneau">
+      <div class="section-entete">
+        <h2>Photos "Nous deux"</h2>
+        <button class="btn-prim" onclick="ouvrirFormulairePhoto()">+ Ajouter une photo</button>
+      </div>
+      <div id="form-photo" class="formulaire" style="display:none">
+        <h3>Nouvelle photo</h3>
+        <div class="form-grille">
+          <div class="form-champ">
+            <label>Légende</label>
+            <input id="p-legende" type="text" placeholder="Notre premier souvenir…" />
+          </div>
+          <div class="form-champ">
+            <label>Date (texte libre)</label>
+            <input id="p-date" type="text" placeholder="Juillet 2023" />
+          </div>
+          <div class="form-champ">
+            <label>Photo principale ? (hero)</label>
+            <select id="p-hero">
+              <option value="false">Non</option>
+              <option value="true">Oui — affichée en grand</option>
+            </select>
+          </div>
+          <div class="form-champ">
+            <label>Emoji (si pas d'image)</label>
+            <input id="p-emoji" type="text" placeholder="🌸" maxlength="4" />
+          </div>
+        </div>
+        <div class="form-champ" style="margin-bottom:1rem">
+          <label>Image</label>
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="uploadImageAdmin('photos', this)" />
+            <p>Clique pour choisir une image</p>
+          </div>
+          <input id="p-image" type="text" placeholder="URL générée automatiquement" readonly
+                 style="margin-top:.4rem" class="champ" />
+        </div>
+        <div class="form-actions">
+          <button class="btn-prim" onclick="sauvegarderPhoto()">Sauvegarder</button>
+          <button class="btn-sec" onclick="fermerFormulaire('form-photo')">Annuler</button>
+        </div>
+      </div>
+      <div class="cartes-grille" id="liste-photos"></div>
+    </div>
+
+    <!-- Capsules -->
+    <div id="panneau-capsules-admin" class="panneau">
+      <div class="section-entete">
+        <h2>Capsules temporelles</h2>
+        <button class="btn-prim" onclick="ouvrirFormulaireCapsule()">+ Ajouter une capsule</button>
+      </div>
+      <div id="form-capsule" class="formulaire" style="display:none">
+        <h3>Nouvelle capsule</h3>
+        <div class="form-grille">
+          <div class="form-champ">
+            <label>Titre</label>
+            <input id="cap-titre" type="text" placeholder="Pour notre anniversaire" />
+          </div>
+          <div class="form-champ">
+            <label>Emoji</label>
+            <input id="cap-emoji" type="text" placeholder="💌" maxlength="4" />
+          </div>
+          <div class="form-champ">
+            <label>Date d'ouverture</label>
+            <input id="cap-date" type="date" />
+          </div>
+        </div>
+        <div class="form-champ" style="margin-bottom:.8rem">
+          <label>Contenu (paragraphes)</label>
+          <div class="liste-items" id="cap-paras-liste"></div>
+          <div class="liste-add">
+            <input id="cap-para-input" type="text" class="champ" placeholder="Un paragraphe…"
+                   onkeydown="if(event.key==='Enter'){ajouterPara();event.preventDefault()}" />
+            <button class="btn-sec" onclick="ajouterPara()">+</button>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-prim" onclick="sauvegarderCapsule()">Sauvegarder</button>
+          <button class="btn-sec" onclick="fermerFormulaire('form-capsule')">Annuler</button>
+        </div>
+      </div>
+      <div class="cartes-grille" id="liste-capsules"></div>
+    </div>
+
+    <!-- Émotions -->
+    <div id="panneau-emotions-admin" class="panneau">
+      <div class="section-entete">
+        <h2>Traducteur émotionnel</h2>
+        <button class="btn-prim" onclick="ouvrirFormulaireEmotion()">+ Ajouter une émotion</button>
+      </div>
+      <div id="form-emotion" class="formulaire" style="display:none">
+        <h3>Nouvelle émotion</h3>
+        <div class="form-grille">
+          <div class="form-champ">
+            <label>Identifiant (slug, ex: "triste")</label>
+            <input id="em-id" type="text" placeholder="triste" />
+          </div>
+          <div class="form-champ">
+            <label>Label (affiché sur le bouton)</label>
+            <input id="em-label" type="text" placeholder="triste" />
+          </div>
+        </div>
+        <div class="form-grille une-col">
+          <div class="form-champ">
+            <label>Message principal</label>
+            <textarea id="em-message" placeholder="La tristesse dit quelque chose d'important…"></textarea>
+          </div>
+        </div>
+        <div class="form-champ" style="margin-bottom:.8rem">
+          <label>Petites pensées</label>
+          <div class="liste-items" id="em-minis-liste"></div>
+          <div class="liste-add">
+            <input id="em-mini-input" type="text" class="champ" placeholder="Une pensée douce…"
+                   onkeydown="if(event.key==='Enter'){ajouterMini();event.preventDefault()}" />
+            <button class="btn-sec" onclick="ajouterMini()">+</button>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-prim" onclick="sauvegarderEmotion()">Sauvegarder</button>
+          <button class="btn-sec" onclick="fermerFormulaire('form-emotion')">Annuler</button>
+        </div>
+      </div>
+      <div class="cartes-grille" id="liste-emotions"></div>
+    </div>
+
+    <!-- Pop-up -->
+    <div id="panneau-popup-admin" class="panneau">
+      <div class="section-entete"><h2>Pop-up d'accueil</h2></div>
+      <div class="formulaire">
+        <h3>Modifier le message d'accueil</h3>
+        <div class="form-grille une-col">
+          <div class="form-champ">
+            <label>Titre principal</label>
+            <input id="pp-titre" type="text" />
+          </div>
+          <div class="form-champ">
+            <label>Signature</label>
+            <input id="pp-signature" type="text" />
+          </div>
+          <div class="form-champ">
+            <label>Paragraphes (un par ligne — ajoute "---" pour un séparateur)</label>
+            <textarea id="pp-paras" rows="8"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-prim" onclick="sauvegarderPopup()">Sauvegarder</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script src="supabase.js"></script>
+<script>
+/* ================================================================
+   ✏️  MODIFIER ICI — MOT DE PASSE ADMIN
+   ----------------------------------------------------------------
+   Change "notre2024" par le mot de passe que vous voulez.
+   ⚠️  Évite les mots de passe trop simples — le site est public.
+================================================================ */
+const MOTS_DE_PASSE = ["notre2024", "dadoucherie"];
+// Deux mots de passe : un pour toi, un pour elle si tu veux
+// Tu peux en ajouter autant que tu veux dans ce tableau.
+
+/* ================================================================
+   CONNEXION
+================================================================ */
+function seConnecter() {
+  const mdp = document.getElementById("input-mdp").value;
+  if (MOTS_DE_PASSE.includes(mdp)) {
+    sessionStorage.setItem("admin_ok", "1");
+    document.getElementById("ecran-connexion").classList.add("cache");
+    document.getElementById("app").classList.add("visible");
+    chargerTout();
+  } else {
+    document.getElementById("erreur-connexion").style.display = "block";
+    document.getElementById("input-mdp").value = "";
+    document.getElementById("input-mdp").focus();
+  }
+}
+
+function seDeconnecter() {
+  sessionStorage.removeItem("admin_ok");
+  location.reload();
+}
+
+// Auto-connexion si session active
+if (sessionStorage.getItem("admin_ok")) {
+  document.getElementById("ecran-connexion").classList.add("cache");
+  document.getElementById("app").classList.add("visible");
+}
+
+/* ================================================================
+   NAVIGATION
+================================================================ */
+function aller(panneau) {
+  document.querySelectorAll(".panneau").forEach(p => p.classList.remove("actif"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("actif"));
+  document.getElementById("panneau-" + panneau)?.classList.add("actif");
+  event.currentTarget?.classList.add("actif");
+  chargerPanneau(panneau);
+}
+
+function chargerPanneau(id) {
+  const fns = {
+    "tableau-bord":    chargerTableauBord,
+    "galerie-admin":   chargerGalerie,
+    "comprendre-admin":chargerComprendre,
+    "etoiles-admin":   chargerEtoiles,
+    "voyages-admin":   chargerVoyages,
+    "albums-admin":    chargerAlbums,
+    "photos-admin":    chargerPhotos,
+    "capsules-admin":  chargerCapsules,
+    "emotions-admin":  chargerEmotions,
+    "popup-admin":     chargerPopup,
+  };
+  fns[id]?.();
+}
+
+/* ================================================================
+   TOAST
+================================================================ */
+function toast(msg, type="succes") {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "visible " + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.className = "", 3000);
+}
+
+/* ================================================================
+   HELPERS FORMULAIRES
+================================================================ */
+let editId = null;
+const listesTemp = { moments:[], paras:[], minis:[], imagesAlbum:[] };
+
+function ouvrirFormulaire(id) {
+  document.getElementById(id).style.display = "block";
+  document.getElementById(id).scrollIntoView({ behavior:"smooth" });
+}
+function fermerFormulaire(id) {
+  document.getElementById(id).style.display = "none";
+  editId = null;
+}
+function viderChamps(...ids) { ids.forEach(id => { const el = document.getElementById(id); if(el) el.value=""; }); }
+
+/* ================================================================
+   UPLOAD IMAGE
+================================================================ */
+async function uploadImageAdmin(contexte, input) {
+  const fichier = input.files[0];
+  if (!fichier) return;
+  toast("Upload en cours…", "gris");
+  const chemin = `${contexte}/${Date.now()}_${fichier.name.replace(/\s/g,"_")}`;
+  const url = await db.uploadImage("images", chemin, fichier);
+  if (url) {
+    document.getElementById(contexte === "galerie" ? "g-image" : "p-image").value = url;
+    toast("Image uploadée ✓");
+  } else {
+    toast("Erreur upload", "erreur");
+  }
+}
+
+async function uploadImagesAlbum(input) {
+  const apercu = document.getElementById("apercu-album");
+  for (const fichier of input.files) {
+    toast("Upload " + fichier.name + "…", "gris");
+    const chemin = `albums/${Date.now()}_${fichier.name.replace(/\s/g,"_")}`;
+    const url = await db.uploadImage("images", chemin, fichier);
+    if (url) {
+      listesTemp.imagesAlbum.push(url);
+      const img = document.createElement("img");
+      img.src = url;
+      apercu.appendChild(img);
+    }
+  }
+  toast("Photos uploadées ✓");
+}
+
+/* ================================================================
+   LISTES DYNAMIQUES (moments forts, paragraphes, minis…)
+================================================================ */
+function renderListe(conteneurId, tableau, cle) {
+  const el = document.getElementById(conteneurId);
+  el.innerHTML = "";
+  tableau.forEach((item, i) => {
+    const div = document.createElement("div");
+    div.className = "liste-item";
+    div.innerHTML = `<span>${item}</span><button onclick="supprimerDeListe('${cle}',${i})">✕</button>`;
+    el.appendChild(div);
+  });
+}
+function supprimerDeListe(cle, i) {
+  listesTemp[cle].splice(i, 1);
+  const maps = { moments:"v-moments-liste", paras:"cap-paras-liste", minis:"em-minis-liste" };
+  renderListe(maps[cle], listesTemp[cle], cle);
+}
+function ajouterMoment() {
+  const v = document.getElementById("v-moment-input").value.trim();
+  if (!v) return;
+  listesTemp.moments.push(v);
+  renderListe("v-moments-liste", listesTemp.moments, "moments");
+  document.getElementById("v-moment-input").value = "";
+}
+function ajouterPara() {
+  const v = document.getElementById("cap-para-input").value.trim();
+  if (!v) return;
+  listesTemp.paras.push(v);
+  renderListe("cap-paras-liste", listesTemp.paras, "paras");
+  document.getElementById("cap-para-input").value = "";
+}
+function ajouterMini() {
+  const v = document.getElementById("em-mini-input").value.trim();
+  if (!v) return;
+  listesTemp.minis.push(v);
+  renderListe("em-minis-liste", listesTemp.minis, "minis");
+  document.getElementById("em-mini-input").value = "";
+}
+
+/* ================================================================
+   TABLEAU DE BORD
+================================================================ */
+async function chargerTableauBord() {
+  // Test connexion Supabase
+  const statut = document.getElementById("supabase-statut");
+  try {
+    const r = await db.lire("galerie", "limit=1");
+    if (Array.isArray(r)) {
+      statut.innerHTML = `<span style="color:#4a7a5a">✓ Supabase connecté et opérationnel</span>`;
+    }
+  } catch(e) {
+    statut.innerHTML = `<span style="color:#7a3a3a">✗ Erreur de connexion — vérifie les clés dans supabase.js</span>`;
+  }
+
+  // Stats
+  const tables = [
+    { table:"galerie",   label:"Cartes galerie",  emoji:"✦" },
+    { table:"comprendre",label:"Observations",     emoji:"💭" },
+    { table:"etoiles",   label:"Étoiles univers",  emoji:"⭐" },
+    { table:"voyages",   label:"Voyages",          emoji:"✈️" },
+    { table:"albums",    label:"Albums",           emoji:"📷" },
+    { table:"photos",    label:"Photos nous",      emoji:"💑" },
+    { table:"capsules",  label:"Capsules",         emoji:"🔒" },
+    { table:"emotions",  label:"Émotions",         emoji:"💫" },
+  ];
+
+  const grille = document.getElementById("stats-grille");
+  grille.innerHTML = "<p style='color:var(--texte-c);font-size:.85rem'>Chargement des stats…</p>";
+
+  const resultats = await Promise.all(tables.map(t => db.lire(t.table)));
+  grille.innerHTML = "";
+  tables.forEach((t, i) => {
+    const n = Array.isArray(resultats[i]) ? resultats[i].length : "?";
+    const div = document.createElement("div");
+    div.className = "carte-admin";
+    div.innerHTML = `
+      <div style="font-size:1.8rem;margin-bottom:.4rem">${t.emoji}</div>
+      <div class="carte-admin-titre">${n}</div>
+      <div class="carte-admin-meta">${t.label}</div>`;
+    grille.appendChild(div);
+  });
+}
+
+/* ================================================================
+   GALERIE
+================================================================ */
+function ouvrirFormulaireGalerie(item=null) {
+  editId = item?.id || null;
+  document.getElementById("form-galerie-titre").textContent = item ? "Modifier la carte" : "Nouvelle carte";
+  document.getElementById("g-titre").value  = item?.titre  || "";
+  document.getElementById("g-texte").value  = item?.texte  || "";
+  document.getElementById("g-emoji").value  = item?.emoji  || "";
+  document.getElementById("g-image").value  = item?.image  || "";
+  document.getElementById("g-cat").value    = item?.categorie || "debut";
+  ouvrirFormulaire("form-galerie");
+}
+async function sauvegarderGalerie() {
+  const data = {
+    titre:     document.getElementById("g-titre").value.trim(),
+    texte:     document.getElementById("g-texte").value.trim(),
+    emoji:     document.getElementById("g-emoji").value.trim(),
+    image:     document.getElementById("g-image").value.trim() || null,
+    categorie: document.getElementById("g-cat").value
+  };
+  if (!data.titre) { toast("Le titre est requis", "erreur"); return; }
+  const res = editId ? await db.modifier("galerie", editId, data) : await db.inserer("galerie", data);
+  if (res) { toast(editId ? "Carte modifiée ✓" : "Carte ajoutée ✓"); fermerFormulaire("form-galerie"); chargerGalerie(); }
+  else toast("Erreur", "erreur");
+}
+async function chargerGalerie() {
+  const liste = await db.lire("galerie");
+  const el = document.getElementById("liste-galerie");
+  const cats = { debut:"Notre début", calme:"Moments calmes", aimer:"Ce que j'aime", voir:"Ce que je vois" };
+  el.innerHTML = liste.map(item => `
+    <div class="carte-admin">
+      <div style="font-size:1.5rem;margin-bottom:.3rem">${item.emoji||"✦"}</div>
+      <div class="carte-admin-titre">${item.titre}</div>
+      <div class="carte-admin-meta">${cats[item.categorie]||item.categorie}</div>
+      <div class="carte-admin-actions">
+        <button class="btn-sec" onclick='ouvrirFormulaireGalerie(${JSON.stringify(item)})'>Modifier</button>
+        <button class="btn-danger" onclick="supprimerItem('galerie','${item.id}',chargerGalerie)">Supprimer</button>
+      </div>
+    </div>`).join("");
+}
+
+/* ================================================================
+   COMPRENDRE
+================================================================ */
+function ouvrirFormulaireComprendre(item=null) {
+  editId = item?.id || null;
+  document.getElementById("c-titre").value = item?.titre || "";
+  document.getElementById("c-texte").value = item?.texte || "";
+  ouvrirFormulaire("form-comprendre");
+}
+async function sauvegarderComprendre() {
+  const data = { titre: document.getElementById("c-titre").value.trim(), texte: document.getElementById("c-texte").value.trim() };
+  if (!data.titre) { toast("Titre requis","erreur"); return; }
+  const res = editId ? await db.modifier("comprendre", editId, data) : await db.inserer("comprendre", data);
+  if (res) { toast("Sauvegardé ✓"); fermerFormulaire("form-comprendre"); chargerComprendre(); }
+}
+async function chargerComprendre() {
+  const liste = await db.lire("comprendre");
+  const el = document.getElementById("liste-comprendre");
+  el.innerHTML = "<table class='tableau'><thead><tr><th>Titre</th><th>Texte</th><th>Actions</th></tr></thead><tbody>" +
+    liste.map(i => `<tr>
+      <td><strong>${i.titre}</strong></td>
+      <td style="color:var(--texte-c);font-size:.82rem">${i.texte?.substring(0,60)}…</td>
+      <td><div style="display:flex;gap:.4rem">
+        <button class="btn-sec" onclick='ouvrirFormulaireComprendre(${JSON.stringify(i)})'>Modifier</button>
+        <button class="btn-danger" onclick="supprimerItem('comprendre','${i.id}',chargerComprendre)">✕</button>
+      </div></td></tr>`).join("") + "</tbody></table>";
+}
+
+/* ================================================================
+   ÉTOILES UNIVERS
+================================================================ */
+function ouvrirFormulaireEtoile(item=null) {
+  editId = item?.id || null;
+  document.getElementById("e-label").value   = item?.label   || "";
+  document.getElementById("e-emoji").value   = item?.emoji   || "⭐";
+  document.getElementById("e-x").value       = item?.x       || 50;
+  document.getElementById("e-y").value       = item?.y       || 50;
+  document.getElementById("e-message").value = item?.message || "";
+  ouvrirFormulaire("form-etoile");
+}
+async function sauvegarderEtoile() {
+  const data = {
+    label:   document.getElementById("e-label").value.trim(),
+    emoji:   document.getElementById("e-emoji").value.trim() || "⭐",
+    x:       parseInt(document.getElementById("e-x").value),
+    y:       parseInt(document.getElementById("e-y").value),
+    message: document.getElementById("e-message").value.trim()
+  };
+  if (!data.label) { toast("Label requis","erreur"); return; }
+  const res = editId ? await db.modifier("etoiles", editId, data) : await db.inserer("etoiles", data);
+  if (res) { toast("Étoile sauvegardée ✓"); fermerFormulaire("form-etoile"); chargerEtoiles(); }
+}
+async function chargerEtoiles() {
+  const liste = await db.lire("etoiles");
+  const el = document.getElementById("liste-etoiles");
+  el.innerHTML = liste.map(e => `
+    <div class="carte-admin">
+      <div style="font-size:1.5rem">${e.emoji} <span class="badge bleu">x:${e.x} y:${e.y}</span></div>
+      <div class="carte-admin-titre">${e.label}</div>
+      <div class="carte-admin-meta" style="font-style:italic">"${e.message?.substring(0,50)}…"</div>
+      <div class="carte-admin-actions">
+        <button class="btn-sec" onclick='ouvrirFormulaireEtoile(${JSON.stringify(e)})'>Modifier</button>
+        <button class="btn-danger" onclick="supprimerItem('etoiles','${e.id}',chargerEtoiles)">Supprimer</button>
+      </div>
+    </div>`).join("");
+}
+
+/* ================================================================
+   VOYAGES
+================================================================ */
+function ouvrirFormulaireVoyage(item=null) {
+  editId = item?.id || null;
+  listesTemp.moments = item?.moments_forts || [];
+  document.getElementById("form-voyage-titre").textContent = item ? "Modifier le voyage" : "Nouveau voyage";
+  document.getElementById("v-nom").value    = item?.nom    || "";
+  document.getElementById("v-pays").value   = item?.pays   || "";
+  document.getElementById("v-emoji").value  = item?.emoji  || "";
+  document.getElementById("v-annee").value  = item?.annee  || "";
+  document.getElementById("v-lat").value    = item?.lat    || "";
+  document.getElementById("v-lng").value    = item?.lng    || "";
+  document.getElementById("v-resume").value = item?.resume || "";
+  document.getElementById("v-video").value  = item?.video  || "";
+  document.getElementById("v-fait").value   = item?.fait !== false ? "true" : "false";
+  renderListe("v-moments-liste", listesTemp.moments, "moments");
+  ouvrirFormulaire("form-voyage");
+}
+async function sauvegarderVoyage() {
+  const data = {
+    nom:           document.getElementById("v-nom").value.trim(),
+    pays:          document.getElementById("v-pays").value.trim(),
+    emoji:         document.getElementById("v-emoji").value.trim() || "✈️",
+    annee:         document.getElementById("v-annee").value.trim(),
+    lat:           parseFloat(document.getElementById("v-lat").value),
+    lng:           parseFloat(document.getElementById("v-lng").value),
+    resume:        document.getElementById("v-resume").value.trim(),
+    moments_forts: listesTemp.moments,
+    video:         document.getElementById("v-video").value.trim() || null,
+    fait:          document.getElementById("v-fait").value === "true"
+  };
+  if (!data.nom) { toast("Nom requis","erreur"); return; }
+  const res = editId ? await db.modifier("voyages", editId, data) : await db.inserer("voyages", data);
+  if (res) { toast("Voyage sauvegardé ✓"); fermerFormulaire("form-voyage"); chargerVoyages(); listesTemp.moments=[]; }
+}
+async function chargerVoyages() {
+  const liste = await db.lire("voyages");
+  const el = document.getElementById("liste-voyages");
+  el.innerHTML = liste.map(v => `
+    <div class="carte-admin">
+      <div style="font-size:1.5rem;margin-bottom:.3rem">${v.emoji} <span class="badge ${v.fait?'vert':'gris'}">${v.fait?'Fait':'Rêve'}</span></div>
+      <div class="carte-admin-titre">${v.nom}</div>
+      <div class="carte-admin-meta">${v.pays} · ${v.annee||'—'}</div>
+      <div class="carte-admin-actions">
+        <button class="btn-sec" onclick='ouvrirFormulaireVoyage(${JSON.stringify(v)})'>Modifier</button>
+        <button class="btn-danger" onclick="supprimerItem('voyages','${v.id}',chargerVoyages)">Supprimer</button>
+      </div>
+    </div>`).join("");
+}
+
+/* ================================================================
+   ALBUMS
+================================================================ */
+let albumAdminId = null;
+function ouvrirFormulaireAlbum() { ouvrirFormulaire("form-album"); }
+async function sauvegarderAlbum() {
+  const data = {
+    titre:   document.getElementById("a-titre").value.trim(),
+    lieu:    document.getElementById("a-lieu").value.trim(),
+    date:    document.getElementById("a-date").value.trim(),
+    emoji:   document.getElementById("a-emoji").value.trim() || "📷",
+    couleur: document.getElementById("a-couleur").value
+  };
+  if (!data.titre) { toast("Titre requis","erreur"); return; }
+  const res = await db.inserer("albums", data);
+  if (res) { toast("Album créé ✓"); fermerFormulaire("form-album"); chargerAlbums(); }
+}
+async function chargerAlbums() {
+  const liste = await db.lire("albums");
+  const el = document.getElementById("liste-albums");
+  el.innerHTML = liste.map(a => `
+    <div class="carte-admin" style="border-left-color:${a.couleur}">
+      <div style="font-size:1.5rem;margin-bottom:.3rem">${a.emoji}</div>
+      <div class="carte-admin-titre">${a.titre}</div>
+      <div class="carte-admin-meta">${a.lieu} · ${a.date||'—'}</div>
+      <div class="carte-admin-actions">
+        <button class="btn-sec" onclick="ouvrirAjoutPhoto('${a.id}','${a.titre}')">+ Photo</button>
+        <button class="btn-danger" onclick="supprimerItem('albums','${a.id}',chargerAlbums)">Supprimer</button>
+      </div>
+    </div>`).join("");
+}
+function ouvrirAjoutPhoto(id, titre) {
+  albumAdminId = id;
+  listesTemp.imagesAlbum = [];
+  document.getElementById("apercu-album").innerHTML = "";
+  document.getElementById("form-photo-album-titre").textContent = `Ajouter des photos — ${titre}`;
+  ouvrirFormulaire("form-photo-album");
+}
+async function sauvegarderPhotoAlbum() {
+  const theme = document.getElementById("pa-theme").value.trim() || "Général";
+  const themeEmoji = document.getElementById("pa-theme-emoji").value.trim() || "📷";
+  const legende = document.getElementById("pa-legende").value.trim();
+  for (const url of listesTemp.imagesAlbum) {
+    await db.inserer("album_photos", { album_id: albumAdminId, theme, theme_emoji: themeEmoji, src: url, legende });
+  }
+  toast("Photos ajoutées ✓");
+  listesTemp.imagesAlbum = [];
+  document.getElementById("apercu-album").innerHTML = "";
+}
+
+/* ================================================================
+   PHOTOS NOUS
+================================================================ */
+function ouvrirFormulairePhoto(item=null) {
+  editId = item?.id || null;
+  document.getElementById("p-legende").value = item?.legende || "";
+  document.getElementById("p-date").value    = item?.date    || "";
+  document.getElementById("p-emoji").value   = item?.emoji   || "📷";
+  document.getElementById("p-image").value   = item?.image   || "";
+  document.getElementById("p-hero").value    = item?.hero ? "true" : "false";
+  ouvrirFormulaire("form-photo");
+}
+async function sauvegarderPhoto() {
+  const data = {
+    legende: document.getElementById("p-legende").value.trim(),
+    date:    document.getElementById("p-date").value.trim(),
+    emoji:   document.getElementById("p-emoji").value.trim() || "📷",
+    image:   document.getElementById("p-image").value.trim() || null,
+    hero:    document.getElementById("p-hero").value === "true"
+  };
+  const res = editId ? await db.modifier("photos", editId, data) : await db.inserer("photos", data);
+  if (res) { toast("Photo sauvegardée ✓"); fermerFormulaire("form-photo"); chargerPhotos(); }
+}
+async function chargerPhotos() {
+  const liste = await db.lire("photos");
+  const el = document.getElementById("liste-photos");
+  el.innerHTML = liste.map(p => `
+    <div class="carte-admin">
+      ${p.image ? `<img src="${p.image}" style="width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:.5rem" />` : `<div style="font-size:2rem;text-align:center;margin-bottom:.5rem">${p.emoji}</div>`}
+      <div class="carte-admin-titre">${p.legende||'Sans légende'}</div>
+      <div class="carte-admin-meta">${p.date||'—'} ${p.hero?'· <span class="badge vert">Hero</span>':''}</div>
+      <div class="carte-admin-actions">
+        <button class="btn-sec" onclick='ouvrirFormulairePhoto(${JSON.stringify(p)})'>Modifier</button>
+        <button class="btn-danger" onclick="supprimerItem('photos','${p.id}',chargerPhotos)">Supprimer</button>
+      </div>
+    </div>`).join("");
+}
+
+/* ================================================================
+   CAPSULES
+================================================================ */
+function ouvrirFormulaireCapsule(item=null) {
+  editId = item?.id || null;
+  listesTemp.paras = item?.contenu || [];
+  document.getElementById("cap-titre").value = item?.titre || "";
+  document.getElementById("cap-emoji").value = item?.emoji || "💌";
+  document.getElementById("cap-date").value  = item?.date_ouverture?.split("T")[0] || "";
+  renderListe("cap-paras-liste", listesTemp.paras, "paras");
+  ouvrirFormulaire("form-capsule");
+}
+async function sauvegarderCapsule() {
+  const data = {
+    titre:         document.getElementById("cap-titre").value.trim(),
+    emoji:         document.getElementById("cap-emoji").value.trim() || "💌",
+    date_ouverture:document.getElementById("cap-date").value,
+    contenu:       listesTemp.paras
+  };
+  if (!data.titre || !data.date_ouverture) { toast("Titre et date requis","erreur"); return; }
+  const res = editId ? await db.modifier("capsules", editId, data) : await db.inserer("capsules", data);
+  if (res) { toast("Capsule sauvegardée ✓"); fermerFormulaire("form-capsule"); chargerCapsules(); listesTemp.paras=[]; }
+}
+async function chargerCapsules() {
+  const liste = await db.lire("capsules");
+  const el = document.getElementById("liste-capsules");
+  el.innerHTML = liste.map(c => {
+    const dateStr = c.date_ouverture ? new Date(c.date_ouverture).toLocaleDateString("fr-FR") : "?";
+    const ouverte = new Date() >= new Date(c.date_ouverture);
+    return `<div class="carte-admin">
+      <div style="font-size:1.5rem;margin-bottom:.3rem">${c.emoji} <span class="badge ${ouverte?'vert':'gris'}">${ouverte?'Ouverte':'Verrouillée'}</span></div>
+      <div class="carte-admin-titre">${c.titre}</div>
+      <div class="carte-admin-meta">S'ouvre le ${dateStr}</div>
+      <div class="carte-admin-actions">
+        <button class="btn-sec" onclick='ouvrirFormulaireCapsule(${JSON.stringify(c)})'>Modifier</button>
+        <button class="btn-danger" onclick="supprimerItem('capsules','${c.id}',chargerCapsules)">Supprimer</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ================================================================
+   ÉMOTIONS
+================================================================ */
+function ouvrirFormulaireEmotion(item=null) {
+  editId = item?.id || null;
+  listesTemp.minis = item?.mini || [];
+  document.getElementById("em-id").value      = item?.slug    || "";
+  document.getElementById("em-label").value   = item?.label   || "";
+  document.getElementById("em-message").value = item?.message || "";
+  renderListe("em-minis-liste", listesTemp.minis, "minis");
+  ouvrirFormulaire("form-emotion");
+}
+async function sauvegarderEmotion() {
+  const data = {
+    slug:    document.getElementById("em-id").value.trim(),
+    label:   document.getElementById("em-label").value.trim(),
+    message: document.getElementById("em-message").value.trim(),
+    mini:    listesTemp.minis
+  };
+  if (!data.slug || !data.label) { toast("ID et label requis","erreur"); return; }
+  const res = editId ? await db.modifier("emotions", editId, data) : await db.inserer("emotions", data);
+  if (res) { toast("Émotion sauvegardée ✓"); fermerFormulaire("form-emotion"); chargerEmotions(); listesTemp.minis=[]; }
+}
+async function chargerEmotions() {
+  const liste = await db.lire("emotions");
+  const el = document.getElementById("liste-emotions");
+  el.innerHTML = liste.map(e => `
+    <div class="carte-admin">
+      <div class="carte-admin-titre">${e.label}</div>
+      <div class="carte-admin-meta" style="font-style:italic">"${e.message?.substring(0,60)}…"</div>
+      <div class="carte-admin-actions">
+        <button class="btn-sec" onclick='ouvrirFormulaireEmotion(${JSON.stringify(e)})'>Modifier</button>
+        <button class="btn-danger" onclick="supprimerItem('emotions','${e.id}',chargerEmotions)">Supprimer</button>
+      </div>
+    </div>`).join("");
+}
+
+/* ================================================================
+   POP-UP
+================================================================ */
+async function chargerPopup() {
+  const liste = await db.lire("popup");
+  const item  = liste[0];
+  if (!item) return;
+  document.getElementById("pp-titre").value     = item.titre     || "";
+  document.getElementById("pp-signature").value = item.signature || "";
+  document.getElementById("pp-paras").value     = (item.paragraphes || [])
+    .map(p => p.separateur ? "---" : p.texte).join("\n");
+}
+async function sauvegarderPopup() {
+  const lignes = document.getElementById("pp-paras").value.split("\n").filter(l => l.trim());
+  const paragraphes = lignes.map(l => l.trim() === "---" ? { separateur:true } : { texte:l.trim() });
+  const data = {
+    titre:       document.getElementById("pp-titre").value.trim(),
+    signature:   document.getElementById("pp-signature").value.trim(),
+    paragraphes
+  };
+  const liste = await db.lire("popup");
+  const res   = liste[0]
+    ? await db.modifier("popup", liste[0].id, data)
+    : await db.inserer("popup", data);
+  if (res) toast("Pop-up mis à jour ✓");
+}
+
+/* ================================================================
+   SUPPRIMER GÉNÉRIQUE
+================================================================ */
+async function supprimerItem(table, id, callback) {
+  if (!confirm("Supprimer définitivement ?")) return;
+  const ok = await db.supprimer(table, id);
+  if (ok) { toast("Supprimé ✓"); callback(); }
+  else toast("Erreur suppression","erreur");
+}
+
+/* ================================================================
+   CHARGEMENT INITIAL
+================================================================ */
+function chargerTout() {
+  if (sessionStorage.getItem("admin_ok")) chargerTableauBord();
+}
+document.addEventListener("DOMContentLoaded", chargerTout);
+</script>
+</body>
+</html>
