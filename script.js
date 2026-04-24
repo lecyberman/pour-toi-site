@@ -2262,4 +2262,3 @@ async function chargerDepuisSupabase() {
     console.warn("Supabase non disponible — données statiques utilisées.", err);
   }
 }
-
