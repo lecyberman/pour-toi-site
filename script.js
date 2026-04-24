@@ -522,8 +522,10 @@ function initComprendre() {
 let cielInitialise = false;
 
 function initUnivers() {
-  if (cielInitialise) return;
-  cielInitialise = true;
+  // Toujours réinitialiser les objets cliquables (les données peuvent avoir changé)
+  const conteneurCheck = document.getElementById("univers-objets");
+  if (cielInitialise && conteneurCheck && conteneurCheck.children.length === universObjets.length) return;
+  if (!cielInitialise) cielInitialise = true;
 
   // Canvas étoilé
   const canvas = document.getElementById("ciel-canvas");
@@ -602,7 +604,7 @@ function initUnivers() {
   }
   scintiller();
 
-  // Objets cliquables
+  // Objets cliquables — toujours reconstruire
   const conteneur = document.getElementById("univers-objets");
   conteneur.innerHTML = "";
 
@@ -717,13 +719,15 @@ function telechargerDessin() {
   lien.click();
 }
 
-function validerDessin() {
-  const msgs  = messagesApresDessin;
-  const msg   = msgs[Math.floor(Math.random() * msgs.length)];
-  const div   = document.getElementById("message-apres-dessin");
+async function validerDessin() {
+  const msgs = messagesApresDessin;
+  const msg  = msgs[Math.floor(Math.random() * msgs.length)];
+  const div  = document.getElementById("message-apres-dessin");
   document.getElementById("message-apres-texte").textContent = msg;
   div.hidden = false;
   div.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  // Sauvegarder dans Supabase si connecté
+  await sauvegarderDessinEnLigne("dessin-canvas", "dessin", msg);
 }
 
 // ── Traducteur émotionnel ─────────────────────────────────────────
@@ -2261,4 +2265,27 @@ async function chargerDepuisSupabase() {
   } catch(err) {
     console.warn("Supabase non disponible — données statiques utilisées.", err);
   }
+}
+
+
+/* ================================================================
+   SAUVEGARDE DESSINS & ŒUVRES DANS SUPABASE
+================================================================ */
+async function sauvegarderDessinEnLigne(canvasId, type, message = "") {
+  if (typeof db === "undefined" || SUPABASE_URL.includes("XXXXXXXXXXXX")) return null;
+
+  try {
+    const canvas = document.getElementById(canvasId);
+    // Convertir canvas en blob
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+    const chemin = `${type}/${Date.now()}.png`;
+    const url = await db.uploadImage("images", chemin, blob);
+    if (url) {
+      await db.inserer("dessins", { image_url: url, message, type });
+      return url;
+    }
+  } catch(e) {
+    console.warn("Sauvegarde dessin échouée:", e);
+  }
+  return null;
 }
