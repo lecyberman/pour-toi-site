@@ -264,6 +264,7 @@
     <button class="nav-btn" onclick="aller('capsules-admin')">✦ Capsules temporelles</button>
     <button class="nav-btn" onclick="aller('emotions-admin')">✦ Émotions</button>
     <button class="nav-btn" onclick="aller('popup-admin')">✦ Pop-up accueil</button>
+    <button class="nav-btn" onclick="aller('dessins-admin')">✦ Dessins sauvegardés</button>
     <div class="sidebar-sep"></div>
     <button class="btn-deconnexion" onclick="seDeconnecter()">Se déconnecter</button>
   </nav>
@@ -320,9 +321,10 @@
             <label>Image</label>
             <div class="upload-zone">
               <input type="file" accept="image/*" onchange="uploadImageAdmin('galerie', this)" />
-              <p>Clique pour choisir une image</p>
+              <p>Clique pour choisir une image (max 10MB)</p>
             </div>
-            <input id="g-image" type="text" placeholder="URL générée automatiquement" readonly />
+            <div id="apercu-galerie"></div>
+            <input id="g-image" type="text" placeholder="URL générée automatiquement" readonly style="margin-top:.4rem" class="champ" />
           </div>
         </div>
         <div class="form-actions">
@@ -572,8 +574,9 @@
           <label>Image</label>
           <div class="upload-zone">
             <input type="file" accept="image/*" onchange="uploadImageAdmin('photos', this)" />
-            <p>Clique pour choisir une image</p>
+            <p>Clique pour choisir une image (max 10MB)</p>
           </div>
+          <div id="apercu-photos"></div>
           <input id="p-image" type="text" placeholder="URL générée automatiquement" readonly
                  style="margin-top:.4rem" class="champ" />
         </div>
@@ -690,6 +693,16 @@
       </div>
     </div>
 
+
+    <!-- Dessins & Œuvres sauvegardés -->
+    <div id="panneau-dessins-admin" class="panneau">
+      <div class="section-entete">
+        <h2>Dessins & Œuvres sauvegardés</h2>
+        <p style="font-size:.85rem;color:var(--texte-c)">Tous les dessins créés sur le site sont sauvegardés ici.</p>
+      </div>
+      <div id="liste-dessins" class="cartes-grille"></div>
+    </div>
+
   </main>
 </div>
 
@@ -758,6 +771,7 @@ function chargerPanneau(id) {
     "capsules-admin":  chargerCapsules,
     "emotions-admin":  chargerEmotions,
     "popup-admin":     chargerPopup,
+    "dessins-admin":   chargerDessins,
   };
   fns[id]?.();
 }
@@ -795,14 +809,32 @@ function viderChamps(...ids) { ids.forEach(id => { const el = document.getElemen
 async function uploadImageAdmin(contexte, input) {
   const fichier = input.files[0];
   if (!fichier) return;
+
+  // Vérifier taille (max 10MB)
+  if (fichier.size > 10 * 1024 * 1024) {
+    toast("Image trop lourde (max 10MB)", "erreur"); return;
+  }
+
+  const targetId = contexte === "galerie" ? "g-image" : "p-image";
+  const targetEl = document.getElementById(targetId);
+  targetEl.value = "Upload en cours…";
   toast("Upload en cours…", "gris");
-  const chemin = `${contexte}/${Date.now()}_${fichier.name.replace(/\s/g,"_")}`;
-  const url = await db.uploadImage("images", chemin, fichier);
+
+  const ext    = fichier.name.split('.').pop();
+  const chemin = `${contexte}/${Date.now()}.${ext}`;
+  const url    = await db.uploadImage("images", chemin, fichier);
+
   if (url) {
-    document.getElementById(contexte === "galerie" ? "g-image" : "p-image").value = url;
-    toast("Image uploadée ✓");
+    targetEl.value = url;
+    toast("✓ Image uploadée avec succès !");
+    // Aperçu immédiat
+    const apercu = document.getElementById("apercu-" + contexte);
+    if (apercu) {
+      apercu.innerHTML = `<img src="${url}" style="max-height:120px;border-radius:8px;margin-top:.5rem" />`;
+    }
   } else {
-    toast("Erreur upload", "erreur");
+    targetEl.value = "";
+    toast("Erreur upload — vérifie les policies du bucket dans Supabase → Storage → Policies", "erreur");
   }
 }
 
@@ -998,7 +1030,14 @@ async function sauvegarderEtoile() {
   };
   if (!data.label) { toast("Label requis","erreur"); return; }
   const res = editId ? await db.modifier("etoiles", editId, data) : await db.inserer("etoiles", data);
-  if (res) { toast("Étoile sauvegardée ✓"); fermerFormulaire("form-etoile"); chargerEtoiles(); }
+  if (res) {
+    toast("Étoile sauvegardée ✓ — elle apparaîtra dans l'univers au prochain chargement");
+    editId = null;
+    // Vider le formulaire mais ne pas le fermer (pour faciliter l'ajout multiple)
+    document.getElementById("e-label").value = "";
+    document.getElementById("e-message").value = "";
+    chargerEtoiles();
+  }
 }
 async function chargerEtoiles() {
   const liste = await db.lire("etoiles");
@@ -1272,6 +1311,29 @@ async function supprimerItem(table, id, callback) {
 /* ================================================================
    CHARGEMENT INITIAL
 ================================================================ */
+
+/* ================================================================
+   DESSINS SAUVEGARDÉS
+================================================================ */
+async function chargerDessins() {
+  const liste = await db.lire("dessins");
+  const el = document.getElementById("liste-dessins");
+  if (!liste || liste.length === 0) {
+    el.innerHTML = '<p style="color:var(--texte-c);font-style:italic">Aucun dessin sauvegardé pour l\'instant.</p>';
+    return;
+  }
+  el.innerHTML = liste.reverse().map(d => `
+    <div class="carte-admin">
+      ${d.image_url ? `<img src="${d.image_url}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:.5rem" />` : ''}
+      <div class="carte-admin-titre">${d.type === 'oeuvre' ? '🎨 Œuvre' : '✏️ Dessin'}</div>
+      ${d.message ? `<div class="carte-admin-meta" style="font-style:italic">"${d.message.substring(0,60)}"</div>` : ''}
+      <div class="carte-admin-meta">${new Date(d.created_at).toLocaleDateString('fr-FR')}</div>
+      <div class="carte-admin-actions">
+        ${d.image_url ? `<a href="${d.image_url}" target="_blank" class="btn-sec" style="text-decoration:none">Voir</a>` : ''}
+        <button class="btn-danger" onclick="supprimerItem('dessins','${d.id}',chargerDessins)">Supprimer</button>
+      </div>
+    </div>`).join("");
+}
 function chargerTout() {
   if (sessionStorage.getItem("admin_ok")) chargerTableauBord();
 }
