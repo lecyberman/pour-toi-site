@@ -419,8 +419,8 @@
             <input id="v-pays" type="text" placeholder="Japon" />
           </div>
           <div class="form-champ">
-            <label>Emoji / drapeau</label>
-            <input id="v-emoji" type="text" placeholder="🇯🇵" maxlength="4" />
+            <label>Emoji / drapeau (colle : 🇯🇵 🇲🇦 🌴)</label>
+            <input id="v-emoji" type="text" placeholder="🇯🇵" />
           </div>
           <div class="form-champ">
             <label>Année / période</label>
@@ -463,6 +463,15 @@
             </select>
           </div>
         </div>
+        <div class="form-champ" style="margin-bottom:1rem">
+          <label>Photos du voyage (optionnel)</label>
+          <div class="upload-zone">
+            <input type="file" accept="image/*" multiple
+                   onchange="uploadPhotosVoyage(this)" />
+            <p>Clique pour ajouter des photos du voyage (plusieurs possibles)</p>
+          </div>
+          <div class="upload-apercu" id="apercu-voyage"></div>
+        </div>
         <div class="form-actions">
           <button class="btn-prim" onclick="sauvegarderVoyage()">Sauvegarder</button>
           <button class="btn-sec" onclick="fermerFormulaire('form-voyage')">Annuler</button>
@@ -479,6 +488,9 @@
       </div>
       <div id="form-album" class="formulaire" style="display:none">
         <h3>Nouvel album</h3>
+        <p style="font-size:.82rem;color:var(--texte-c);margin-bottom:.8rem">
+          💡 Conseil : donne à l'album le même nom que le voyage correspondant pour qu'ils soient automatiquement liés (ex: "Barcelone").
+        </p>
         <div class="form-grille">
           <div class="form-champ">
             <label>Titre de l'album</label>
@@ -493,8 +505,8 @@
             <input id="a-date" type="text" placeholder="Été 2024" />
           </div>
           <div class="form-champ">
-            <label>Emoji</label>
-            <input id="a-emoji" type="text" placeholder="🇪🇸" maxlength="4" />
+            <label>Emoji (colle directement 🇪🇸 🇯🇵 etc.)</label>
+            <input id="a-emoji" type="text" placeholder="🇪🇸" />
           </div>
           <div class="form-champ">
             <label>Couleur d'accent</label>
@@ -842,16 +854,38 @@ async function uploadImagesAlbum(input) {
   const apercu = document.getElementById("apercu-album");
   for (const fichier of input.files) {
     toast("Upload " + fichier.name + "…", "gris");
-    const chemin = `albums/${Date.now()}_${fichier.name.replace(/\s/g,"_")}`;
+    const ext = fichier.name.split('.').pop();
+    const chemin = `albums/${Date.now()}.${ext}`;
     const url = await db.uploadImage("images", chemin, fichier);
     if (url) {
       listesTemp.imagesAlbum.push(url);
       const img = document.createElement("img");
-      img.src = url;
+      img.src = url; img.style.cssText = "height:70px;border-radius:6px;object-fit:cover";
       apercu.appendChild(img);
     }
   }
-  toast("Photos uploadées ✓");
+  toast(listesTemp.imagesAlbum.length + " photo(s) prête(s) ✓");
+}
+
+// Temp storage for voyage photos
+listesTemp.imagesVoyage = [];
+
+async function uploadPhotosVoyage(input) {
+  const apercu = document.getElementById("apercu-voyage");
+  for (const fichier of input.files) {
+    toast("Upload " + fichier.name + "…", "gris");
+    const ext = fichier.name.split('.').pop();
+    const chemin = `voyages/${Date.now()}.${ext}`;
+    const url = await db.uploadImage("images", chemin, fichier);
+    if (url) {
+      listesTemp.imagesVoyage = listesTemp.imagesVoyage || [];
+      listesTemp.imagesVoyage.push({ src: url, legende: fichier.name.replace(/\.[^/.]+$/, "") });
+      const img = document.createElement("img");
+      img.src = url; img.style.cssText = "height:70px;border-radius:6px;object-fit:cover";
+      apercu.appendChild(img);
+    }
+  }
+  toast((listesTemp.imagesVoyage?.length || 0) + " photo(s) prête(s) ✓");
 }
 
 /* ================================================================
@@ -1060,6 +1094,9 @@ async function chargerEtoiles() {
 function ouvrirFormulaireVoyage(item=null) {
   editId = item?.id || null;
   listesTemp.moments = item?.moments_forts || [];
+  listesTemp.imagesVoyage = [];
+  const ap = document.getElementById("apercu-voyage");
+  if (ap) ap.innerHTML = "";
   document.getElementById("form-voyage-titre").textContent = item ? "Modifier le voyage" : "Nouveau voyage";
   document.getElementById("v-nom").value    = item?.nom    || "";
   document.getElementById("v-pays").value   = item?.pays   || "";
@@ -1088,7 +1125,20 @@ async function sauvegarderVoyage() {
   };
   if (!data.nom) { toast("Nom requis","erreur"); return; }
   const res = editId ? await db.modifier("voyages", editId, data) : await db.inserer("voyages", data);
-  if (res) { toast("Voyage sauvegardé ✓"); fermerFormulaire("form-voyage"); chargerVoyages(); listesTemp.moments=[]; }
+  if (res) {
+    // Sauvegarder les photos si présentes
+    const photos = listesTemp.imagesVoyage || [];
+    for (const p of photos) {
+      await db.inserer("voyage_photos", { voyage_id: res.id, src: p.src, legende: p.legende });
+    }
+    const nb = photos.length;
+    toast("Voyage sauvegardé ✓" + (nb > 0 ? ` + ${nb} photo(s)` : ""));
+    fermerFormulaire("form-voyage");
+    chargerVoyages();
+    listesTemp.moments = [];
+    listesTemp.imagesVoyage = [];
+    document.getElementById("apercu-voyage").innerHTML = "";
+  }
 }
 async function chargerVoyages() {
   const liste = await db.lire("voyages");
