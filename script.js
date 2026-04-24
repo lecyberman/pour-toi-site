@@ -2154,14 +2154,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 ================================================================ */
 
 async function chargerDepuisSupabase() {
-  // Vérifie si Supabase est configuré
   if (typeof db === "undefined" || SUPABASE_URL.includes("XXXXXXXXXXXX")) {
     console.info("Supabase non configuré — données statiques utilisées.");
     return;
   }
 
   try {
-    // Popup
+    // ── Popup : remplace seulement si données présentes ──
     const popupData = await db.lire("popup");
     if (popupData?.length > 0) {
       const p = popupData[0];
@@ -2174,93 +2173,150 @@ async function chargerDepuisSupabase() {
       }
     }
 
-    // Galerie
+    // ── Galerie : FUSIONNE avec les données statiques ──
     const galerie = await db.lire("galerie");
     if (galerie?.length > 0) {
-      gallerieData.length = 0;
-      galerie.forEach((item, i) => gallerieData.push({ ...item, id: i + 1 }));
+      // Ajouter seulement les items Supabase qui ne sont pas déjà dans le statique
+      const titresExistants = new Set(gallerieData.map(g => g.titre.toLowerCase()));
+      let nextId = Math.max(...gallerieData.map(g => g.id || 0), 100) + 1;
+      galerie.forEach(item => {
+        if (!titresExistants.has(item.titre.toLowerCase())) {
+          gallerieData.push({ ...item, id: nextId++ });
+        }
+      });
     }
 
-    // Comprendre
+    // ── Comprendre : FUSIONNE ──
     const comprendre = await db.lire("comprendre");
     if (comprendre?.length > 0) {
-      comprendreData.length = 0;
-      comprendre.forEach(item => comprendreData.push({ titre: item.titre, texte: item.texte }));
+      const titresExistants = new Set(comprendreData.map(c => c.titre.toLowerCase()));
+      comprendre.forEach(item => {
+        if (!titresExistants.has(item.titre.toLowerCase())) {
+          comprendreData.push({ titre: item.titre, texte: item.texte });
+        }
+      });
     }
 
-    // Étoiles
+    // ── Étoiles : FUSIONNE ──
     const etoiles = await db.lire("etoiles");
     if (etoiles?.length > 0) {
-      universObjets.length = 0;
-      etoiles.forEach(e => universObjets.push({ label: e.label, message: e.message, emoji: e.emoji, x: e.x, y: e.y }));
+      const labelsExistants = new Set(universObjets.map(e => e.label.toLowerCase()));
+      etoiles.forEach(e => {
+        if (!labelsExistants.has(e.label.toLowerCase())) {
+          universObjets.push({ label: e.label, message: e.message, emoji: e.emoji, x: e.x, y: e.y });
+        }
+      });
     }
 
-    // Voyages
+    // ── Voyages : FUSIONNE ──
     const voyages = await db.lire("voyages");
     if (voyages?.length > 0) {
-      voyagesData.length = 0;
-      voyages.forEach(v => voyagesData.push({
-        id: v.nom.toLowerCase().replace(/\s+/g, "-"),
-        nom: v.nom, pays: v.pays, emoji: v.emoji, annee: v.annee,
-        coords: { lat: v.lat, lng: v.lng },
-        fait: v.fait, resume: v.resume,
-        momentsForts: v.moments_forts || [],
-        video: v.video, photos: []
-      }));
+      // Charger aussi les photos de voyage
+      const voyagePhotos = await db.lire("voyage_photos");
+      const nomsExistants = new Set(voyagesData.map(v => v.nom.toLowerCase()));
+      voyages.forEach(v => {
+        const vid = v.nom.toLowerCase().replace(/\s+/g, "-");
+        const photos = (voyagePhotos || [])
+          .filter(p => p.voyage_id === v.id)
+          .map(p => ({ src: p.src, legende: p.legende }));
+        if (!nomsExistants.has(v.nom.toLowerCase())) {
+          voyagesData.push({
+            id: vid, nom: v.nom, pays: v.pays, emoji: v.emoji, annee: v.annee,
+            coords: { lat: v.lat, lng: v.lng },
+            fait: v.fait, resume: v.resume,
+            momentsForts: v.moments_forts || [],
+            video: v.video, photos
+          });
+        } else {
+          // Mettre à jour les photos et infos du voyage existant
+          const existing = voyagesData.find(vd => vd.nom.toLowerCase() === v.nom.toLowerCase());
+          if (existing) {
+            if (v.annee && v.annee !== "À compléter") existing.annee = v.annee;
+            if (v.resume) existing.resume = v.resume;
+            if (v.moments_forts?.length) existing.momentsForts = v.moments_forts;
+            if (v.video) existing.video = v.video;
+            if (photos.length) existing.photos = photos;
+          }
+        }
+      });
     }
 
-    // Albums
+    // ── Albums : FUSIONNE ──
     const albums = await db.lire("albums");
     if (albums?.length > 0) {
       const albumPhotos = await db.lire("album_photos");
-      albumsData.length = 0;
+      const titresExistants = new Set(albumsData.map(a => a.titre.toLowerCase()));
       albums.forEach(a => {
-        const photosAlbum = albumPhotos.filter(p => p.album_id === a.id);
-        // Grouper par thème
+        const photosAlbum = (albumPhotos || []).filter(p => p.album_id === a.id);
         const themesMap = {};
         photosAlbum.forEach(p => {
           const k = p.theme || "Général";
           if (!themesMap[k]) themesMap[k] = { nom: k, emoji: p.theme_emoji || "📷", photos: [] };
           themesMap[k].photos.push({ src: p.src, legende: p.legende });
         });
-        albumsData.push({
-          id: a.id, titre: a.titre, lieu: a.lieu, date: a.date,
-          emoji: a.emoji, couleur: a.couleur, couverture: null,
-          themes: Object.values(themesMap).length > 0
-            ? Object.values(themesMap)
-            : [{ nom: "Photos", emoji: "📷", photos: [] }]
-        });
+        if (!titresExistants.has(a.titre.toLowerCase())) {
+          albumsData.push({
+            id: a.id, titre: a.titre, lieu: a.lieu, date: a.date,
+            emoji: a.emoji, couleur: a.couleur, couverture: null,
+            themes: Object.values(themesMap).length > 0
+              ? Object.values(themesMap)
+              : [{ nom: "Photos", emoji: "📷", photos: [] }]
+          });
+        } else {
+          // Mettre à jour les thèmes/photos de l'album existant
+          const existing = albumsData.find(ad => ad.titre.toLowerCase() === a.titre.toLowerCase());
+          if (existing && Object.values(themesMap).length > 0) {
+            Object.values(themesMap).forEach(theme => {
+              const t = existing.themes.find(t => t.nom === theme.nom);
+              if (t) {
+                // Fusionner les photos sans doublons
+                const srcsExistants = new Set(t.photos.map(p => p.src));
+                theme.photos.forEach(p => { if (!srcsExistants.has(p.src)) t.photos.push(p); });
+              } else {
+                existing.themes.push(theme);
+              }
+            });
+          }
+        }
       });
     }
 
-    // Photos nous deux
+    // ── Photos nous deux : FUSIONNE ──
     const photos = await db.lire("photos");
     if (photos?.length > 0) {
-      photosData.length = 0;
-      photos.forEach(p => photosData.push({ legende: p.legende, date: p.date, image: p.image, emoji: p.emoji, hero: p.hero }));
+      const legendesExistantes = new Set(photosData.map(p => p.legende?.toLowerCase()));
+      photos.forEach(p => {
+        if (!legendesExistantes.has(p.legende?.toLowerCase())) {
+          photosData.push({ legende: p.legende, date: p.date, image: p.image, emoji: p.emoji, hero: p.hero });
+        }
+      });
     }
 
-    // Capsules
+    // ── Capsules : FUSIONNE ──
     const capsules = await db.lire("capsules");
     if (capsules?.length > 0) {
-      capsulesData.length = 0;
-      capsules.forEach(c => capsulesData.push({
-        id: c.id, titre: c.titre, icone: c.emoji,
-        dateOuvert: c.date_ouverture?.split("T")[0] || c.date_ouverture,
-        contenu: c.contenu || []
-      }));
+      const titresExistants = new Set(capsulesData.map(c => c.titre.toLowerCase()));
+      capsules.forEach(c => {
+        if (!titresExistants.has(c.titre.toLowerCase())) {
+          capsulesData.push({
+            id: c.id, titre: c.titre, icone: c.emoji,
+            dateOuvert: c.date_ouverture?.split("T")[0] || c.date_ouverture,
+            contenu: c.contenu || []
+          });
+        }
+      });
     }
 
-    // Émotions
+    // ── Émotions : FUSIONNE ──
     const emotions = await db.lire("emotions");
     if (emotions?.length > 0) {
-      Object.keys(emotionsData).forEach(k => delete emotionsData[k]);
       emotions.forEach(e => {
+        // Ajouter ou mettre à jour
         emotionsData[e.slug] = { label: e.label, message: e.message, mini: e.mini || [] };
       });
     }
 
-    console.info("✓ Données chargées depuis Supabase");
+    console.info("✓ Données Supabase fusionnées avec données statiques");
 
   } catch(err) {
     console.warn("Supabase non disponible — données statiques utilisées.", err);
