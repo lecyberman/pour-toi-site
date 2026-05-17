@@ -123,6 +123,24 @@ create table if not exists souhaits (
   created_at timestamptz default now()
 );
 
+-- Photos liées à un voyage (chargées sur le site public)
+create table if not exists voyage_photos (
+  id         uuid default gen_random_uuid() primary key,
+  voyage_id  uuid references voyages(id) on delete cascade,
+  src        text,
+  legende    text,
+  created_at timestamptz default now()
+);
+
+-- Dessins et œuvres sauvegardés depuis le site
+create table if not exists dessins (
+  id         uuid default gen_random_uuid() primary key,
+  image_url  text not null,
+  message    text,
+  type       text default 'dessin',  -- 'dessin' | 'oeuvre'
+  created_at timestamptz default now()
+);
+
 -- ================================================================
 -- BUCKET STORAGE pour les images
 -- (à créer manuellement dans Supabase → Storage)
@@ -134,25 +152,32 @@ create table if not exists souhaits (
 -- POLITIQUES RLS (Row Level Security)
 -- Permet la lecture publique + écriture depuis le site
 -- ================================================================
-alter table galerie     enable row level security;
-alter table comprendre  enable row level security;
-alter table etoiles     enable row level security;
-alter table voyages     enable row level security;
-alter table albums      enable row level security;
-alter table album_photos enable row level security;
-alter table photos      enable row level security;
-alter table capsules    enable row level security;
-alter table emotions    enable row level security;
-alter table popup       enable row level security;
-alter table souhaits    enable row level security;
+alter table galerie       enable row level security;
+alter table comprendre    enable row level security;
+alter table etoiles       enable row level security;
+alter table voyages       enable row level security;
+alter table albums        enable row level security;
+alter table album_photos  enable row level security;
+alter table photos        enable row level security;
+alter table capsules      enable row level security;
+alter table emotions      enable row level security;
+alter table popup         enable row level security;
+alter table souhaits      enable row level security;
+alter table voyage_photos enable row level security;
+alter table dessins       enable row level security;
 
--- Lecture publique pour toutes les tables
+-- Lecture + écriture publiques pour toutes les tables (idempotent — re-exécutable)
 do $$ declare t text;
 begin
-  foreach t in array array['galerie','comprendre','etoiles','voyages','albums','album_photos','photos','capsules','emotions','popup','souhaits']
+  foreach t in array array[
+    'galerie','comprendre','etoiles','voyages','albums','album_photos',
+    'photos','capsules','emotions','popup','souhaits','voyage_photos','dessins'
+  ]
   loop
-    execute format('create policy "lecture publique" on %I for select using (true)', t);
-    execute format('create policy "ecriture publique" on %I for all using (true) with check (true)', t);
+    execute format('drop policy if exists "lecture publique"  on %I', t);
+    execute format('drop policy if exists "ecriture publique" on %I', t);
+    execute format('create policy "lecture publique"  on %I for select using (true)', t);
+    execute format('create policy "ecriture publique" on %I for all    using (true) with check (true)', t);
   end loop;
 end $$;
 

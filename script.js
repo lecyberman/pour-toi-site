@@ -1944,8 +1944,19 @@ function fermerModalVoyage() {
 
 /* ================================================================
    LOGIQUE — LISTE DE SOUHAITS
+   ----------------------------------------------------------------
+   - Source de vérité : Supabase (table `souhaits`)
+   - Cache localStorage : permet l'affichage instantané hors-ligne
+   - Toute modification est répliquée en base
 ================================================================ */
 const SOUHAITS_KEY = "souhaits_voyages_v1";
+
+// Indique si Supabase est utilisable (configuré + reachable)
+function supabaseDispo() {
+  return typeof db !== "undefined"
+      && typeof SUPABASE_URL === "string"
+      && !SUPABASE_URL.includes("XXXXXXXXXXXX");
+}
 
 function chargerSouhaits() {
   try {
@@ -1959,8 +1970,55 @@ function sauvegarderSouhaits(liste) {
   try { localStorage.setItem(SOUHAITS_KEY, JSON.stringify(liste)); } catch(e) {}
 }
 
-function initSouhaits() {
+async function initSouhaits() {
+  // Afficher d'abord la version locale (réactive)
   afficherSouhaits();
+  // Puis fusionner avec Supabase si dispo
+  await synchroniserSouhaitsDepuisSupabase();
+  afficherSouhaits();
+}
+
+// Charge les souhaits depuis Supabase et les fusionne avec le cache local.
+// La règle : Supabase fait foi pour ce qu'il contient ; les souhaits préremplis
+// purement locaux (non encore synchronisés) sont poussés vers la base.
+async function synchroniserSouhaitsDepuisSupabase() {
+  if (!supabaseDispo()) return;
+  try {
+    const distants = await db.lire("souhaits");
+    if (!Array.isArray(distants)) return;
+
+    const locaux = chargerSouhaits();
+    const fusion = [];
+    const nomsDistants = new Set(distants.map(d => (d.nom || "").toLowerCase()));
+
+    // 1) Tout ce qui est en base : on prend l'id UUID Supabase
+    distants.forEach(d => fusion.push({
+      id:    d.id,
+      nom:   d.nom,
+      emoji: d.emoji || "✈️",
+      note:  d.note || "",
+      fait:  !!d.fait
+    }));
+
+    // 2) Les souhaits locaux non encore en base (premier chargement) :
+    //    on les pousse vers Supabase, puis on les ajoute à la fusion avec leur nouvel UUID
+    for (const s of locaux) {
+      if (nomsDistants.has((s.nom || "").toLowerCase())) continue;
+      const cree = await db.inserer("souhaits", {
+        nom:   s.nom,
+        emoji: s.emoji || "✈️",
+        note:  s.note  || "",
+        fait:  !!s.fait
+      });
+      if (cree && cree.id) {
+        fusion.push({ id: cree.id, nom: cree.nom, emoji: cree.emoji, note: cree.note || "", fait: !!cree.fait });
+      }
+    }
+
+    sauvegarderSouhaits(fusion);
+  } catch(e) {
+    console.warn("Souhaits : sync Supabase échouée — on garde le cache local.", e);
+  }
 }
 
 function afficherSouhaits() {
@@ -1980,8 +2038,10 @@ function afficherSouhaits() {
     const div = document.createElement("div");
     div.className = "souhait-item" + (souhait.fait ? " souhait-fait" : "");
     div.style.animationDelay = `${i * 0.05}s`;
+    // id échappé (UUID ou "custom-…") — utilisable comme attribut
+    const idAttr = String(souhait.id).replace(/'/g, "\\'");
     div.innerHTML = `
-      <button class="souhait-check" onclick="toggleSouhait('${souhait.id}')"
+      <button class="souhait-check" onclick="toggleSouhait('${idAttr}')"
               aria-label="${souhait.fait ? "Marquer comme non visité" : "Marquer comme visité"}"
               title="${souhait.fait ? "Déjà visité ✓" : "Pas encore visité"}">
         ${souhait.fait ? "✓" : "○"}
@@ -1991,24 +2051,43 @@ function afficherSouhaits() {
         <strong>${souhait.nom}</strong>
         ${souhait.note ? `<span>${souhait.note}</span>` : ""}
       </div>
-      <button class="souhait-suppr" onclick="supprimerSouhait('${souhait.id}')" aria-label="Supprimer">✕</button>`;
+      <button class="souhait-suppr" onclick="supprimerSouhait('${idAttr}')" aria-label="Supprimer">✕</button>`;
     conteneur.appendChild(div);
   });
 }
 
-function toggleSouhait(id) {
-  const liste = chargerSouhaits();
-  const item  = liste.find(s => s.id === id);
-  if (item) { item.fait = !item.fait; sauvegarderSouhaits(liste); afficherSouhaits(); }
+// Heuristique : un id UUID v4 vient de Supabase ; "custom-…" ou un slug court est local.
+function estIdSupabase(id) {
+  return typeof id === "string"
+      && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
-function supprimerSouhait(id) {
+async function toggleSouhait(id) {
+  const liste = chargerSouhaits();
+  const item  = liste.find(s => s.id === id);
+  if (!item) return;
+  item.fait = !item.fait;
+  sauvegarderSouhaits(liste);
+  afficherSouhaits();
+
+  if (supabaseDispo() && estIdSupabase(id)) {
+    try { await db.modifier("souhaits", id, { fait: item.fait }); }
+    catch(e) { console.warn("toggleSouhait Supabase:", e); }
+  }
+}
+
+async function supprimerSouhait(id) {
   const liste = chargerSouhaits().filter(s => s.id !== id);
   sauvegarderSouhaits(liste);
   afficherSouhaits();
+
+  if (supabaseDispo() && estIdSupabase(id)) {
+    try { await db.supprimer("souhaits", id); }
+    catch(e) { console.warn("supprimerSouhait Supabase:", e); }
+  }
 }
 
-function ajouterSouhait() {
+async function ajouterSouhait() {
   const nomInput   = document.getElementById("souhait-input-nom");
   const emojiInput = document.getElementById("souhait-input-emoji");
   const noteInput  = document.getElementById("souhait-input-note");
@@ -2016,16 +2095,28 @@ function ajouterSouhait() {
   const nom = nomInput.value.trim();
   if (!nom) { nomInput.focus(); return; }
 
-  const liste = chargerSouhaits();
-  liste.push({
-    id:    "custom-" + Date.now(),
+  const data = {
     nom:   nom,
     emoji: emojiInput.value.trim() || "✈️",
     note:  noteInput.value.trim(),
     fait:  false
-  });
+  };
 
+  // ── Tentative d'enregistrement Supabase d'abord (pour avoir l'UUID) ──
+  let idFinal = "custom-" + Date.now();
+  if (supabaseDispo()) {
+    try {
+      const cree = await db.inserer("souhaits", data);
+      if (cree && cree.id) idFinal = cree.id;
+    } catch(e) {
+      console.warn("ajouterSouhait Supabase:", e);
+    }
+  }
+
+  const liste = chargerSouhaits();
+  liste.push({ id: idFinal, ...data });
   sauvegarderSouhaits(liste);
+
   nomInput.value   = "";
   emojiInput.value = "";
   noteInput.value  = "";
@@ -2315,6 +2406,10 @@ async function chargerDepuisSupabase() {
         emotionsData[e.slug] = { label: e.label, message: e.message, mini: e.mini || [] };
       });
     }
+
+    // ── Souhaits : rafraîchit le cache local dès le chargement
+    //    (la synchro complète se fait dans initSouhaits si l'utilisateur visite l'onglet)
+    try { await synchroniserSouhaitsDepuisSupabase(); } catch(e) {}
 
     console.info("✓ Données Supabase fusionnées avec données statiques");
 

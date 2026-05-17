@@ -264,6 +264,7 @@
     <button class="nav-btn" onclick="aller('capsules-admin')">✦ Capsules temporelles</button>
     <button class="nav-btn" onclick="aller('emotions-admin')">✦ Émotions</button>
     <button class="nav-btn" onclick="aller('popup-admin')">✦ Pop-up accueil</button>
+    <button class="nav-btn" onclick="aller('souhaits-admin')">✦ Souhaits de voyages</button>
     <button class="nav-btn" onclick="aller('dessins-admin')">✦ Dessins sauvegardés</button>
     <div class="sidebar-sep"></div>
     <button class="btn-deconnexion" onclick="seDeconnecter()">Se déconnecter</button>
@@ -706,6 +707,45 @@
     </div>
 
 
+    <!-- Souhaits de voyages -->
+    <div id="panneau-souhaits-admin" class="panneau">
+      <div class="section-entete">
+        <h2>Souhaits de voyages</h2>
+        <button class="btn-prim" onclick="ouvrirFormulaireSouhait()">+ Ajouter un souhait</button>
+      </div>
+      <div id="form-souhait" class="formulaire" style="display:none">
+        <h3 id="form-souhait-titre">Nouveau souhait</h3>
+        <div class="form-grille">
+          <div class="form-champ">
+            <label>Destination</label>
+            <input id="s-nom" type="text" placeholder="Japon" />
+          </div>
+          <div class="form-champ">
+            <label>Emoji / drapeau</label>
+            <input id="s-emoji" type="text" placeholder="🇯🇵" maxlength="4" />
+          </div>
+          <div class="form-champ">
+            <label>Déjà visité ?</label>
+            <select id="s-fait">
+              <option value="false">Non — encore un rêve</option>
+              <option value="true">Oui — déjà fait ✓</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grille une-col">
+          <div class="form-champ">
+            <label>Note (pourquoi ce voyage ?)</label>
+            <textarea id="s-note" placeholder="Les cerisiers en fleurs, la culture…"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-prim" onclick="sauvegarderSouhait()">Sauvegarder</button>
+          <button class="btn-sec" onclick="fermerFormulaire('form-souhait')">Annuler</button>
+        </div>
+      </div>
+      <div class="cartes-grille" id="liste-souhaits"></div>
+    </div>
+
     <!-- Dessins & Œuvres sauvegardés -->
     <div id="panneau-dessins-admin" class="panneau">
       <div class="section-entete">
@@ -763,11 +803,14 @@ if (sessionStorage.getItem("admin_ok")) {
 /* ================================================================
    NAVIGATION
 ================================================================ */
-function aller(panneau) {
+function aller(panneau, evt) {
   document.querySelectorAll(".panneau").forEach(p => p.classList.remove("actif"));
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("actif"));
   document.getElementById("panneau-" + panneau)?.classList.add("actif");
-  event.currentTarget?.classList.add("actif");
+  // Compatibilité : si appelé via onclick="aller('x')" le navigateur expose window.event,
+  // sinon on accepte explicitement un event passé en 2e argument.
+  const e = evt || window.event;
+  if (e && e.currentTarget) e.currentTarget.classList.add("actif");
   chargerPanneau(panneau);
 }
 
@@ -783,6 +826,7 @@ function chargerPanneau(id) {
     "capsules-admin":  chargerCapsules,
     "emotions-admin":  chargerEmotions,
     "popup-admin":     chargerPopup,
+    "souhaits-admin":  chargerSouhaitsAdmin,
     "dessins-admin":   chargerDessins,
   };
   fns[id]?.();
@@ -953,6 +997,8 @@ async function chargerTableauBord() {
     { table:"photos",    label:"Photos nous",      emoji:"💑" },
     { table:"capsules",  label:"Capsules",         emoji:"🔒" },
     { table:"emotions",  label:"Émotions",         emoji:"💫" },
+    { table:"souhaits",  label:"Souhaits voyages", emoji:"🌍" },
+    { table:"dessins",   label:"Dessins",          emoji:"✏️" },
   ];
 
   const grille = document.getElementById("stats-grille");
@@ -1346,6 +1392,56 @@ async function sauvegarderPopup() {
     ? await db.modifier("popup", liste[0].id, data)
     : await db.inserer("popup", data);
   if (res) toast("Pop-up mis à jour ✓");
+}
+
+/* ================================================================
+   SOUHAITS DE VOYAGES
+================================================================ */
+function ouvrirFormulaireSouhait(item=null) {
+  editId = item?.id || null;
+  document.getElementById("form-souhait-titre").textContent = item ? "Modifier le souhait" : "Nouveau souhait";
+  document.getElementById("s-nom").value   = item?.nom   || "";
+  document.getElementById("s-emoji").value = item?.emoji || "";
+  document.getElementById("s-note").value  = item?.note  || "";
+  document.getElementById("s-fait").value  = item?.fait ? "true" : "false";
+  ouvrirFormulaire("form-souhait");
+}
+async function sauvegarderSouhait() {
+  const data = {
+    nom:   document.getElementById("s-nom").value.trim(),
+    emoji: document.getElementById("s-emoji").value.trim() || "✈️",
+    note:  document.getElementById("s-note").value.trim(),
+    fait:  document.getElementById("s-fait").value === "true"
+  };
+  if (!data.nom) { toast("Nom requis", "erreur"); return; }
+  const res = editId
+    ? await db.modifier("souhaits", editId, data)
+    : await db.inserer("souhaits", data);
+  if (res) {
+    toast(editId ? "Souhait modifié ✓" : "Souhait ajouté ✓");
+    fermerFormulaire("form-souhait");
+    chargerSouhaitsAdmin();
+  } else {
+    toast("Erreur de sauvegarde", "erreur");
+  }
+}
+async function chargerSouhaitsAdmin() {
+  const liste = await db.lire("souhaits");
+  const el = document.getElementById("liste-souhaits");
+  if (!liste || liste.length === 0) {
+    el.innerHTML = '<p style="color:var(--texte-c);font-style:italic">Aucun souhait en base pour l\'instant.</p>';
+    return;
+  }
+  el.innerHTML = liste.map(s => `
+    <div class="carte-admin">
+      <div style="font-size:1.5rem;margin-bottom:.3rem">${s.emoji||"✈️"} <span class="badge ${s.fait?'vert':'gris'}">${s.fait?'Visité':'À découvrir'}</span></div>
+      <div class="carte-admin-titre">${s.nom}</div>
+      <div class="carte-admin-meta" style="font-style:italic">${s.note ? `"${s.note.substring(0,80)}"` : "—"}</div>
+      <div class="carte-admin-actions">
+        <button class="btn-sec" onclick='ouvrirFormulaireSouhait(${JSON.stringify(s)})'>Modifier</button>
+        <button class="btn-danger" onclick="supprimerItem('souhaits','${s.id}',chargerSouhaitsAdmin)">Supprimer</button>
+      </div>
+    </div>`).join("");
 }
 
 /* ================================================================
