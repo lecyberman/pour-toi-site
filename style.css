@@ -2486,3 +2486,142 @@ textarea:focus {
   .humeur-btn { padding: 0.7rem 0.4rem; }
   .humeur-emoji { font-size: 1.5rem; }
 }
+
+
+/* ================================================================
+   DRAMAS — formulaire refondu (picker emoji + étoiles tactiles)
+================================================================ */
+.drama-statut-choix {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.drama-statut-btn {
+  background: var(--blanc-pur);
+  border: 1.5px solid var(--creme-fonce);
+  border-radius: var(--r-md);
+  padding: 0.7rem 0.4rem;
+  cursor: pointer;
+  font-family: var(--font-corps);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.2s ease;
+  color: var(--brun);
+}
+.drama-statut-btn:hover, .drama-statut-btn:focus {
+  border-color: var(--lavande-2);
+  outline: none;
+}
+.drama-statut-btn.actif {
+  background: var(--lavande);
+  border-color: var(--lavande-2);
+  color: var(--brun-fonce);
+  transform: scale(1.02);
+}
+.drama-statut-emoji { font-size: 1.4rem; line-height: 1; }
+.drama-statut-label {
+  font-size: 0.78rem;
+  font-style: italic;
+  font-family: var(--font-titre);
+  letter-spacing: 0.03em;
+}
+
+.drama-note-zone, .drama-emoji-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.drama-note-label {
+  font-size: 0.82rem;
+  color: var(--texte-clair);
+  font-style: italic;
+  font-family: var(--font-titre);
+  letter-spacing: 0.03em;
+}
+.drama-etoiles {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.drama-etoile {
+  background: transparent;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--brun-clair);
+  cursor: pointer;
+  padding: 0.3rem 0.4rem;
+  transition: color 0.18s ease, transform 0.18s ease;
+  line-height: 1;
+  min-width: 38px;
+}
+.drama-etoile:hover, .drama-etoile:focus {
+  transform: scale(1.15);
+  outline: none;
+}
+.drama-etoile.actif { color: var(--or); }
+.drama-etoile.actif::before { content: "★"; }
+.drama-etoile.actif { font-size: 1.8rem; }
+.drama-etoile:not(.actif)::before { content: "☆"; }
+.drama-etoile { color: var(--brun-clair); }
+.drama-etoile.actif { color: var(--or); }
+.drama-note-effacer {
+  background: transparent;
+  border: 1px solid var(--creme-fonce);
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  font-size: 0.7rem;
+  color: var(--brun);
+  cursor: pointer;
+  opacity: 0.5;
+  margin-left: 6px;
+  transition: opacity 0.2s;
+}
+.drama-note-effacer:hover { opacity: 1; }
+
+/* Emoji picker pour le site (visiteur) — même style que admin */
+.emoji-choix-site {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  gap: 8px;
+  padding: 0.8rem;
+  background: var(--creme);
+  border-radius: 12px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+.emoji-choix-site .emoji-btn {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--blanc-pur);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  padding: 0;
+}
+.emoji-choix-site .emoji-btn:hover,
+.emoji-choix-site .emoji-btn:focus {
+  background: var(--lavande);
+  transform: scale(1.08);
+  outline: none;
+}
+.emoji-choix-site .emoji-btn.actif {
+  background: var(--lavande);
+  border-color: var(--lavande-2);
+  transform: scale(1.05);
+}
+
+/* Mobile : drama form */
+@media (max-width: 760px) {
+  .drama-statut-btn { padding: 0.6rem 0.3rem; }
+  .drama-statut-emoji { font-size: 1.2rem; }
+  .drama-statut-label { font-size: 0.72rem; }
+  .drama-etoile { font-size: 1.6rem; min-width: 36px; padding: 0.4rem 0.3rem; }
+}

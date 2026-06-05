@@ -516,15 +516,48 @@
         <summary class="dramas-form-toggle">+ Ajouter un drama</summary>
         <div class="dramas-form">
           <input id="drama-titre-input" type="text" placeholder="Titre du drama" class="drama-input" />
-          <div class="drama-form-grille">
-            <select id="drama-statut-select" class="drama-input">
-              <option value="a_voir">À voir</option>
-              <option value="en_cours">En cours</option>
-              <option value="fini">Vu</option>
-            </select>
-            <input id="drama-emoji-input" type="text" maxlength="4" placeholder="Emoji 🎬" class="drama-input drama-input-emoji" />
-            <input id="drama-note-input" type="number" min="0" max="5" value="0" placeholder="Note /5" class="drama-input drama-input-note" />
+
+          <!-- Statut : 3 gros boutons à toucher -->
+          <div class="drama-statut-choix" role="group" aria-label="Où en est-on ?">
+            <button type="button" class="drama-statut-btn actif" data-statut="a_voir"
+                    onclick="choisirStatutDrama('a_voir')">
+              <span class="drama-statut-emoji">🔖</span>
+              <span class="drama-statut-label">À voir</span>
+            </button>
+            <button type="button" class="drama-statut-btn" data-statut="en_cours"
+                    onclick="choisirStatutDrama('en_cours')">
+              <span class="drama-statut-emoji">▶️</span>
+              <span class="drama-statut-label">En cours</span>
+            </button>
+            <button type="button" class="drama-statut-btn" data-statut="fini"
+                    onclick="choisirStatutDrama('fini')">
+              <span class="drama-statut-emoji">✓</span>
+              <span class="drama-statut-label">Vu</span>
+            </button>
           </div>
+          <input id="drama-statut-select" type="hidden" value="a_voir" />
+
+          <!-- Note : 5 étoiles à toucher -->
+          <div class="drama-note-zone">
+            <label class="drama-note-label">Ta note (facultatif)</label>
+            <div class="drama-etoiles" id="drama-etoiles" role="group" aria-label="Note de 0 à 5 étoiles">
+              <button type="button" class="drama-etoile" data-note="1" onclick="choisirNoteDrama(1)" aria-label="1 étoile">☆</button>
+              <button type="button" class="drama-etoile" data-note="2" onclick="choisirNoteDrama(2)" aria-label="2 étoiles">☆</button>
+              <button type="button" class="drama-etoile" data-note="3" onclick="choisirNoteDrama(3)" aria-label="3 étoiles">☆</button>
+              <button type="button" class="drama-etoile" data-note="4" onclick="choisirNoteDrama(4)" aria-label="4 étoiles">☆</button>
+              <button type="button" class="drama-etoile" data-note="5" onclick="choisirNoteDrama(5)" aria-label="5 étoiles">☆</button>
+              <button type="button" class="drama-note-effacer" onclick="choisirNoteDrama(0)" aria-label="Pas de note">✕</button>
+            </div>
+            <input id="drama-note-input" type="hidden" value="0" />
+          </div>
+
+          <!-- Emoji : picker visuel -->
+          <div class="drama-emoji-zone">
+            <label class="drama-note-label">Emoji (facultatif) — touche ce que tu veux</label>
+            <div class="emoji-choix-site" id="drama-emoji-choix" role="group"></div>
+            <input id="drama-emoji-input" type="hidden" value="🎬" />
+          </div>
+
           <textarea id="drama-commentaire-input" rows="2" placeholder="Ce qu'on en pense (facultatif)" class="drama-input"></textarea>
           <button class="btn-entrer" onclick="ajouterDrama()">Ajouter ✦</button>
         </div>

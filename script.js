@@ -3013,8 +3013,56 @@ async function envoyerCreation() {
 /* ================================================================
    "NOS DRAMAS" 📺
 ================================================================ */
+const EMOJIS_DRAMAS = [
+  "🎬","📺","🎞️","🍿","🎭","💕","💖","💔","❤️",
+  "🌸","🌹","🌷","🌺","🌼","🪷","🦋","🌈",
+  "✨","⭐","🌟","💫","🌙","☀️","☁️","🌃","🌆",
+  "💎","🎀","🍵","☕","🍰","🍣","🥢","🥟","🏯",
+  "👘","🎎","⛩️","🐉","🐰","🐱","🐶","😭","🥺","🥰"
+];
+
+let dramaPickerInit = false;
+
 async function initDramas() {
+  if (!dramaPickerInit) {
+    construireChoixEmojiDrama("🎬");
+    dramaPickerInit = true;
+  }
   await afficherDramas();
+}
+
+function construireChoixEmojiDrama(emojiActif) {
+  const conteneur = document.getElementById("drama-emoji-choix");
+  if (!conteneur) return;
+  conteneur.innerHTML = "";
+  EMOJIS_DRAMAS.forEach(em => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "emoji-btn" + (em === emojiActif ? " actif" : "");
+    b.textContent = em;
+    b.setAttribute("aria-label", "Choisir " + em);
+    b.onclick = () => {
+      document.getElementById("drama-emoji-input").value = em;
+      conteneur.querySelectorAll(".emoji-btn").forEach(bb =>
+        bb.classList.toggle("actif", bb.textContent === em)
+      );
+    };
+    conteneur.appendChild(b);
+  });
+}
+
+function choisirStatutDrama(statut) {
+  document.getElementById("drama-statut-select").value = statut;
+  document.querySelectorAll(".drama-statut-btn").forEach(b => {
+    b.classList.toggle("actif", b.dataset.statut === statut);
+  });
+}
+
+function choisirNoteDrama(n) {
+  document.getElementById("drama-note-input").value = n;
+  document.querySelectorAll(".drama-etoile").forEach((e, i) => {
+    e.classList.toggle("actif", (i + 1) <= n);
+  });
 }
 
 async function afficherDramas() {
@@ -3058,7 +3106,7 @@ async function afficherDramas() {
 async function ajouterDrama() {
   const titre = document.getElementById("drama-titre-input").value.trim();
   if (!titre) return;
-  const statut = document.getElementById("drama-statut-select").value;
+  const statut = document.getElementById("drama-statut-select").value || "a_voir";
   const note = parseInt(document.getElementById("drama-note-input").value) || 0;
   const emoji = document.getElementById("drama-emoji-input").value.trim() || "🎬";
   const commentaire = document.getElementById("drama-commentaire-input").value.trim();
@@ -3066,10 +3114,15 @@ async function ajouterDrama() {
   if (supabaseDispo()) {
     try { await db.inserer("dramas", data); } catch(e) {}
   }
+  // Reset form
   document.getElementById("drama-titre-input").value = "";
   document.getElementById("drama-commentaire-input").value = "";
-  document.getElementById("drama-emoji-input").value = "";
+  document.getElementById("drama-emoji-input").value = "🎬";
   document.getElementById("drama-note-input").value = "0";
+  document.getElementById("drama-statut-select").value = "a_voir";
+  choisirStatutDrama("a_voir");
+  choisirNoteDrama(0);
+  construireChoixEmojiDrama("🎬");
   await afficherDramas();
 }
 
