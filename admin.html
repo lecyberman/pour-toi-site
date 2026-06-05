@@ -324,6 +324,40 @@
       0%,100% { transform: translate(-50%, -50%) scale(1); }
       50%     { transform: translate(-50%, -50%) scale(1.12); }
     }
+
+    /* ── Choix d'emoji visuel (grille de boutons) ── */
+    .emoji-choix {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+      gap: 8px;
+      padding: .8rem;
+      background: var(--creme);
+      border-radius: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .emoji-btn {
+      width: 100%; aspect-ratio: 1;
+      background: var(--blanc);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: all .18s ease;
+      display: grid; place-items: center;
+      line-height: 1;
+      padding: 0;
+    }
+    .emoji-btn:hover, .emoji-btn:focus {
+      background: var(--lavande);
+      transform: scale(1.08);
+      outline: none;
+    }
+    .emoji-btn.actif {
+      background: var(--lavande);
+      border-color: var(--lavande-2);
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
@@ -488,8 +522,11 @@
             <input id="e-label" type="text" placeholder="Notre étoile" />
           </div>
           <div class="form-champ">
-            <label>Apparence (emoji)</label>
-            <input id="e-emoji" type="text" placeholder="⭐" maxlength="4" oninput="majPreviewEtoile()" />
+            <label>Apparence — touche ce que tu veux</label>
+            <div class="emoji-choix" id="emoji-choix-etoile" role="group" aria-label="Choisir l'emoji">
+              <!-- généré par JS au chargement -->
+            </div>
+            <input id="e-emoji" type="hidden" value="⭐" />
           </div>
         </div>
         <div class="form-grille une-col">
@@ -1247,6 +1284,39 @@ async function chargerComprendre() {
 /* ================================================================
    ÉTOILES UNIVERS
 ================================================================ */
+// Banque d'emojis suggérés pour les étoiles (doux, célestes, romantiques)
+const EMOJIS_ETOILES = [
+  "⭐","✨","🌟","💫","🌠","🌙","☀️","🪐",
+  "💖","💝","❤️","🌸","🌹","🌺","🌷","🌻",
+  "🦋","🕊️","🌈","💎","🍃","🌿","🌊","🔥",
+  "💌","💍","✦","✧","☁️","🍀","🌼","🪷"
+];
+
+function construireChoixEmojiEtoile(emojiActif) {
+  const conteneur = document.getElementById("emoji-choix-etoile");
+  if (!conteneur) return;
+  conteneur.innerHTML = "";
+  EMOJIS_ETOILES.forEach(em => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "emoji-btn" + (em === emojiActif ? " actif" : "");
+    b.textContent = em;
+    b.setAttribute("aria-label", "Choisir " + em);
+    b.onclick = () => choisirEmojiEtoile(em);
+    conteneur.appendChild(b);
+  });
+}
+
+function choisirEmojiEtoile(em) {
+  document.getElementById("e-emoji").value = em;
+  // Mettre à jour l'état "actif"
+  document.querySelectorAll("#emoji-choix-etoile .emoji-btn").forEach(b => {
+    b.classList.toggle("actif", b.textContent === em);
+  });
+  // Mettre à jour l'aperçu dans le ciel
+  majPreviewEtoile();
+}
+
 function ouvrirFormulaireEtoile(item=null) {
   editId = item?.id || null;
   document.getElementById("e-label").value   = item?.label   || "";
@@ -1254,18 +1324,18 @@ function ouvrirFormulaireEtoile(item=null) {
   document.getElementById("e-x").value       = item?.x       || 50;
   document.getElementById("e-y").value       = item?.y       || 50;
   document.getElementById("e-message").value = item?.message || "";
+  // Construire la grille d'emojis avec l'actuel actif
+  construireChoixEmojiEtoile(item?.emoji || "⭐");
   // Reset/initialise le ciel cliquable
   const etoile = document.getElementById("ciel-picker-etoile");
   const aide   = document.getElementById("ciel-picker-aide");
   if (item) {
-    // Édition : afficher l'étoile à sa position actuelle
     etoile.textContent = item.emoji || "⭐";
     etoile.style.left  = (item.x || 50) + "%";
     etoile.style.top   = (item.y || 50) + "%";
     etoile.hidden = false;
     if (aide) aide.style.display = "none";
   } else {
-    // Nouvelle : ciel vide, aide visible
     etoile.hidden = true;
     if (aide) aide.style.display = "";
   }
