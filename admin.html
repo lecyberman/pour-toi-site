@@ -223,10 +223,127 @@
     .badge.gris  { background:var(--creme-f); color:var(--brun); }
     .badge.bleu  { background:rgba(192,212,232,.3); color:#3a5a7a; }
 
-    @media(max-width:640px) {
-      .sidebar { width:100%; min-height:auto; flex-direction:row; flex-wrap:wrap; }
+    @media(max-width:760px) {
+      /* Layout vertical sur mobile */
       #app { flex-direction:column; }
-      .form-grille { grid-template-columns:1fr; }
+
+      /* Sidebar → barre horizontale scrollable en haut */
+      .sidebar {
+        width: 100%;
+        height: auto;
+        min-height: auto;
+        position: sticky;
+        top: 0;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: .6rem .7rem;
+        gap: .35rem;
+        border-right: none;
+        border-bottom: 1px solid var(--creme-f);
+        background: var(--blanc);
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+      }
+      .sidebar::-webkit-scrollbar { height: 3px; }
+      .sidebar::-webkit-scrollbar-thumb { background: var(--creme-f); border-radius: 2px; }
+
+      .sidebar-titre {
+        display: none;  /* trop encombrant sur mobile */
+      }
+      .sidebar-sep {
+        display: none;
+      }
+      .nav-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+        font-size: .75rem;
+        padding: .55rem .9rem;
+        min-height: 38px;
+      }
+      .btn-deconnexion {
+        flex-shrink: 0;
+        margin-top: 0;
+        margin-left: auto;
+        white-space: nowrap;
+        padding: .55rem .9rem;
+        font-size: .7rem;
+      }
+
+      /* Contenu principal : moins de padding, scroll vertical */
+      .main {
+        padding: 1.2rem 1rem 5rem;
+        overflow-y: visible;
+      }
+      .section-entete {
+        gap: .6rem;
+        margin-bottom: 1rem;
+      }
+      .section-entete h2 {
+        font-size: 1.3rem;
+      }
+      .form-grille { grid-template-columns: 1fr; gap: .9rem; }
+      .formulaire { padding: 1.1rem 1rem; }
+      .formulaire h3 { font-size: 1.1rem; margin-bottom: .8rem; }
+      .cartes-grille { grid-template-columns: 1fr; gap: .8rem; }
+      .carte-admin { padding: .9rem 1rem; }
+
+      /* Boutons primaires plus larges (touch-friendly) */
+      .btn-prim, .btn-sec {
+        padding: .7rem 1.2rem;
+        font-size: .88rem;
+      }
+      .form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+      }
+      .form-actions button {
+        flex: 1;
+        min-width: 120px;
+      }
+
+      /* Inputs plus grands au touch */
+      .champ, input[type="text"], input[type="number"], input[type="date"],
+      input[type="color"], select, textarea {
+        font-size: 16px !important;  /* évite le zoom iOS */
+        padding: .8rem .9rem !important;
+      }
+
+      /* Connexion */
+      #ecran-connexion { padding: 1rem; }
+      .connexion-boite, .pin-boite-admin {
+        width: 100%;
+        max-width: 360px;
+        padding: 1.6rem 1.2rem 1.2rem !important;
+      }
+      .pin-pave { gap: 10px; }
+      .pin-touche {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1;
+        max-width: 70px;
+        max-height: 70px;
+        font-size: 1.3rem;
+      }
+
+      /* Ciel picker un peu plus petit */
+      .ciel-picker { height: 200px; }
+
+      /* Emoji choix : grille plus compacte */
+      .emoji-choix {
+        grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+        gap: 6px;
+        padding: .6rem;
+      }
+      .emoji-btn { font-size: 1.2rem; }
+    }
+
+    /* Très petit (iPhone SE etc.) */
+    @media (max-width: 400px) {
+      .pin-touche { max-width: 60px; max-height: 60px; font-size: 1.2rem; }
+      .nav-btn { font-size: .72rem; padding: .5rem .75rem; }
+      .section-entete h2 { font-size: 1.15rem; }
     }
 
     /* ── PIN keypad admin ── */

@@ -977,14 +977,27 @@ textarea:focus {
 /* ----------------------------------------------------------------
    14. RESPONSIVE
 ---------------------------------------------------------------- */
-@media (max-width: 600px) {
+@media (max-width: 760px) {
+  /* Nav du site : ligne unique scrollable horizontalement */
   #nav-principale {
-    gap: 0.3rem;
+    gap: 0.35rem;
+    padding: 0.5rem 0.7rem;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
   }
+  #nav-principale::-webkit-scrollbar { height: 2px; }
+  #nav-principale::-webkit-scrollbar-thumb { background: var(--brun-clair); border-radius: 2px; }
 
   #nav-principale button {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
+    font-size: 0.72rem;
+    padding: 0.45rem 0.75rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-height: 36px;
   }
 
   .section-inner {
@@ -2422,11 +2435,47 @@ textarea:focus {
 /* ================================================================
    RESPONSIVE — mobile-first
 ================================================================ */
-@media (max-width: 640px) {
-  .pin-boite { padding: 1.6rem 1rem 1rem; }
-  .pin-touche { width: 56px; height: 56px; font-size: 1.25rem; }
+@media (max-width: 760px) {
+  /* PIN modale */
+  .pin-boite {
+    padding: 1.6rem 1rem 1rem;
+    width: min(360px, 94vw);
+  }
+  .pin-pave { gap: 10px; }
+  .pin-touche {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    max-width: 70px;
+    max-height: 70px;
+    font-size: 1.3rem;
+    margin: 0 auto;
+  }
+  .pin-dot { width: 12px; height: 12px; }
+
+  /* Lettre juillet */
   .lettre-boite { padding: 2rem 1.4rem 1.6rem; }
   .lettre-ligne { font-size: 1rem; }
+
+  /* Dramas form */
   .drama-form-grille { grid-template-columns: 1fr 1fr; }
   .drama-carte { grid-template-columns: 40px 1fr auto; gap: 0.7rem; }
+
+  /* Nos mots : actions empilées proprement */
+  .mots-actions { gap: 8px; }
+  .mots-envoyer { width: 100%; margin-left: 0; }
+
+  /* Inputs : taille de police 16px pour éviter le zoom iOS */
+  textarea, input[type="text"], input[type="number"], input[type="email"],
+  input[type="password"], input[type="date"], select {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 400px) {
+  .pin-touche { max-width: 58px; max-height: 58px; font-size: 1.15rem; }
+  .pin-pave { gap: 8px; }
+  .humeurs-boutons { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+  .humeur-btn { padding: 0.7rem 0.4rem; }
+  .humeur-emoji { font-size: 1.5rem; }
 }
