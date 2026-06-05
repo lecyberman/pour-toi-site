@@ -69,6 +69,12 @@ html {
   font-size: 16px;
 }
 
+html {
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 body {
   font-family: var(--font-corps);
   background-color: var(--creme);
@@ -76,6 +82,7 @@ body {
   line-height: 1.7;
   min-height: 100vh;
   overflow-x: hidden;
+  max-width: 100%;
   /* Texture papier légère via CSS */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
 }

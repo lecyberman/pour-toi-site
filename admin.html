@@ -15,10 +15,16 @@
       --font-c: 'Lato',sans-serif; --r: 10px; --trans: .3s ease;
     }
     * { box-sizing:border-box; margin:0; padding:0; }
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
     body { font-family:var(--font-c); background:var(--creme); color:var(--texte); min-height:100vh; }
     button { cursor:pointer; font-family:var(--font-c); border:none; background:none; }
-    input,textarea,select { font-family:var(--font-c); }
-    img { max-width:100%; }
+    input,textarea,select { font-family:var(--font-c); -webkit-appearance: none; appearance: none; }
+    img { max-width:100%; height: auto; }
 
     /* ── Écran de connexion ── */
     #ecran-connexion {
@@ -156,22 +162,47 @@
     .form-champ textarea { resize:vertical; min-height:80px; }
     .form-actions { display:flex; gap:.8rem; margin-top:1rem; }
 
-    /* Upload image */
+    /* Upload image — version touch-friendly */
     .upload-zone {
-      border:2px dashed var(--brun-c); border-radius:var(--r);
-      padding:1.5rem; text-align:center; cursor:pointer;
-      transition:all var(--trans); position:relative;
+      border: 2px dashed var(--brun-c);
+      border-radius: var(--r);
+      padding: 1.8rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--trans);
+      position: relative;
+      background: rgba(245, 240, 232, .5);
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .upload-zone:hover { border-color:var(--lavande-2); background:rgba(213,200,232,.1); }
+    .upload-zone:hover, .upload-zone:focus-within {
+      border-color: var(--lavande-2);
+      background: rgba(213, 200, 232, .15);
+    }
     .upload-zone input[type=file] {
-      position:absolute; inset:0; opacity:0; cursor:pointer;
+      position: absolute; inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%; height: 100%;
+      font-size: 0;
     }
-    .upload-zone p { font-size:.85rem; color:var(--brun); }
+    .upload-zone p {
+      font-size: .92rem;
+      color: var(--brun-f);
+      pointer-events: none;
+      line-height: 1.5;
+    }
+    .upload-zone p::before {
+      content: "📷 ";
+      font-size: 1.1em;
+    }
     .upload-apercu {
-      display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.8rem;
+      display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .8rem;
     }
     .upload-apercu img {
-      width:80px; height:80px; object-fit:cover; border-radius:6px;
+      width: 80px; height: 80px; object-fit: cover; border-radius: 6px;
     }
 
     /* Toast notifications */
@@ -585,7 +616,7 @@
             <label>Image</label>
             <div class="upload-zone">
               <input type="file" accept="image/*" onchange="uploadImageAdmin('galerie', this)" />
-              <p>Clique pour choisir une image (max 10MB)</p>
+              <p>Touche ici pour choisir une photo</p>
             </div>
             <div id="apercu-galerie"></div>
             <input id="g-image" type="text" placeholder="URL générée automatiquement" readonly style="margin-top:.4rem" class="champ" />
@@ -740,7 +771,7 @@
           <div class="upload-zone">
             <input type="file" accept="image/*" multiple
                    onchange="uploadPhotosVoyage(this)" />
-            <p>Clique pour ajouter des photos du voyage (plusieurs possibles)</p>
+            <p>Touche ici pour ajouter des photos</p>
           </div>
           <div class="upload-apercu" id="apercu-voyage"></div>
         </div>
@@ -814,7 +845,7 @@
           <div class="upload-zone">
             <input type="file" accept="image/*" multiple
                    onchange="uploadImagesAlbum(this)" />
-            <p>Clique pour choisir une ou plusieurs photos</p>
+            <p>Touche ici pour choisir des photos</p>
           </div>
           <div class="upload-apercu" id="apercu-album"></div>
         </div>
@@ -858,7 +889,7 @@
           <label>Image</label>
           <div class="upload-zone">
             <input type="file" accept="image/*" onchange="uploadImageAdmin('photos', this)" />
-            <p>Clique pour choisir une image (max 10MB)</p>
+            <p>Touche ici pour choisir une photo</p>
           </div>
           <div id="apercu-photos"></div>
           <input id="p-image" type="text" placeholder="URL générée automatiquement" readonly
