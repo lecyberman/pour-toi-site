@@ -1711,30 +1711,36 @@ textarea:focus {
 ================================================================ */
 .footer-discret {
   position: fixed;
-  bottom: 14px;
-  right: 14px;
+  bottom: 18px;
+  right: 18px;
   z-index: 50;
 }
 .footer-cle {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.5);
-  border: 1px solid var(--creme-fonce);
-  font-size: 0.9rem;
+  background: var(--blanc-pur);
+  border: 1px solid var(--brun-clair);
+  font-size: 1.1rem;
   cursor: pointer;
-  opacity: 0.35;
-  transition: opacity var(--trans-douce), transform var(--trans-douce);
-  color: var(--brun);
+  opacity: 0.65;
+  transition: opacity var(--trans-douce), transform var(--trans-douce), box-shadow var(--trans-douce);
+  color: var(--brun-fonce);
   display: grid;
   place-items: center;
   font-family: inherit;
   backdrop-filter: blur(8px);
+  box-shadow: 0 3px 10px rgba(74, 55, 40, 0.1);
 }
 .footer-cle:hover, .footer-cle:focus {
   opacity: 1;
-  transform: scale(1.05);
+  transform: scale(1.08);
   outline: none;
+  box-shadow: 0 6px 18px rgba(74, 55, 40, 0.15);
+}
+@media (max-width: 640px) {
+  .footer-discret { bottom: 14px; right: 14px; }
+  .footer-cle { width: 40px; height: 40px; font-size: 1rem; }
 }
 
 /* ================================================================
@@ -2423,5 +2429,4 @@ textarea:focus {
   .lettre-ligne { font-size: 1rem; }
   .drama-form-grille { grid-template-columns: 1fr 1fr; }
   .drama-carte { grid-template-columns: 40px 1fr auto; gap: 0.7rem; }
-  .footer-cle { width: 32px; height: 32px; font-size: 0.8rem; }
 }
