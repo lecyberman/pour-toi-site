@@ -257,8 +257,10 @@
     .liste-item span { flex:1; font-size:.88rem; }
     .liste-item button { font-size:.75rem; color:var(--brun); opacity:.5; }
     .liste-item button:hover { opacity:1; color:#7a3a3a; }
-    .liste-add { display:flex; gap:.5rem; }
+    .liste-add { display:flex; gap:.5rem; align-items:stretch; }
     .liste-add input { flex:1; }
+    .liste-add textarea { flex:1; min-height: 42px; resize: vertical; }
+    .liste-add .btn-sec { align-self: flex-start; padding: .6rem 1rem; }
 
     /* Tableau */
     .tableau { width:100%; border-collapse:collapse; font-size:.85rem; }
@@ -642,8 +644,9 @@
             <textarea id="g-texte" placeholder="Ce que tu veux dire…"></textarea>
           </div>
           <div class="form-champ">
-            <label>Emoji (si pas d'image)</label>
-            <input id="g-emoji" type="text" placeholder="🌙" maxlength="4" />
+            <label>Emoji (si pas d'image) — touche ce que tu veux</label>
+            <div class="emoji-choix" id="emoji-choix-galerie" role="group"></div>
+            <input id="g-emoji" type="hidden" value="✦" />
           </div>
           <div class="form-champ">
             <label>Image</label>
@@ -755,19 +758,20 @@
             <input id="v-pays" type="text" placeholder="Japon" />
           </div>
           <div class="form-champ">
-            <label>Emoji / drapeau (colle : 🇯🇵 🇲🇦 🌴)</label>
-            <input id="v-emoji" type="text" placeholder="🇯🇵" />
+            <label>Drapeau / emoji — touche ce que tu veux</label>
+            <div class="emoji-choix" id="emoji-choix-voyage" role="group"></div>
+            <input id="v-emoji" type="hidden" value="✈️" />
           </div>
           <div class="form-champ">
             <label>Année / période</label>
             <input id="v-annee" type="text" placeholder="Été 2024" />
           </div>
           <div class="form-champ">
-            <label>Latitude</label>
+            <label>Latitude (auto-remplie si tu choisis un drapeau)</label>
             <input id="v-lat" type="number" step="0.01" placeholder="35.68" />
           </div>
           <div class="form-champ">
-            <label>Longitude</label>
+            <label>Longitude (auto-remplie si tu choisis un drapeau)</label>
             <input id="v-lng" type="number" step="0.01" placeholder="139.69" />
           </div>
         </div>
@@ -841,8 +845,9 @@
             <input id="a-date" type="text" placeholder="Été 2024" />
           </div>
           <div class="form-champ">
-            <label>Emoji (colle directement 🇪🇸 🇯🇵 etc.)</label>
-            <input id="a-emoji" type="text" placeholder="🇪🇸" />
+            <label>Emoji / drapeau — touche ce que tu veux</label>
+            <div class="emoji-choix" id="emoji-choix-album" role="group"></div>
+            <input id="a-emoji" type="hidden" value="📷" />
           </div>
           <div class="form-champ">
             <label>Couleur d'accent</label>
@@ -865,8 +870,9 @@
             <input id="pa-theme" type="text" placeholder="Paysages" />
           </div>
           <div class="form-champ">
-            <label>Emoji du thème</label>
-            <input id="pa-theme-emoji" type="text" placeholder="🏙️" maxlength="4" />
+            <label>Emoji du thème — touche ce que tu veux</label>
+            <div class="emoji-choix" id="emoji-choix-theme" role="group"></div>
+            <input id="pa-theme-emoji" type="hidden" value="🏙️" />
           </div>
           <div class="form-champ">
             <label>Légende</label>
@@ -914,8 +920,9 @@
             </select>
           </div>
           <div class="form-champ">
-            <label>Emoji (si pas d'image)</label>
-            <input id="p-emoji" type="text" placeholder="🌸" maxlength="4" />
+            <label>Emoji (si pas d'image) — touche ce que tu veux</label>
+            <div class="emoji-choix" id="emoji-choix-photo" role="group"></div>
+            <input id="p-emoji" type="hidden" value="📷" />
           </div>
         </div>
         <div class="form-champ" style="margin-bottom:1rem">
@@ -950,8 +957,9 @@
             <input id="cap-titre" type="text" placeholder="Pour notre anniversaire" />
           </div>
           <div class="form-champ">
-            <label>Emoji</label>
-            <input id="cap-emoji" type="text" placeholder="💌" maxlength="4" />
+            <label>Emoji — touche ce que tu veux</label>
+            <div class="emoji-choix" id="emoji-choix-capsule" role="group"></div>
+            <input id="cap-emoji" type="hidden" value="💌" />
           </div>
           <div class="form-champ">
             <label>Date d'ouverture</label>
@@ -993,19 +1001,22 @@
             <input id="em-label" type="text" placeholder="triste" />
           </div>
         </div>
-        <div class="form-grille une-col">
-          <div class="form-champ">
-            <label>Message principal</label>
-            <textarea id="em-message" placeholder="La tristesse dit quelque chose d'important…"></textarea>
+        <div class="form-champ" style="margin-bottom:.8rem">
+          <label>Messages principaux (un sera tiré au hasard à chaque clic)</label>
+          <p class="form-aide">Ajoute plusieurs phrases différentes. Plus tu en mets, plus la réponse sera surprenante 🌸</p>
+          <div class="liste-items" id="em-messages-liste"></div>
+          <div class="liste-add">
+            <textarea id="em-message-input" class="champ" rows="2" placeholder="Une phrase douce pour cette émotion…"></textarea>
+            <button type="button" class="btn-sec" onclick="ajouterMessageEmotion()">+</button>
           </div>
         </div>
         <div class="form-champ" style="margin-bottom:.8rem">
-          <label>Petites pensées</label>
+          <label>Petites pensées (3 tirées au hasard à chaque clic)</label>
           <div class="liste-items" id="em-minis-liste"></div>
           <div class="liste-add">
             <input id="em-mini-input" type="text" class="champ" placeholder="Une pensée douce…"
                    onkeydown="if(event.key==='Enter'){ajouterMini();event.preventDefault()}" />
-            <button class="btn-sec" onclick="ajouterMini()">+</button>
+            <button type="button" class="btn-sec" onclick="ajouterMini()">+</button>
           </div>
         </div>
         <div class="form-actions">
@@ -1056,8 +1067,9 @@
             <input id="s-nom" type="text" placeholder="Japon" />
           </div>
           <div class="form-champ">
-            <label>Emoji / drapeau</label>
-            <input id="s-emoji" type="text" placeholder="🇯🇵" maxlength="4" />
+            <label>Drapeau / emoji — touche ce que tu veux</label>
+            <div class="emoji-choix" id="emoji-choix-souhait" role="group"></div>
+            <input id="s-emoji" type="hidden" value="✈️" />
           </div>
           <div class="form-champ">
             <label>Déjà visité ?</label>
@@ -1321,7 +1333,12 @@ function renderListe(conteneurId, tableau, cle) {
 }
 function supprimerDeListe(cle, i) {
   listesTemp[cle].splice(i, 1);
-  const maps = { moments:"v-moments-liste", paras:"cap-paras-liste", minis:"em-minis-liste" };
+  const maps = {
+    moments:  "v-moments-liste",
+    paras:    "cap-paras-liste",
+    minis:    "em-minis-liste",
+    messages: "em-messages-liste"
+  };
   renderListe(maps[cle], listesTemp[cle], cle);
 }
 function ajouterMoment() {
@@ -1419,9 +1436,10 @@ function ouvrirFormulaireGalerie(item=null) {
   document.getElementById("form-galerie-titre").textContent = item ? "Modifier la carte" : "Nouvelle carte";
   document.getElementById("g-titre").value  = item?.titre  || "";
   document.getElementById("g-texte").value  = item?.texte  || "";
-  document.getElementById("g-emoji").value  = item?.emoji  || "";
+  document.getElementById("g-emoji").value  = item?.emoji  || "✦";
   document.getElementById("g-image").value  = item?.image  || "";
   document.getElementById("g-cat").value    = item?.categorie || "debut";
+  construireChoixEmoji("emoji-choix-galerie", "galerie", "g-emoji", item?.emoji || "✦");
   ouvrirFormulaire("form-galerie");
 }
 async function sauvegarderGalerie() {
@@ -1484,36 +1502,100 @@ async function chargerComprendre() {
 /* ================================================================
    ÉTOILES UNIVERS
 ================================================================ */
-// Banque d'emojis suggérés pour les étoiles (doux, célestes, romantiques)
-const EMOJIS_ETOILES = [
-  "⭐","✨","🌟","💫","🌠","🌙","☀️","🪐",
-  "💖","💝","❤️","🌸","🌹","🌺","🌷","🌻",
-  "🦋","🕊️","🌈","💎","🍃","🌿","🌊","🔥",
-  "💌","💍","✦","✧","☁️","🍀","🌼","🪷"
-];
+// Banques d'emojis groupées par contexte (douces, thématiques)
+const BANQUES_EMOJI = {
+  etoile: [
+    "⭐","✨","🌟","💫","🌠","🌙","☀️","🪐",
+    "💖","💝","❤️","🌸","🌹","🌺","🌷","🌻",
+    "🦋","🕊️","🌈","💎","🍃","🌿","🌊","🔥",
+    "💌","💍","✦","✧","☁️","🍀","🌼","🪷"
+  ],
+  galerie: [
+    "✦","✧","✨","⭐","🌟","💫","🌙","☁️","🕊️",
+    "🌸","🌹","🌺","🌷","🌻","🌼","🌿","🍃","🪷",
+    "💖","💝","❤️","🦋","🌈","💎","🔥","🍀","🌾",
+    "☀️","🌅","🌌","💐","💞","🐚","🪄","🎀"
+  ],
+  capsule: [
+    "💌","💍","💖","💝","❤️","🌹","🌸","✨","⭐",
+    "🌟","💫","🔒","🌿","🌳","🪷","🌷","🌼","🦋",
+    "🌈","💎","🌙","☀️","🍀","🕊️","💞","🎁","🪄",
+    "🌌","🧡","💛","💚","💙","🪻","🥂","🎈"
+  ],
+  photo: [
+    "📷","📸","🎞️","💑","💕","💖","💝","❤️","🌸",
+    "🌹","🦋","🌈","✨","⭐","🌟","💫","🌙","☀️",
+    "🌅","🪷","🌷","🌼","🌻","🍃","🌊","💎","🍀",
+    "🕊️","🌌","💐","🌿","☁️","💞","🧡","💗"
+  ],
+  voyage: [
+    "🇯🇵","🇫🇷","🇮🇹","🇪🇸","🇲🇦","🇹🇭","🇺🇸","🇬🇧",
+    "🇩🇪","🇧🇪","🇳🇱","🇵🇹","🇬🇷","🇹🇷","🇨🇦","🇧🇷",
+    "🇦🇺","🇰🇷","🇨🇳","🇮🇳","🇿🇦","🇲🇽","🇦🇷","🇮🇩",
+    "🇻🇳","🇪🇬","🇸🇳","🇨🇮","🇲🇱","🇹🇬","🇧🇫","🇨🇲",
+    "✈️","🌍","🗺️","🏖️","🏝️","🏔️","🗽","🗼","🌋","⛩️","🕌","🏛️"
+  ],
+  album: [
+    "📷","📸","🎞️","🇯🇵","🇫🇷","🇮🇹","🇪🇸","🇲🇦",
+    "🇹🇭","🇺🇸","🇬🇧","🇩🇪","🇬🇷","🇨🇦","🇰🇷","🇸🇳",
+    "🏖️","🏝️","🏔️","⛩️","🗼","🗽","🌋","🌅",
+    "🌇","🌃","🍂","🌸","🌻","🦋","✈️","🌍","🗺️",
+    "🥂","🍷","☕","🍽️","🌊","🏛️","🏰","💕"
+  ],
+  souhait: [
+    "🇯🇵","🇫🇷","🇮🇹","🇪🇸","🇲🇦","🇹🇭","🇺🇸","🇬🇧",
+    "🇩🇪","🇨🇦","🇧🇷","🇦🇺","🇰🇷","🇨🇳","🇮🇳","🇿🇦",
+    "🇲🇽","🇦🇷","🇮🇩","🇻🇳","🇪🇬","🇸🇳","🇨🇮","🇲🇱",
+    "🇹🇬","🇬🇷","🇹🇷","🇧🇪","🇳🇱","🇵🇹","🇮🇸","🇵🇪",
+    "✈️","🌍","🗺️","🏖️","🏝️","🏔️","🗽","🗼","🌋","⛩️"
+  ],
+  theme: [
+    "🏙️","🏖️","🏝️","🏔️","🌅","🌄","🌇","🌃","🌆",
+    "☕","🍽️","🥂","🍷","🍔","🍕","🍣","🍜","🌸",
+    "🌻","🌹","🌷","🦋","🐢","🐠","🐬","🏛️","🏰",
+    "⛩️","🗼","🗽","🎨","📷","🥐","🍦","🍰","🎭"
+  ],
+  emotion: [
+    "🌸","🌙","☁️","✨","🌧️","🔥","🍃","💫","💧",
+    "🌊","☀️","🌷","🌹","💝","💖","❤️","🥺","🥰",
+    "😊","😢","😔","😴","😌","🤍","🌈","🪷","💐",
+    "🌺","🌼","🍀","🕊️","🦋"
+  ]
+};
 
-function construireChoixEmojiEtoile(emojiActif) {
-  const conteneur = document.getElementById("emoji-choix-etoile");
+// Picker générique réutilisable
+function construireChoixEmoji(conteneurId, banqueCle, inputCacheId, emojiActif, onChange) {
+  const conteneur = document.getElementById(conteneurId);
   if (!conteneur) return;
   conteneur.innerHTML = "";
-  EMOJIS_ETOILES.forEach(em => {
+  const banque = BANQUES_EMOJI[banqueCle] || BANQUES_EMOJI.galerie;
+  banque.forEach(em => {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "emoji-btn" + (em === emojiActif ? " actif" : "");
     b.textContent = em;
     b.setAttribute("aria-label", "Choisir " + em);
-    b.onclick = () => choisirEmojiEtoile(em);
+    b.onclick = () => {
+      const input = document.getElementById(inputCacheId);
+      if (input) input.value = em;
+      conteneur.querySelectorAll(".emoji-btn").forEach(bb =>
+        bb.classList.toggle("actif", bb.textContent === em)
+      );
+      if (typeof onChange === "function") onChange(em);
+    };
     conteneur.appendChild(b);
   });
 }
 
+// Compat ancienne API pour étoiles
+function construireChoixEmojiEtoile(emojiActif) {
+  construireChoixEmoji("emoji-choix-etoile", "etoile", "e-emoji", emojiActif, () => majPreviewEtoile());
+}
 function choisirEmojiEtoile(em) {
   document.getElementById("e-emoji").value = em;
-  // Mettre à jour l'état "actif"
   document.querySelectorAll("#emoji-choix-etoile .emoji-btn").forEach(b => {
     b.classList.toggle("actif", b.textContent === em);
   });
-  // Mettre à jour l'aperçu dans le ciel
   majPreviewEtoile();
 }
 
@@ -1607,6 +1689,44 @@ async function chargerEtoiles() {
 /* ================================================================
    VOYAGES
 ================================================================ */
+// Quand on touche un drapeau, on auto-remplit pays + lat/lng (approximatif, capitales)
+const PAYS_COORDS = {
+  "🇯🇵": { nom: "Japon",        lat: 36.20, lng: 138.25 },
+  "🇫🇷": { nom: "France",       lat: 46.60, lng:   2.20 },
+  "🇮🇹": { nom: "Italie",       lat: 42.50, lng:  12.50 },
+  "🇪🇸": { nom: "Espagne",      lat: 40.50, lng:  -3.80 },
+  "🇲🇦": { nom: "Maroc",        lat: 31.80, lng:  -7.10 },
+  "🇹🇭": { nom: "Thaïlande",    lat: 15.87, lng: 100.99 },
+  "🇺🇸": { nom: "États-Unis",   lat: 37.10, lng: -95.70 },
+  "🇬🇧": { nom: "Royaume-Uni",  lat: 55.40, lng:  -3.40 },
+  "🇩🇪": { nom: "Allemagne",    lat: 51.16, lng:  10.45 },
+  "🇧🇪": { nom: "Belgique",     lat: 50.50, lng:   4.47 },
+  "🇳🇱": { nom: "Pays-Bas",     lat: 52.13, lng:   5.29 },
+  "🇵🇹": { nom: "Portugal",     lat: 39.40, lng:  -8.22 },
+  "🇬🇷": { nom: "Grèce",        lat: 39.07, lng:  21.82 },
+  "🇹🇷": { nom: "Turquie",      lat: 38.96, lng:  35.24 },
+  "🇨🇦": { nom: "Canada",       lat: 56.13, lng: -106.35 },
+  "🇧🇷": { nom: "Brésil",       lat: -14.24, lng: -51.93 },
+  "🇦🇺": { nom: "Australie",    lat: -25.27, lng: 133.78 },
+  "🇰🇷": { nom: "Corée du Sud", lat: 35.91, lng: 127.77 },
+  "🇨🇳": { nom: "Chine",        lat: 35.86, lng: 104.20 },
+  "🇮🇳": { nom: "Inde",         lat: 20.59, lng:  78.96 },
+  "🇿🇦": { nom: "Afrique du Sud",lat: -30.56, lng:  22.94 },
+  "🇲🇽": { nom: "Mexique",      lat: 23.63, lng: -102.55 },
+  "🇦🇷": { nom: "Argentine",    lat: -38.42, lng: -63.62 },
+  "🇮🇩": { nom: "Indonésie",    lat:  -0.79, lng: 113.92 },
+  "🇻🇳": { nom: "Vietnam",      lat: 14.06, lng: 108.28 },
+  "🇪🇬": { nom: "Égypte",       lat: 26.82, lng:  30.80 },
+  "🇸🇳": { nom: "Sénégal",      lat: 14.50, lng: -14.45 },
+  "🇨🇮": { nom: "Côte d'Ivoire",lat: 7.54, lng:  -5.55 },
+  "🇲🇱": { nom: "Mali",         lat: 17.57, lng:  -4.00 },
+  "🇹🇬": { nom: "Togo",         lat:  8.62, lng:   0.82 },
+  "🇧🇫": { nom: "Burkina Faso", lat: 12.24, lng:  -1.56 },
+  "🇨🇲": { nom: "Cameroun",     lat:  7.37, lng:  12.35 },
+  "🇮🇸": { nom: "Islande",      lat: 64.96, lng: -19.02 },
+  "🇵🇪": { nom: "Pérou",        lat: -9.19, lng: -75.02 }
+};
+
 function ouvrirFormulaireVoyage(item=null) {
   editId = item?.id || null;
   listesTemp.moments = item?.moments_forts || [];
@@ -1616,13 +1736,22 @@ function ouvrirFormulaireVoyage(item=null) {
   document.getElementById("form-voyage-titre").textContent = item ? "Modifier le voyage" : "Nouveau voyage";
   document.getElementById("v-nom").value    = item?.nom    || "";
   document.getElementById("v-pays").value   = item?.pays   || "";
-  document.getElementById("v-emoji").value  = item?.emoji  || "";
+  document.getElementById("v-emoji").value  = item?.emoji  || "✈️";
   document.getElementById("v-annee").value  = item?.annee  || "";
   document.getElementById("v-lat").value    = item?.lat    || "";
   document.getElementById("v-lng").value    = item?.lng    || "";
   document.getElementById("v-resume").value = item?.resume || "";
   document.getElementById("v-video").value  = item?.video  || "";
   document.getElementById("v-fait").value   = item?.fait !== false ? "true" : "false";
+  construireChoixEmoji("emoji-choix-voyage", "voyage", "v-emoji", item?.emoji || "✈️", em => {
+    // Auto-remplir pays + lat/lng si on a les coords
+    if (PAYS_COORDS[em]) {
+      const p = PAYS_COORDS[em];
+      if (!document.getElementById("v-pays").value.trim()) document.getElementById("v-pays").value = p.nom;
+      if (!document.getElementById("v-lat").value)         document.getElementById("v-lat").value = p.lat;
+      if (!document.getElementById("v-lng").value)         document.getElementById("v-lng").value = p.lng;
+    }
+  });
   renderListe("v-moments-liste", listesTemp.moments, "moments");
   ouvrirFormulaire("form-voyage");
 }
@@ -1675,7 +1804,11 @@ async function chargerVoyages() {
    ALBUMS
 ================================================================ */
 let albumAdminId = null;
-function ouvrirFormulaireAlbum() { ouvrirFormulaire("form-album"); }
+function ouvrirFormulaireAlbum() {
+  document.getElementById("a-emoji").value = "📷";
+  construireChoixEmoji("emoji-choix-album", "album", "a-emoji", "📷");
+  ouvrirFormulaire("form-album");
+}
 async function sauvegarderAlbum() {
   const data = {
     titre:   document.getElementById("a-titre").value.trim(),
@@ -1707,6 +1840,8 @@ function ouvrirAjoutPhoto(id, titre) {
   listesTemp.imagesAlbum = [];
   document.getElementById("apercu-album").innerHTML = "";
   document.getElementById("form-photo-album-titre").textContent = `Ajouter des photos — ${titre}`;
+  document.getElementById("pa-theme-emoji").value = "🏙️";
+  construireChoixEmoji("emoji-choix-theme", "theme", "pa-theme-emoji", "🏙️");
   ouvrirFormulaire("form-photo-album");
 }
 async function sauvegarderPhotoAlbum() {
@@ -1731,6 +1866,7 @@ function ouvrirFormulairePhoto(item=null) {
   document.getElementById("p-emoji").value   = item?.emoji   || "📷";
   document.getElementById("p-image").value   = item?.image   || "";
   document.getElementById("p-hero").value    = item?.hero ? "true" : "false";
+  construireChoixEmoji("emoji-choix-photo", "photo", "p-emoji", item?.emoji || "📷");
   ouvrirFormulaire("form-photo");
 }
 async function sauvegarderPhoto() {
@@ -1768,6 +1904,7 @@ function ouvrirFormulaireCapsule(item=null) {
   document.getElementById("cap-titre").value = item?.titre || "";
   document.getElementById("cap-emoji").value = item?.emoji || "💌";
   document.getElementById("cap-date").value  = item?.date_ouverture?.split("T")[0] || "";
+  construireChoixEmoji("emoji-choix-capsule", "capsule", "cap-emoji", item?.emoji || "💌");
   renderListe("cap-paras-liste", listesTemp.paras, "paras");
   ouvrirFormulaire("form-capsule");
 }
@@ -1805,23 +1942,47 @@ async function chargerCapsules() {
 ================================================================ */
 function ouvrirFormulaireEmotion(item=null) {
   editId = item?.id || null;
-  listesTemp.minis = item?.mini || [];
-  document.getElementById("em-id").value      = item?.slug    || "";
-  document.getElementById("em-label").value   = item?.label   || "";
-  document.getElementById("em-message").value = item?.message || "";
-  renderListe("em-minis-liste", listesTemp.minis, "minis");
+  listesTemp.minis    = item?.mini || [];
+  // Reprend les messages (pluriel) si présents, sinon convertit le message singulier
+  listesTemp.messages = Array.isArray(item?.messages) && item.messages.length > 0
+                        ? [...item.messages]
+                        : (item?.message ? [item.message] : []);
+  document.getElementById("em-id").value     = item?.slug  || "";
+  document.getElementById("em-label").value  = item?.label || "";
+  renderListe("em-messages-liste", listesTemp.messages, "messages");
+  renderListe("em-minis-liste",    listesTemp.minis,    "minis");
   ouvrirFormulaire("form-emotion");
 }
+
+function ajouterMessageEmotion() {
+  const ta = document.getElementById("em-message-input");
+  const v = ta.value.trim();
+  if (!v) return;
+  listesTemp.messages = listesTemp.messages || [];
+  listesTemp.messages.push(v);
+  renderListe("em-messages-liste", listesTemp.messages, "messages");
+  ta.value = "";
+}
+
 async function sauvegarderEmotion() {
+  const messages = listesTemp.messages || [];
   const data = {
-    slug:    document.getElementById("em-id").value.trim(),
-    label:   document.getElementById("em-label").value.trim(),
-    message: document.getElementById("em-message").value.trim(),
-    mini:    listesTemp.minis
+    slug:     document.getElementById("em-id").value.trim(),
+    label:    document.getElementById("em-label").value.trim(),
+    messages: messages,
+    message:  messages[0] || "",  // garde le 1er pour la compat ascendante
+    mini:     listesTemp.minis || []
   };
   if (!data.slug || !data.label) { toast("ID et label requis","erreur"); return; }
+  if (messages.length === 0)     { toast("Ajoute au moins un message","erreur"); return; }
   const res = editId ? await db.modifier("emotions", editId, data) : await db.inserer("emotions", data);
-  if (res) { toast("Émotion sauvegardée ✓"); fermerFormulaire("form-emotion"); chargerEmotions(); listesTemp.minis=[]; }
+  if (res) {
+    toast("Émotion sauvegardée ✓");
+    fermerFormulaire("form-emotion");
+    chargerEmotions();
+    listesTemp.minis = [];
+    listesTemp.messages = [];
+  }
 }
 async function chargerEmotions() {
   const liste = await db.lire("emotions");
@@ -1871,9 +2032,16 @@ function ouvrirFormulaireSouhait(item=null) {
   editId = item?.id || null;
   document.getElementById("form-souhait-titre").textContent = item ? "Modifier le souhait" : "Nouveau souhait";
   document.getElementById("s-nom").value   = item?.nom   || "";
-  document.getElementById("s-emoji").value = item?.emoji || "";
+  document.getElementById("s-emoji").value = item?.emoji || "✈️";
   document.getElementById("s-note").value  = item?.note  || "";
   document.getElementById("s-fait").value  = item?.fait ? "true" : "false";
+  construireChoixEmoji("emoji-choix-souhait", "souhait", "s-emoji", item?.emoji || "✈️", em => {
+    // Si on a un drapeau connu, auto-remplir le nom du pays
+    if (typeof PAYS_COORDS !== "undefined" && PAYS_COORDS[em]
+        && !document.getElementById("s-nom").value.trim()) {
+      document.getElementById("s-nom").value = PAYS_COORDS[em].nom;
+    }
+  });
   ouvrirFormulaire("form-souhait");
 }
 async function sauvegarderSouhait() {

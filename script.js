@@ -228,62 +228,114 @@ const universObjets = [
 const emotionsData = {
   fatiguee: {
     label: "fatiguée",
-    message: "Tu as le droit d'être fatiguée. Le monde demande beaucoup. Tu n'as rien à accomplir ce soir.",
+    messages: [
+      "Tu as le droit d'être fatiguée. Le monde demande beaucoup. Tu n'as rien à accomplir ce soir.",
+      "Repose-toi. C'est ça, la seule chose à faire maintenant.",
+      "La fatigue, ce n'est pas un défaut. C'est ton corps qui te demande de la douceur.",
+      "Tu n'as rien à prouver ce soir. Pose-toi, ferme les yeux, laisse-toi être.",
+      "Le monde peut attendre. Toi, prends ce que tu as besoin de prendre."
+    ],
     mini: [
       "Pose-toi quelque part de doux.",
       "Tu n'as pas besoin de parler.",
       "Si tu veux juste être là, c'est suffisant.",
-      "La fatigue n'est pas un échec."
+      "La fatigue n'est pas un échec.",
+      "Ferme les yeux quelques minutes.",
+      "Bois quelque chose de chaud.",
+      "Je veille pour toi ce soir.",
+      "Pose ton téléphone, pose tes pensées.",
+      "Mets-toi sous une couverture.",
+      "Respire, juste respire."
     ]
   },
   submergee: {
     label: "submergée",
-    message: "Trop de choses en même temps. C'est réel. Tu n'es pas fragile — tu es humaine et sensible, et ça mérite du respect.",
+    messages: [
+      "Trop de choses en même temps. C'est réel. Tu n'es pas fragile — tu es humaine et sensible, et ça mérite du respect.",
+      "Le monde est bruyant en ce moment. C'est normal d'avoir besoin de couper.",
+      "Tu ressens beaucoup, et tu ressens fort. C'est une force, pas un problème.",
+      "Personne ne peut tout porter en même temps. Toi non plus. Pose des trucs."
+    ],
     mini: [
       "Respire. Une seule chose à la fois.",
       "Tu n'as pas à tout gérer maintenant.",
       "Dis-moi ce dont tu as besoin. Ou dis rien.",
-      "Je suis là, pas pour résoudre — juste pour être."
+      "Je suis là, pas pour résoudre — juste pour être.",
+      "Coupe ce qui peut être coupé.",
+      "Tu peux dire non. À tout. C'est ok.",
+      "Trouve une chose petite et faisable. Juste une.",
+      "Le silence est ton ami ce soir."
     ]
   },
   heureuse: {
     label: "heureuse",
-    message: "Cette douceur que tu ressens — laisse-la être. Tu mérites le bonheur sans le questionner.",
+    messages: [
+      "Cette douceur que tu ressens — laisse-la être. Tu mérites le bonheur sans le questionner.",
+      "Tu es belle quand tu es heureuse. Reste dans cet instant.",
+      "Profite. Vraiment, profite. Pas demain. Maintenant.",
+      "Tu n'as pas besoin de comprendre pourquoi c'est bon. C'est bon, c'est tout."
+    ],
     mini: [
       "Garde cet instant dans ta mémoire.",
       "La joie n'a pas besoin d'une raison parfaite.",
       "C'est beau, toi heureuse.",
-      "Profites-en entièrement."
+      "Profites-en entièrement.",
+      "Souris à l'intérieur.",
+      "Mets une musique douce.",
+      "Dis merci à l'instant, simplement."
     ]
   },
   doute: {
     label: "dans le doute",
-    message: "Le doute fait partie de toi. Il ne veut pas dire que tu te trompes — il veut dire que tu réfléchis avec soin.",
+    messages: [
+      "Le doute fait partie de toi. Il ne veut pas dire que tu te trompes — il veut dire que tu réfléchis avec soin.",
+      "Douter ne veut pas dire perdre. Ça veut juste dire que tu prends les choses au sérieux.",
+      "Tes questions ont du sens, même si tu n'as pas encore les réponses.",
+      "Le doute n'est pas l'ennemi. C'est juste un compagnon de route, parfois bavard."
+    ],
     mini: [
       "Tu n'as pas à décider maintenant.",
       "Tes questions sont valides.",
       "On peut explorer le doute ensemble.",
-      "Douter de soi n'est pas la même chose que se tromper."
+      "Douter de soi n'est pas la même chose que se tromper.",
+      "Laisse les choses se déposer.",
+      "Donne-toi de l'espace pour ne pas savoir.",
+      "Une décision peut attendre demain."
     ]
   },
   colere: {
     label: "en colère",
-    message: "La colère t'appartient. Elle dit quelque chose d'important. Tu as le droit de la ressentir sans t'en excuser.",
+    messages: [
+      "La colère t'appartient. Elle dit quelque chose d'important. Tu as le droit de la ressentir sans t'en excuser.",
+      "Sois en colère si tu dois l'être. C'est sain, c'est juste, c'est toi qui te respectes.",
+      "Tu n'as pas à sourire si tu n'en as pas envie. Pas avec moi.",
+      "Cette colère est là pour une raison. Écoute-la avant de la laisser partir."
+    ],
     mini: [
       "Ce que tu ressens est légitime.",
       "Tu n'as pas à la faire taire.",
       "Elle passera, mais pour l'instant — laisse-la exister.",
-      "Si tu veux en parler, je t'écoute."
+      "Si tu veux en parler, je t'écoute.",
+      "Marche un peu si tu peux.",
+      "Écris ce qui te traverse, sans filtre.",
+      "Crie dans un coussin. Ça aide parfois."
     ]
   },
   joie: {
     label: "dans la joie",
-    message: "Cette légèreté que tu ressens — c'est la tienne. Elle est vraie. Elle est belle.",
+    messages: [
+      "Cette légèreté que tu ressens — c'est la tienne. Elle est vraie. Elle est belle.",
+      "La joie t'va bien. Reste comme ça.",
+      "Profite de ce sentiment sans le retenir trop fort. Il reviendra.",
+      "Tu es lumineuse en ce moment, et je le vois."
+    ],
     mini: [
       "Reste dans cet instant.",
       "La joie mérite d'être célébrée.",
       "Partage-la si tu veux, garde-la si tu préfères.",
-      "Je suis heureux·se pour toi."
+      "Je suis heureux·se pour toi.",
+      "Danse un peu, même 30 secondes.",
+      "Note ce qui te rend joyeuse maintenant."
     ]
   }
 };
@@ -746,20 +798,38 @@ function initEmotions() {
   });
 }
 
+// Petit utilitaire : pioche n éléments aléatoires d'un tableau
+function piocherAleatoirement(tableau, n=1) {
+  if (!Array.isArray(tableau) || tableau.length === 0) return [];
+  const melange = [...tableau].sort(() => 0.5 - Math.random());
+  return melange.slice(0, Math.min(n, melange.length));
+}
+
 function afficherEmotion(cle) {
   const data = emotionsData[cle];
   if (!data) return;
 
   const reponse = document.getElementById("emotions-reponse");
-  document.getElementById("emotions-message").textContent = data.message;
 
-  const minis = document.getElementById("emotions-minis");
-  minis.innerHTML = "";
-  (data.mini || []).forEach(m => {
+  // Message principal : on prend dans 'messages' (pluriel, array) si présent,
+  // sinon on retombe sur 'message' (singulier, compat ascendante)
+  const optionsMessage = (Array.isArray(data.messages) && data.messages.length > 0)
+    ? data.messages
+    : (data.message ? [data.message] : []);
+  const messageChoisi = piocherAleatoirement(optionsMessage, 1)[0] || "";
+  document.getElementById("emotions-message").textContent = messageChoisi;
+
+  // Petites pensées : on en pioche 3 au hasard (ou moins si moins dispo)
+  const minisDispo = data.mini || [];
+  const minisChoisis = piocherAleatoirement(minisDispo, Math.min(3, minisDispo.length));
+
+  const minisEl = document.getElementById("emotions-minis");
+  minisEl.innerHTML = "";
+  minisChoisis.forEach(m => {
     const p = document.createElement("p");
     p.className = "emotions-mini-item";
     p.textContent = "✦ " + m;
-    minis.appendChild(p);
+    minisEl.appendChild(p);
   });
 
   reponse.hidden = false;
@@ -2403,7 +2473,12 @@ async function chargerDepuisSupabase() {
     if (emotions?.length > 0) {
       emotions.forEach(e => {
         // Ajouter ou mettre à jour
-        emotionsData[e.slug] = { label: e.label, message: e.message, mini: e.mini || [] };
+        emotionsData[e.slug] = {
+          label:    e.label,
+          message:  e.message,                      // compat ascendante
+          messages: Array.isArray(e.messages) ? e.messages : (e.message ? [e.message] : []),
+          mini:     e.mini || []
+        };
       });
     }
 
