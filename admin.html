@@ -129,12 +129,36 @@
       background:var(--blanc); border-radius:var(--r); padding:1.2rem;
       box-shadow:0 2px 10px rgba(74,55,40,.07);
       border-left:3px solid var(--lavande-2);
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
     }
+    .carte-admin-clickable { cursor: pointer; user-select: none; }
+    .carte-admin-clickable:hover, .carte-admin-clickable:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(74,55,40,.1);
+      background: linear-gradient(135deg, var(--blanc) 0%, rgba(213,200,232,.18) 100%);
+      outline: none;
+    }
+    .carte-admin-clickable:active { transform: translateY(0); }
     .carte-admin-titre {
       font-family:var(--font-t); font-size:1.05rem; color:var(--brun-f); margin-bottom:.3rem;
     }
     .carte-admin-meta { font-size:.75rem; color:var(--texte-c); margin-bottom:.8rem; }
+    .carte-admin-cta {
+      margin-top:.6rem; font-size:.72rem; color: var(--lavande-2);
+      font-style: italic; letter-spacing: .03em; opacity: .85;
+    }
     .carte-admin-actions { display:flex; gap:.5rem; flex-wrap:wrap; }
+
+    .tableau-bord-hint {
+      text-align: center;
+      font-style: italic;
+      color: var(--texte-c);
+      font-size: .9rem;
+      margin: -.3rem 0 1.2rem;
+      padding: .7rem 1rem;
+      background: rgba(213, 200, 232, .25);
+      border-radius: 10px;
+    }
 
     /* Formulaires */
     .formulaire {
