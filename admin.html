@@ -261,6 +261,69 @@
     .pin-touche-vide { background:transparent; cursor:default; }
     .pin-touche-vide:hover { background:transparent; transform:none; }
     .pin-touche-effacer { background: var(--creme-f); font-size:1.1rem; }
+
+    /* ── Sélecteur visuel d'étoile (ciel cliquable) ── */
+    .form-aide {
+      font-size: .82rem;
+      color: var(--texte-c);
+      font-style: italic;
+      margin: -.3rem 0 .5rem;
+      line-height: 1.4;
+    }
+    .ciel-picker {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      background: linear-gradient(135deg, #2e2748 0%, #463a64 50%, #382850 100%);
+      border-radius: 14px;
+      cursor: crosshair;
+      overflow: hidden;
+      user-select: none;
+      border: 2px dashed transparent;
+      transition: border-color .25s ease;
+    }
+    .ciel-picker:hover { border-color: var(--lavande-2); }
+    .ciel-picker::before {
+      content: "";
+      position: absolute; inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,255,255,.7), transparent),
+        radial-gradient(1.5px 1.5px at 28% 62%, rgba(255,255,255,.6), transparent),
+        radial-gradient(1.5px 1.5px at 45% 25%, rgba(255,255,255,.8), transparent),
+        radial-gradient(1.5px 1.5px at 65% 80%, rgba(255,255,255,.6), transparent),
+        radial-gradient(1.5px 1.5px at 78% 35%, rgba(255,255,255,.7), transparent),
+        radial-gradient(1.5px 1.5px at 88% 65%, rgba(255,255,255,.6), transparent),
+        radial-gradient(1.5px 1.5px at 35% 88%, rgba(255,255,255,.6), transparent),
+        radial-gradient(2px 2px at 58% 45%, rgba(255,255,255,.5), transparent);
+    }
+    .ciel-picker-aide {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255,255,255,.75);
+      font-style: italic; font-family: var(--font-t);
+      font-size: 1.05rem; letter-spacing: .05em;
+      pointer-events: none; text-align: center;
+      animation: aideRespire 3s ease-in-out infinite;
+    }
+    @keyframes aideRespire {
+      0%,100% { opacity: .65; }
+      50%     { opacity: 1; }
+    }
+    .ciel-picker-etoile {
+      position: absolute;
+      font-size: 2.2rem;
+      line-height: 1;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 0 10px rgba(255, 220, 130, .7));
+      transition: top .3s ease, left .3s ease;
+      pointer-events: none;
+      animation: etoileScintille 2s ease-in-out infinite;
+    }
+    @keyframes etoileScintille {
+      0%,100% { transform: translate(-50%, -50%) scale(1); }
+      50%     { transform: translate(-50%, -50%) scale(1.12); }
+    }
   </style>
 </head>
 <body>
@@ -421,25 +484,30 @@
         <h3>Nouvelle étoile</h3>
         <div class="form-grille">
           <div class="form-champ">
-            <label>Label (sous l'étoile)</label>
+            <label>Nom de l'étoile</label>
             <input id="e-label" type="text" placeholder="Notre étoile" />
           </div>
           <div class="form-champ">
-            <label>Emoji</label>
-            <input id="e-emoji" type="text" placeholder="⭐" maxlength="4" />
-          </div>
-          <div class="form-champ">
-            <label>Position X (0-100)</label>
-            <input id="e-x" type="number" min="5" max="95" value="50" />
-          </div>
-          <div class="form-champ">
-            <label>Position Y (0-100)</label>
-            <input id="e-y" type="number" min="5" max="95" value="50" />
+            <label>Apparence (emoji)</label>
+            <input id="e-emoji" type="text" placeholder="⭐" maxlength="4" oninput="majPreviewEtoile()" />
           </div>
         </div>
         <div class="form-grille une-col">
           <div class="form-champ">
-            <label>Message au clic</label>
+            <label>Place ton étoile dans le ciel</label>
+            <p class="form-aide">Clique simplement à l'endroit où tu veux qu'elle apparaisse 🌙</p>
+            <div class="ciel-picker" id="ciel-picker" onclick="placerEtoile(event)"
+                 role="application" aria-label="Clique pour positionner l'étoile">
+              <div class="ciel-picker-aide" id="ciel-picker-aide">Clique ici 👆</div>
+              <div class="ciel-picker-etoile" id="ciel-picker-etoile" hidden>⭐</div>
+            </div>
+            <input id="e-x" type="hidden" value="50" />
+            <input id="e-y" type="hidden" value="50" />
+          </div>
+        </div>
+        <div class="form-grille une-col">
+          <div class="form-champ">
+            <label>Message au clic (ce qui apparaît quand on touche l'étoile)</label>
             <textarea id="e-message" placeholder="Si on pouvait choisir une étoile à nous…"></textarea>
           </div>
         </div>
@@ -1186,7 +1254,51 @@ function ouvrirFormulaireEtoile(item=null) {
   document.getElementById("e-x").value       = item?.x       || 50;
   document.getElementById("e-y").value       = item?.y       || 50;
   document.getElementById("e-message").value = item?.message || "";
+  // Reset/initialise le ciel cliquable
+  const etoile = document.getElementById("ciel-picker-etoile");
+  const aide   = document.getElementById("ciel-picker-aide");
+  if (item) {
+    // Édition : afficher l'étoile à sa position actuelle
+    etoile.textContent = item.emoji || "⭐";
+    etoile.style.left  = (item.x || 50) + "%";
+    etoile.style.top   = (item.y || 50) + "%";
+    etoile.hidden = false;
+    if (aide) aide.style.display = "none";
+  } else {
+    // Nouvelle : ciel vide, aide visible
+    etoile.hidden = true;
+    if (aide) aide.style.display = "";
+  }
   ouvrirFormulaire("form-etoile");
+}
+
+function placerEtoile(e) {
+  const picker = document.getElementById("ciel-picker");
+  const rect = picker.getBoundingClientRect();
+  let xPct = Math.round(((e.clientX - rect.left) / rect.width)  * 100);
+  let yPct = Math.round(((e.clientY - rect.top)  / rect.height) * 100);
+  // Marges de sécurité (5–95%)
+  xPct = Math.max(5, Math.min(95, xPct));
+  yPct = Math.max(5, Math.min(95, yPct));
+  document.getElementById("e-x").value = xPct;
+  document.getElementById("e-y").value = yPct;
+
+  const etoile = document.getElementById("ciel-picker-etoile");
+  const emojiInput = document.getElementById("e-emoji");
+  etoile.textContent = (emojiInput.value.trim() || "⭐");
+  etoile.style.left  = xPct + "%";
+  etoile.style.top   = yPct + "%";
+  etoile.hidden = false;
+
+  const aide = document.getElementById("ciel-picker-aide");
+  if (aide) aide.style.display = "none";
+}
+
+function majPreviewEtoile() {
+  const etoile = document.getElementById("ciel-picker-etoile");
+  if (etoile && !etoile.hidden) {
+    etoile.textContent = document.getElementById("e-emoji").value.trim() || "⭐";
+  }
 }
 async function sauvegarderEtoile() {
   const data = {
