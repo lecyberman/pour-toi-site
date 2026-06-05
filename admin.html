@@ -282,47 +282,55 @@
       /* Layout vertical sur mobile */
       #app { flex-direction:column; }
 
-      /* Sidebar → barre horizontale scrollable en haut */
+      /* Sidebar → GRILLE 3 colonnes toujours visible (pas de scroll mystérieux) */
       .sidebar {
         width: 100%;
         height: auto;
         min-height: auto;
         position: sticky;
         top: 0;
-        flex-direction: row;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: .6rem .7rem;
-        gap: .35rem;
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: .7rem .7rem .8rem;
         border-right: none;
         border-bottom: 1px solid var(--creme-f);
         background: var(--blanc);
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
+        flex-direction: unset;
+        overflow: visible;
       }
-      .sidebar::-webkit-scrollbar { height: 3px; }
-      .sidebar::-webkit-scrollbar-thumb { background: var(--creme-f); border-radius: 2px; }
-
       .sidebar-titre {
-        display: none;  /* trop encombrant sur mobile */
+        grid-column: 1 / -1;
+        margin-bottom: .3rem;
+        text-align: center;
+        padding-bottom: .4rem;
+        font-size: .9rem;
       }
-      .sidebar-sep {
-        display: none;
-      }
+      .sidebar-titre span { display: none; }
+      .sidebar-sep { display: none; }
       .nav-btn {
-        flex-shrink: 0;
-        white-space: nowrap;
-        font-size: .75rem;
-        padding: .55rem .9rem;
-        min-height: 38px;
+        text-align: center;
+        font-size: .7rem;
+        line-height: 1.25;
+        padding: .55rem .35rem;
+        min-height: 52px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        word-break: keep-all;
+        hyphens: none;
+      }
+      .nav-btn.actif {
+        background: var(--lavande);
+        color: var(--brun-f);
+        font-weight: 400;
       }
       .btn-deconnexion {
-        flex-shrink: 0;
-        margin-top: 0;
-        margin-left: auto;
-        white-space: nowrap;
+        grid-column: 1 / -1;
+        margin-top: .4rem;
         padding: .55rem .9rem;
-        font-size: .7rem;
+        font-size: .75rem;
       }
 
       /* Contenu principal : moins de padding, scroll vertical */
@@ -597,6 +605,7 @@
         <h2>Tableau de bord</h2>
         <a href="index.html" target="_blank" class="btn-sec">Voir le site →</a>
       </div>
+      <p class="tableau-bord-hint">👇 Touche une carte pour gérer cette section</p>
       <div class="cartes-grille" id="stats-grille"></div>
       <div class="formulaire">
         <h3>État de la connexion Supabase</h3>
@@ -1352,18 +1361,18 @@ async function chargerTableauBord() {
     statut.innerHTML = `<span style="color:#7a3a3a">✗ Erreur de connexion — vérifie les clés dans supabase.js</span>`;
   }
 
-  // Stats
+  // Stats — chaque carte navigue vers son panneau admin (touch-to-navigate)
   const tables = [
-    { table:"galerie",   label:"Cartes galerie",  emoji:"✦" },
-    { table:"comprendre",label:"Observations",     emoji:"💭" },
-    { table:"etoiles",   label:"Étoiles univers",  emoji:"⭐" },
-    { table:"voyages",   label:"Voyages",          emoji:"✈️" },
-    { table:"albums",    label:"Albums",           emoji:"📷" },
-    { table:"photos",    label:"Photos nous",      emoji:"💑" },
-    { table:"capsules",  label:"Capsules",         emoji:"🔒" },
-    { table:"emotions",  label:"Émotions",         emoji:"💫" },
-    { table:"souhaits",  label:"Souhaits voyages", emoji:"🌍" },
-    { table:"dessins",   label:"Dessins",          emoji:"✏️" },
+    { table:"galerie",   panneau:"galerie-admin",   label:"Cartes galerie",  emoji:"✦" },
+    { table:"comprendre",panneau:"comprendre-admin",label:"Observations",     emoji:"💭" },
+    { table:"etoiles",   panneau:"etoiles-admin",   label:"Étoiles univers",  emoji:"⭐" },
+    { table:"voyages",   panneau:"voyages-admin",   label:"Voyages",          emoji:"✈️" },
+    { table:"albums",    panneau:"albums-admin",    label:"Albums",           emoji:"📷" },
+    { table:"photos",    panneau:"photos-admin",    label:"Photos nous",      emoji:"💑" },
+    { table:"capsules",  panneau:"capsules-admin",  label:"Capsules",         emoji:"🔒" },
+    { table:"emotions",  panneau:"emotions-admin",  label:"Émotions",         emoji:"💫" },
+    { table:"souhaits",  panneau:"souhaits-admin",  label:"Souhaits voyages", emoji:"🌍" },
+    { table:"dessins",   panneau:"dessins-admin",   label:"Dessins",          emoji:"✏️" },
   ];
 
   const grille = document.getElementById("stats-grille");
@@ -1374,13 +1383,32 @@ async function chargerTableauBord() {
   tables.forEach((t, i) => {
     const n = Array.isArray(resultats[i]) ? resultats[i].length : "?";
     const div = document.createElement("div");
-    div.className = "carte-admin";
+    div.className = "carte-admin carte-admin-clickable";
+    div.setAttribute("role", "button");
+    div.setAttribute("tabindex", "0");
+    div.setAttribute("aria-label", `Gérer ${t.label}`);
     div.innerHTML = `
       <div style="font-size:1.8rem;margin-bottom:.4rem">${t.emoji}</div>
       <div class="carte-admin-titre">${n}</div>
-      <div class="carte-admin-meta">${t.label}</div>`;
+      <div class="carte-admin-meta">${t.label}</div>
+      <div class="carte-admin-cta">Toucher pour gérer →</div>`;
+    div.onclick = () => allerDepuisCarte(t.panneau);
+    div.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); allerDepuisCarte(t.panneau); } };
     grille.appendChild(div);
   });
+}
+
+// Navigation depuis une carte du tableau de bord
+function allerDepuisCarte(panneauId) {
+  document.querySelectorAll(".panneau").forEach(p => p.classList.remove("actif"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("actif"));
+  document.getElementById("panneau-" + panneauId)?.classList.add("actif");
+  document.querySelectorAll(".nav-btn").forEach(b => {
+    const onc = b.getAttribute("onclick") || "";
+    if (onc.includes("'" + panneauId + "'")) b.classList.add("actif");
+  });
+  chargerPanneau(panneauId);
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 /* ================================================================
