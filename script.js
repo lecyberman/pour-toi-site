@@ -3022,6 +3022,7 @@ const EMOJIS_DRAMAS = [
 ];
 
 let dramaPickerInit = false;
+let dramaEnModif    = null; // id du drama en cours de modification, ou null
 
 async function initDramas() {
   if (!dramaPickerInit) {
@@ -3086,18 +3087,23 @@ async function afficherDramas() {
     div.className = "drama-carte drama-" + (d.statut || "a_voir");
     const etoiles = (d.note != null && d.note > 0)
       ? "★".repeat(d.note) + "☆".repeat(5 - d.note)
-      : "";
+      : "<span class=\"drama-note-vide\">Pas encore noté</span>";
     div.innerHTML = `
       <div class="drama-emoji">${d.emoji || "🎬"}</div>
       <div class="drama-info">
         <h3 class="drama-titre">${escapeHtml(d.titre)}</h3>
         <div class="drama-meta">
           <span class="drama-badge drama-badge-${d.statut}">${labels[d.statut] || "À voir"}</span>
-          ${etoiles ? `<span class="drama-note">${etoiles}</span>` : ""}
+          <span class="drama-note">${etoiles}</span>
         </div>
-        ${d.commentaire ? `<p class="drama-commentaire">${escapeHtml(d.commentaire)}</p>` : ""}
+        ${d.commentaire
+          ? `<p class="drama-commentaire">${escapeHtml(d.commentaire)}</p>`
+          : `<p class="drama-commentaire drama-commentaire-vide">Aucun avis encore — touche ✎ pour en ajouter un</p>`}
       </div>
-      <button class="drama-supprimer" onclick="supprimerDrama('${d.id}')" aria-label="Supprimer">✕</button>
+      <div class="drama-actions">
+        <button class="drama-modifier" onclick="modifierDrama('${d.id}')" aria-label="Modifier">✎</button>
+        <button class="drama-supprimer" onclick="supprimerDrama('${d.id}')" aria-label="Supprimer">✕</button>
+      </div>
     `;
     liste.appendChild(div);
   });
@@ -3111,10 +3117,74 @@ async function ajouterDrama() {
   const emoji = document.getElementById("drama-emoji-input").value.trim() || "🎬";
   const commentaire = document.getElementById("drama-commentaire-input").value.trim();
   const data = { titre, statut, note, emoji, commentaire };
+
   if (supabaseDispo()) {
-    try { await db.inserer("dramas", data); } catch(e) {}
+    try {
+      if (dramaEnModif) {
+        await db.modifier("dramas", dramaEnModif, data);
+      } else {
+        await db.inserer("dramas", data);
+      }
+    } catch(e) { console.warn("drama save:", e); }
   }
-  // Reset form
+
+  // Reset form + sortir du mode édition
+  dramaEnModif = null;
+  resetFormulaireDrama();
+  await afficherDramas();
+}
+
+// Ouvre le form pré-rempli pour modifier un drama existant
+async function modifierDrama(id) {
+  if (!supabaseDispo()) return;
+  let drama = null;
+  try {
+    const liste = await db.lire("dramas", "id=eq." + encodeURIComponent(id));
+    drama = (liste || [])[0];
+  } catch(e) { console.warn("lire drama:", e); }
+  if (!drama) return;
+
+  dramaEnModif = drama.id;
+
+  document.getElementById("drama-titre-input").value       = drama.titre || "";
+  document.getElementById("drama-commentaire-input").value = drama.commentaire || "";
+  document.getElementById("drama-emoji-input").value       = drama.emoji || "🎬";
+  document.getElementById("drama-note-input").value        = drama.note || 0;
+  document.getElementById("drama-statut-select").value     = drama.statut || "a_voir";
+
+  choisirStatutDrama(drama.statut || "a_voir");
+  choisirNoteDrama(drama.note || 0);
+  construireChoixEmojiDrama(drama.emoji || "🎬");
+
+  // Mode édition visuel
+  const details = document.querySelector(".dramas-form-wrap");
+  if (details) {
+    details.open = true;
+    details.classList.add("dramas-form-modif");
+  }
+  const summary = document.querySelector(".dramas-form-toggle");
+  if (summary) summary.textContent = "✎ Modifier ce drama";
+  const btn = document.querySelector(".dramas-form .btn-entrer");
+  if (btn) btn.textContent = "Enregistrer ✓";
+
+  // Afficher le bouton "Annuler la modification" s'il existe
+  let annul = document.getElementById("drama-annuler-modif");
+  if (!annul) {
+    annul = document.createElement("button");
+    annul.type = "button";
+    annul.id = "drama-annuler-modif";
+    annul.className = "btn-lien-doux";
+    annul.textContent = "Annuler la modification";
+    annul.onclick = () => { dramaEnModif = null; resetFormulaireDrama(); };
+    btn.parentElement.appendChild(annul);
+  }
+  annul.hidden = false;
+
+  // Scroller doucement vers le form
+  if (details) details.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function resetFormulaireDrama() {
   document.getElementById("drama-titre-input").value = "";
   document.getElementById("drama-commentaire-input").value = "";
   document.getElementById("drama-emoji-input").value = "🎬";
@@ -3123,7 +3193,15 @@ async function ajouterDrama() {
   choisirStatutDrama("a_voir");
   choisirNoteDrama(0);
   construireChoixEmojiDrama("🎬");
-  await afficherDramas();
+  // Remettre le formulaire en mode "Ajouter"
+  const details = document.querySelector(".dramas-form-wrap");
+  if (details) details.classList.remove("dramas-form-modif");
+  const summary = document.querySelector(".dramas-form-toggle");
+  if (summary) summary.textContent = "+ Ajouter un drama";
+  const btn = document.querySelector(".dramas-form .btn-entrer");
+  if (btn) btn.textContent = "Ajouter ✦";
+  const annul = document.getElementById("drama-annuler-modif");
+  if (annul) annul.hidden = true;
 }
 
 async function supprimerDrama(id) {
