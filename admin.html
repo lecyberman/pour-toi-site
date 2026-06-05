@@ -228,20 +228,69 @@
       #app { flex-direction:column; }
       .form-grille { grid-template-columns:1fr; }
     }
+
+    /* ── PIN keypad admin ── */
+    .pin-boite-admin { max-width: 340px; }
+    .pin-boite-admin h2 { margin-bottom: .2rem; }
+    .pin-boite-admin > p { font-size: .85rem; color: var(--texte-c); margin-bottom: 1.4rem; }
+    .pin-dots { display:flex; justify-content:center; gap:18px; margin-bottom:.6rem; }
+    .pin-dot {
+      width:14px; height:14px; border-radius:50%;
+      border:1.5px solid var(--brun-c); background:transparent;
+      transition: background .2s, transform .2s;
+    }
+    .pin-dot.rempli { background: var(--lavande-2); border-color: var(--lavande-2); }
+    .pin-dot.pulse { transform: scale(1.35); }
+    .pin-dots.shake { animation: pinShake .55s ease; }
+    @keyframes pinShake {
+      0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)}
+      40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)}
+    }
+    .pin-message { min-height:1.4rem; font-size:.85rem; color:var(--texte-c); margin-bottom:1rem; }
+    .pin-message.succes { color:#5b8a6a; }
+    .pin-message.erreur { color:#a86b6b; }
+    .pin-pave { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .pin-touche {
+      background: var(--creme); border:1px solid transparent;
+      border-radius:50%; width:64px; height:64px; margin:0 auto;
+      font-size:1.4rem; font-family:var(--font-t); font-weight:300;
+      color:var(--brun-f); cursor:pointer; transition:all .18s ease;
+    }
+    .pin-touche:hover, .pin-touche:focus { background: var(--lavande); outline:none; transform:scale(1.06); }
+    .pin-touche:active { transform:scale(0.96); }
+    .pin-touche-vide { background:transparent; cursor:default; }
+    .pin-touche-vide:hover { background:transparent; transform:none; }
+    .pin-touche-effacer { background: var(--creme-f); font-size:1.1rem; }
   </style>
 </head>
 <body>
 
-<!-- ── Écran connexion ── -->
+<!-- ── Écran connexion — PIN visuel ── -->
 <div id="ecran-connexion">
-  <div class="connexion-boite">
+  <div class="connexion-boite pin-boite-admin">
     <h2>Notre espace</h2>
     <p>Administration — accès privé</p>
-    <input id="input-mdp" class="champ" type="password"
-           placeholder="Mot de passe"
-           onkeydown="if(event.key==='Enter') seConnecter()" />
-    <button class="btn-connexion" onclick="seConnecter()">Entrer</button>
-    <p class="connexion-erreur" id="erreur-connexion">Mot de passe incorrect.</p>
+    <div class="pin-dots" aria-hidden="true">
+      <span class="pin-dot"></span>
+      <span class="pin-dot"></span>
+      <span class="pin-dot"></span>
+      <span class="pin-dot"></span>
+    </div>
+    <p id="pin-message" class="pin-message" role="status" aria-live="polite"></p>
+    <div class="pin-pave" role="group" aria-label="Pavé numérique">
+      <button type="button" class="pin-touche" onclick="tapeChiffre('1')">1</button>
+      <button type="button" class="pin-touche" onclick="tapeChiffre('2')">2</button>
+      <button type="button" class="pin-touche" onclick="tapeChiffre('3')">3</button>
+      <button type="button" class="pin-touche" onclick="tapeChiffre('4')">4</button>
+      <button type="button" class="pin-touche" onclick="tapeChiffre('5')">5</button>
+      <button type="button" class="pin-touche" onclick="tapeChiffre('6')">6</button>
+      <button type="button" class="pin-touche" onclick="tapeChiffre('7')">7</button>
+      <button type="button" class="pin-touche" onclick="tapeChiffre('8')">8</button>
+      <button type="button" class="pin-touche" onclick="tapeChiffre('9')">9</button>
+      <button type="button" class="pin-touche pin-touche-vide" disabled aria-hidden="true"></button>
+      <button type="button" class="pin-touche" onclick="tapeChiffre('0')">0</button>
+      <button type="button" class="pin-touche pin-touche-effacer" onclick="effacerChiffre()" aria-label="Effacer">⌫</button>
+    </div>
   </div>
 </div>
 
@@ -763,34 +812,66 @@
 <script src="supabase.js"></script>
 <script>
 /* ================================================================
-   ✏️  MODIFIER ICI — MOT DE PASSE ADMIN
+   ✏️  MODIFIER ICI — PIN ADMIN (4 chiffres)
    ----------------------------------------------------------------
-   Change "notre2024" par le mot de passe que vous voulez.
-   ⚠️  Évite les mots de passe trop simples — le site est public.
+   Pour changer le code : remplace les 4 chiffres ci-dessous.
 ================================================================ */
-const MOTS_DE_PASSE = ["notre2024", "dadoucherie"];
-// Deux mots de passe : un pour toi, un pour elle si tu veux
-// Tu peux en ajouter autant que tu veux dans ce tableau.
+const PIN_SECRET      = "5922";
+const PIN_SESSION_KEY = "pin_ok_v1";
 
 /* ================================================================
-   CONNEXION
+   CONNEXION — PIN keypad
 ================================================================ */
-function seConnecter() {
-  const mdp = document.getElementById("input-mdp").value;
-  if (MOTS_DE_PASSE.includes(mdp)) {
+let pinSaisie = "";
+
+function tapeChiffre(c) {
+  if (pinSaisie.length >= 4) return;
+  pinSaisie += c;
+  rafraichirPinDots();
+  const dots = document.querySelectorAll(".pin-dot");
+  const dot = dots[pinSaisie.length - 1];
+  if (dot) { dot.classList.add("pulse"); setTimeout(() => dot.classList.remove("pulse"), 280); }
+  if (pinSaisie.length === 4) setTimeout(verifierPin, 200);
+}
+
+function effacerChiffre() {
+  if (pinSaisie.length === 0) return;
+  pinSaisie = pinSaisie.slice(0, -1);
+  rafraichirPinDots();
+}
+
+function rafraichirPinDots() {
+  document.querySelectorAll(".pin-dot").forEach((d, i) => {
+    d.classList.toggle("rempli", i < pinSaisie.length);
+  });
+}
+
+function verifierPin() {
+  const msg = document.getElementById("pin-message");
+  if (pinSaisie === PIN_SECRET) {
+    msg.textContent = "Bienvenue \u2728"; msg.className = "pin-message succes";
     sessionStorage.setItem("admin_ok", "1");
-    document.getElementById("ecran-connexion").classList.add("cache");
-    document.getElementById("app").classList.add("visible");
-    chargerTout();
+    sessionStorage.setItem(PIN_SESSION_KEY, "1");
+    setTimeout(() => {
+      document.getElementById("ecran-connexion").classList.add("cache");
+      document.getElementById("app").classList.add("visible");
+      chargerTout();
+    }, 600);
   } else {
-    document.getElementById("erreur-connexion").style.display = "block";
-    document.getElementById("input-mdp").value = "";
-    document.getElementById("input-mdp").focus();
+    msg.textContent = "Oups, r\u00e9essaie \ud83c\udf38"; msg.className = "pin-message erreur";
+    const wrap = document.querySelector(".pin-dots");
+    if (wrap) wrap.classList.add("shake");
+    setTimeout(() => {
+      if (wrap) wrap.classList.remove("shake");
+      pinSaisie = ""; rafraichirPinDots();
+      msg.textContent = ""; msg.className = "pin-message";
+    }, 800);
   }
 }
 
 function seDeconnecter() {
   sessionStorage.removeItem("admin_ok");
+  sessionStorage.removeItem(PIN_SESSION_KEY);
   location.reload();
 }
 
@@ -799,6 +880,13 @@ if (sessionStorage.getItem("admin_ok")) {
   document.getElementById("ecran-connexion").classList.add("cache");
   document.getElementById("app").classList.add("visible");
 }
+
+// Raccourcis clavier sur l'écran de connexion
+document.addEventListener("keydown", e => {
+  if (sessionStorage.getItem("admin_ok")) return;
+  if (e.key >= "0" && e.key <= "9") { tapeChiffre(e.key); e.preventDefault(); }
+  else if (e.key === "Backspace") { effacerChiffre(); e.preventDefault(); }
+});
 
 /* ================================================================
    NAVIGATION

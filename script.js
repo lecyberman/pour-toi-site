@@ -2440,3 +2440,665 @@ async function sauvegarderDessinEnLigne(canvasId, type, message = "") {
   }
   return null;
 }
+
+
+/* ════════════════════════════════════════════════════════════════
+   ════════════════════════════════════════════════════════════════
+                  AJOUTS V2 — PIN, capsule juillet,
+              espaces privés, créations, dramas, humeurs
+   ════════════════════════════════════════════════════════════════
+   ════════════════════════════════════════════════════════════════ */
+
+
+/* ================================================================
+   PIN — Modal pavé numérique (réutilisable, accessible clavier)
+================================================================ */
+const PIN_SECRET      = "5922";
+const PIN_SESSION_KEY = "pin_ok_v1";
+let pinSaisie         = "";
+let pinCallbackSucces = null;
+let pinCallbackAnnule = null;
+
+function ouvrirPin(titreTexte, callbackSucces, callbackAnnule = null) {
+  pinSaisie = "";
+  pinCallbackSucces = callbackSucces;
+  pinCallbackAnnule = callbackAnnule;
+  const modal = document.getElementById("pin-modal");
+  if (!modal) return;
+  document.getElementById("pin-titre").textContent = titreTexte || "Entrer le code";
+  const msg = document.getElementById("pin-message");
+  msg.textContent = "";
+  msg.className = "pin-message";
+  rafraichirPinDots();
+  modal.hidden = false;
+  setTimeout(() => modal.classList.add("visible"), 10);
+}
+
+function fermerPin() {
+  const modal = document.getElementById("pin-modal");
+  if (!modal) return;
+  modal.classList.remove("visible");
+  setTimeout(() => { modal.hidden = true; }, 250);
+  pinSaisie = "";
+  const cb = pinCallbackAnnule;
+  pinCallbackSucces = null;
+  pinCallbackAnnule = null;
+  if (typeof cb === "function") cb();
+}
+
+function tapeChiffre(c) {
+  if (pinSaisie.length >= 4) return;
+  pinSaisie += c;
+  rafraichirPinDots();
+  const dots = document.querySelectorAll(".pin-dot");
+  const dot = dots[pinSaisie.length - 1];
+  if (dot) {
+    dot.classList.add("pulse");
+    setTimeout(() => dot.classList.remove("pulse"), 280);
+  }
+  if (pinSaisie.length === 4) {
+    setTimeout(verifierPin, 200);
+  }
+}
+
+function effacerChiffre() {
+  if (pinSaisie.length === 0) return;
+  pinSaisie = pinSaisie.slice(0, -1);
+  rafraichirPinDots();
+}
+
+function rafraichirPinDots() {
+  document.querySelectorAll(".pin-dot").forEach((d, i) => {
+    d.classList.toggle("rempli", i < pinSaisie.length);
+  });
+}
+
+function verifierPin() {
+  const msg = document.getElementById("pin-message");
+  if (pinSaisie === PIN_SECRET) {
+    msg.textContent = "Bienvenue ✨";
+    msg.className = "pin-message succes";
+    try { sessionStorage.setItem(PIN_SESSION_KEY, "1"); } catch(e) {}
+    setTimeout(() => {
+      const cb = pinCallbackSucces;
+      pinCallbackSucces = null;
+      pinCallbackAnnule = null;
+      const modal = document.getElementById("pin-modal");
+      modal.classList.remove("visible");
+      setTimeout(() => { modal.hidden = true; pinSaisie = ""; }, 250);
+      if (typeof cb === "function") cb();
+    }, 700);
+  } else {
+    msg.textContent = "Oups, réessaie 🌸";
+    msg.className = "pin-message erreur";
+    const wrap = document.querySelector(".pin-dots");
+    if (wrap) wrap.classList.add("shake");
+    setTimeout(() => {
+      if (wrap) wrap.classList.remove("shake");
+      pinSaisie = "";
+      rafraichirPinDots();
+      msg.textContent = "";
+      msg.className = "pin-message";
+    }, 800);
+  }
+}
+
+function pinEstAutorise() {
+  try { return sessionStorage.getItem(PIN_SESSION_KEY) === "1"; }
+  catch(e) { return false; }
+}
+
+// Raccourci clavier dans la modale PIN
+document.addEventListener("keydown", e => {
+  const modal = document.getElementById("pin-modal");
+  if (!modal || modal.hidden) return;
+  if (e.key >= "0" && e.key <= "9") { tapeChiffre(e.key); e.preventDefault(); }
+  else if (e.key === "Backspace")    { effacerChiffre();  e.preventDefault(); }
+  else if (e.key === "Escape")       { fermerPin();       e.preventDefault(); }
+});
+
+
+/* ================================================================
+   ACCÈS ADMIN DISCRET
+   - Icône 🔑 en bas de page → PIN → admin.html
+   - Triple-clic sur le titre d'accueil → idem
+================================================================ */
+function ouvrirAdminAvecPin() {
+  if (pinEstAutorise()) { window.location.href = "admin.html"; return; }
+  ouvrirPin("Accès admin", () => { window.location.href = "admin.html"; });
+}
+
+(function setupTripleClick() {
+  document.addEventListener("DOMContentLoaded", () => {
+    let clicks = 0, timer = null;
+    const titre = document.querySelector(".accueil-titre");
+    if (!titre) return;
+    titre.addEventListener("click", () => {
+      clicks++;
+      clearTimeout(timer);
+      timer = setTimeout(() => clicks = 0, 700);
+      if (clicks >= 3) { clicks = 0; ouvrirAdminAvecPin(); }
+    });
+  });
+})();
+
+
+/* ================================================================
+   CAPSULE SPÉCIALE "POUR NOTRE HISTOIRE À DEUX 💍"
+================================================================ */
+const CAPSULE_JUILLET_ID   = "juillet-3ans";
+const CAPSULE_JUILLET_DATE = "2026-07-15";
+
+const CAPSULE_JUILLET_TEXTE = [
+  "Il y a trois ans, tu m'as dit qu'on n'était pas compatibles. Que tu ne savais pas comment me classer. Que je n'étais pas juste un ami, mais que tu ne savais pas non plus ce que j'étais. Et moi, j'ai souri, parce que je savais déjà.",
+  "Tu m'as dit que notre relation ne passerait pas un an. Tu avais tes doutes, tes questions, cette façon de tout analyser, de tout peser. Et moi je suis resté — pas parce que j'avais des certitudes, mais parce que même dans l'ambiguïté, être près de toi avait plus de sens que d'être loin.",
+  "Je t'ai appris à me connaître à travers des messages, parce que tu parles mieux par texte que par les mots qu'on dit à voix haute. J'ai appris à lire entre tes lignes. J'ai appris que quand tu regardes un drama chinois en boucle, c'est que le monde dehors est trop bruyant et que tu as besoin de ta bulle. Et j'ai appris à respecter cette bulle — à ne jamais forcer la porte, juste à rester dehors au cas où tu aurais envie de l'ouvrir.",
+  "Tu es restée toi-même — celle qui préfère le canapé à la rue, les histoires d'amour coréennes à la vraie vie sociale, les créations artistiques aux conversations inutiles. Celle qui dessine, qui crée, qui voit la beauté là où les autres voient du vide. Tu as fait des études de mode, tu es designeure industrielle, et tout ce que tu touches a quelque chose — une âme, une intention.",
+  "On a construit ensemble. Deux entreprises au Mali — MSK Création, Genesis. Des marques de sac au Togo — Isdalinia, Elvi Creation. On a fait des projets dans des pays différents, on a porté des choses lourdes ensemble, on a avancé même quand c'était compliqué.",
+  "Et pourtant tu doutes encore parfois. Je le sais. Tu réfléchis beaucoup — c'est ta nature, ce n'est pas un défaut. Mais moi je ne doute pas. Pas une seule seconde.",
+  "Trois ans après le début de ce que tu refusais d'appeler une relation, je suis toujours là. Et je veux te poser une question…"
+];
+
+const LETTRE_JUILLET = [
+  "Mon amour,",
+  "Tu m'avais dit que ça ne durerait pas. Regarde-nous.",
+  "Je t'aime dans ta façon d'être différente, dans ton monde intérieur que peu de gens ont la chance de voir. Je t'aime quand tu regardes ton drama sans dire un mot pendant trois heures. Je t'aime quand tu crées quelque chose de tes mains. Je t'aime dans tes doutes, dans tes silences, dans ta façon de tout ressentir plus fort que les autres.",
+  "Aujourd'hui, le 15 juillet, je veux juste te demander une chose.",
+  "Est-ce que tu veux bien rester avec moi — pour de vrai, pour toujours ?"
+];
+
+// Injection dans capsulesData
+capsulesData.push({
+  id: CAPSULE_JUILLET_ID,
+  titre: "Pour notre histoire à deux 💍",
+  icone: "💍",
+  dateOuvert: CAPSULE_JUILLET_DATE,
+  contenu: CAPSULE_JUILLET_TEXTE,
+  special: "juillet"
+});
+
+// Override de initCapsules pour gérer la capsule spéciale et l'URL secrète
+const _initCapsulesOriginal = initCapsules;
+initCapsules = function() {
+  const liste = document.getElementById("capsules-liste");
+  if (!liste) return;
+  if (liste.children.length > 0) return;
+
+  const maintenant = new Date();
+  maintenant.setHours(0, 0, 0, 0);
+
+  const secretJuillet = location.pathname.includes("secret-juillet")
+                     || location.hash === "#secret-juillet";
+
+  capsulesData.forEach((capsule, i) => {
+    const dateOuverture = new Date(capsule.dateOuvert);
+    dateOuverture.setHours(0, 0, 0, 0);
+    const estOuverte = maintenant >= dateOuverture
+                    || (capsule.id === CAPSULE_JUILLET_ID && secretJuillet);
+
+    const div = document.createElement("div");
+    div.className = "capsule";
+    div.style.animationDelay = `${i * 0.15}s`;
+
+    if (estOuverte && capsule.special === "juillet") {
+      const dateStr = dateOuverture.toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
+      const paragraphes = capsule.contenu.map(p => `<p>${p}</p>`).join("");
+      const sstitre = (secretJuillet && maintenant < dateOuverture)
+        ? "🌸 Aperçu privé"
+        : "Ouvert le " + dateStr;
+      div.innerHTML = `
+        <div class="capsule-ouverte capsule-juillet">
+          <div class="capsule-ouverte-header">
+            <span class="capsule-verrou-icone">${capsule.icone}</span>
+            <h3>${capsule.titre}</h3>
+            <span class="capsule-ouverte-sstitre">${sstitre}</span>
+          </div>
+          <div class="capsule-ouverte-corps">
+            ${paragraphes}
+            <div class="capsule-juillet-actions">
+              <button class="btn-entrer btn-juillet" onclick="ouvrirLettreJuillet()">Et si c'était pour toujours ? 💍</button>
+            </div>
+          </div>
+        </div>`;
+      liste.appendChild(div);
+      return;
+    }
+
+    if (estOuverte) {
+      const paragraphes = capsule.contenu.map(p => `<p>${p}</p>`).join("");
+      const dateStr = dateOuverture.toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
+      div.innerHTML = `
+        <div class="capsule-ouverte">
+          <div class="capsule-ouverte-header">
+            <span class="capsule-verrou-icone">${capsule.icone}</span>
+            <h3>${capsule.titre}</h3>
+            <span class="capsule-ouverte-sstitre">Ouvert le ${dateStr}</span>
+          </div>
+          <div class="capsule-ouverte-corps">
+            ${paragraphes}
+            <span class="capsule-badge-ouvert">✓ Déverrouillé</span>
+          </div>
+        </div>`;
+    } else {
+      const dateStr = dateOuverture.toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
+      div.innerHTML = `
+        <div class="capsule-verrou">
+          <span class="capsule-verrou-icone">🔒</span>
+          <h3 class="capsule-verrou-titre">${capsule.titre}</h3>
+          <p class="capsule-verrou-date">S'ouvrira le ${dateStr}</p>
+          <div class="capsule-compte-rebours" id="rebours-${capsule.id}">
+            <div class="capsule-rebours-unite">
+              <span class="capsule-rebours-nombre" id="rb-j-${capsule.id}">--</span>
+              <span class="capsule-rebours-label">jours</span>
+            </div>
+            <div class="capsule-rebours-unite">
+              <span class="capsule-rebours-nombre" id="rb-h-${capsule.id}">--</span>
+              <span class="capsule-rebours-label">heures</span>
+            </div>
+            <div class="capsule-rebours-unite">
+              <span class="capsule-rebours-nombre" id="rb-m-${capsule.id}">--</span>
+              <span class="capsule-rebours-label">minutes</span>
+            </div>
+          </div>
+        </div>`;
+      mettreAJourRebours(capsule.id, dateOuverture);
+      setInterval(() => mettreAJourRebours(capsule.id, dateOuverture), 60000);
+    }
+
+    liste.appendChild(div);
+  });
+};
+
+function ouvrirLettreJuillet() {
+  const modal = document.getElementById("lettre-juillet");
+  const corps = document.getElementById("lettre-juillet-corps");
+  if (!modal || !corps) return;
+  corps.innerHTML = "";
+  modal.hidden = false;
+  setTimeout(() => modal.classList.add("visible"), 10);
+  LETTRE_JUILLET.forEach((ligne, i) => {
+    setTimeout(() => {
+      const p = document.createElement("p");
+      p.className = "lettre-ligne";
+      p.textContent = ligne;
+      corps.appendChild(p);
+      setTimeout(() => p.classList.add("visible"), 30);
+    }, i * 1200);
+  });
+  setTimeout(() => {
+    const bouton = document.createElement("div");
+    bouton.className = "lettre-action";
+    bouton.innerHTML = `<button class="btn-entrer btn-juillet-final" onclick="repondreOuiPourToujours()">Oui, pour toujours 💍</button>`;
+    corps.appendChild(bouton);
+    setTimeout(() => bouton.classList.add("visible"), 30);
+  }, LETTRE_JUILLET.length * 1200 + 600);
+}
+
+function fermerLettreJuillet() {
+  const modal = document.getElementById("lettre-juillet");
+  if (!modal) return;
+  modal.classList.remove("visible");
+  setTimeout(() => { modal.hidden = true; }, 400);
+}
+
+function repondreOuiPourToujours() {
+  const corps = document.getElementById("lettre-juillet-corps");
+  if (!corps) return;
+  const finale = document.createElement("div");
+  finale.className = "lettre-finale";
+  finale.innerHTML = `
+    <div class="lettre-petales" aria-hidden="true">🌸 🌸 🌸</div>
+    <p class="lettre-finale-texte">Je t'aime. Depuis le début. Pour toujours. 🌸</p>
+  `;
+  corps.appendChild(finale);
+  setTimeout(() => finale.classList.add("visible"), 50);
+}
+
+
+/* ================================================================
+   HELPERS communs
+================================================================ */
+function escapeHtml(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[c]));
+}
+
+
+/* ================================================================
+   "NOS MOTS À NOUS" — journal partagé Elle/Lui (PIN-gated)
+================================================================ */
+let motsAuteurCourant = "elle";
+let motsImageUrl     = null;
+
+async function initMots() {
+  const gate = document.getElementById("mots-gate");
+  const contenu = document.getElementById("mots-contenu");
+  if (!gate || !contenu) return;
+  if (!pinEstAutorise()) {
+    gate.hidden = false;
+    contenu.hidden = true;
+    return;
+  }
+  gate.hidden = true;
+  contenu.hidden = false;
+  await chargerMots();
+}
+
+function demanderPinMots() {
+  ouvrirPin("Accès à notre journal", () => initMots());
+}
+
+async function chargerMots() {
+  const fil = document.getElementById("mots-fil");
+  if (!fil) return;
+  fil.innerHTML = "";
+  let liste = [];
+  if (supabaseDispo()) {
+    try { liste = await db.lire("mots"); } catch(e) { console.warn("mots:", e); }
+  }
+  liste = (liste || []).slice().reverse();
+  if (liste.length === 0) {
+    fil.innerHTML = '<p class="mots-vide">Rien d\'écrit pour l\'instant. C\'est à toi.</p>';
+    return;
+  }
+  liste.forEach(m => {
+    const carte = document.createElement("article");
+    carte.className = "mot-carte mot-" + (m.auteur === "elle" ? "elle" : "lui");
+    const dateStr = m.created_at
+      ? new Date(m.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+      : "";
+    carte.innerHTML = `
+      <header class="mot-header">
+        <span class="mot-auteur">${m.auteur === "elle" ? "Elle" : "Lui"}</span>
+        <span class="mot-date">${dateStr}</span>
+      </header>
+      <div class="mot-texte">${(m.texte || "").split("\n").map(l => `<p>${escapeHtml(l)}</p>`).join("")}</div>
+      ${m.image ? `<img class="mot-image" src="${m.image}" alt="" loading="lazy" />` : ""}
+    `;
+    fil.appendChild(carte);
+  });
+}
+
+function basculerAuteurMot(auteur) {
+  motsAuteurCourant = auteur;
+  document.querySelectorAll(".mots-auteur-btn").forEach(b => {
+    b.classList.toggle("actif", b.dataset.auteur === auteur);
+  });
+}
+
+async function uploadImageMot(input) {
+  const fichier = input.files[0];
+  if (!fichier || !supabaseDispo()) return;
+  const ext = (fichier.name.split(".").pop() || "jpg");
+  const chemin = `mots/${Date.now()}.${ext}`;
+  const url = await db.uploadImage("images", chemin, fichier);
+  if (url) {
+    motsImageUrl = url;
+    document.getElementById("mots-image-apercu").innerHTML =
+      `<img src="${url}" alt="" /><button type="button" onclick="retirerImageMot()" class="mots-img-retirer" aria-label="Retirer l'image">✕</button>`;
+  }
+}
+
+function retirerImageMot() {
+  motsImageUrl = null;
+  document.getElementById("mots-image-apercu").innerHTML = "";
+  document.getElementById("mots-image-input").value = "";
+}
+
+async function envoyerMot() {
+  const ta = document.getElementById("mots-texte");
+  const texte = ta.value.trim();
+  if (!texte) { ta.focus(); return; }
+  const data = { auteur: motsAuteurCourant, texte, image: motsImageUrl };
+  let ok = false;
+  if (supabaseDispo()) {
+    try {
+      const res = await db.inserer("mots", data);
+      if (res) ok = true;
+    } catch(e) { console.warn("envoyerMot:", e); }
+  }
+  if (!ok) {
+    const err = document.getElementById("mots-erreur");
+    if (err) { err.textContent = "La sauvegarde n'a pas marché. Réessaie dans un instant 🌸"; err.classList.add("visible"); setTimeout(()=>err.classList.remove("visible"), 3000); }
+    return;
+  }
+  ta.value = "";
+  retirerImageMot();
+  await chargerMots();
+}
+
+
+/* ================================================================
+   "SES CRÉATIONS" 🎨
+================================================================ */
+let creationImageUrl = null;
+
+async function initCreations() {
+  await afficherCreations();
+}
+
+async function afficherCreations() {
+  const grille = document.getElementById("creations-grille");
+  if (!grille) return;
+  grille.innerHTML = "";
+  let liste = [];
+  if (supabaseDispo()) {
+    try { liste = await db.lire("creations"); } catch(e) {}
+  }
+  liste = (liste || []).slice().reverse();
+  if (liste.length === 0) {
+    grille.innerHTML = '<p class="section-vide">Aucune création pour l\'instant. Ce sera ton espace.</p>';
+    return;
+  }
+  liste.forEach((c, i) => {
+    const carte = document.createElement("div");
+    carte.className = "creation-carte";
+    carte.style.animationDelay = `${i * 0.06}s`;
+    carte.innerHTML = `
+      ${c.image ? `<img class="creation-image" src="${c.image}" alt="${escapeHtml(c.titre || '')}" loading="lazy" />` : `<div class="creation-placeholder">🎨</div>`}
+      <div class="creation-info">
+        <h3 class="creation-titre">${escapeHtml(c.titre || "Sans titre")}</h3>
+        ${c.description ? `<p class="creation-description">${escapeHtml(c.description)}</p>` : ""}
+      </div>
+    `;
+    grille.appendChild(carte);
+  });
+}
+
+async function uploadImageCreation(input) {
+  const fichier = input.files[0];
+  if (!fichier || !supabaseDispo()) return;
+  const ext = (fichier.name.split(".").pop() || "jpg");
+  const chemin = `creations/${Date.now()}.${ext}`;
+  const url = await db.uploadImage("images", chemin, fichier);
+  if (url) {
+    creationImageUrl = url;
+    document.getElementById("creation-image-apercu").innerHTML = `<img src="${url}" alt="" />`;
+  }
+}
+
+async function envoyerCreation() {
+  const titre = document.getElementById("creation-titre-input").value.trim();
+  const desc  = document.getElementById("creation-desc-input").value.trim();
+  if (!titre && !creationImageUrl) return;
+  const data = { titre: titre || "Sans titre", description: desc, image: creationImageUrl };
+  if (supabaseDispo()) {
+    try { await db.inserer("creations", data); } catch(e) {}
+  }
+  document.getElementById("creation-titre-input").value = "";
+  document.getElementById("creation-desc-input").value = "";
+  document.getElementById("creation-image-apercu").innerHTML = "";
+  document.getElementById("creation-image-input").value = "";
+  creationImageUrl = null;
+  await afficherCreations();
+}
+
+
+/* ================================================================
+   "NOS DRAMAS" 📺
+================================================================ */
+async function initDramas() {
+  await afficherDramas();
+}
+
+async function afficherDramas() {
+  const liste = document.getElementById("dramas-liste");
+  if (!liste) return;
+  liste.innerHTML = "";
+  let donnees = [];
+  if (supabaseDispo()) {
+    try { donnees = await db.lire("dramas"); } catch(e) {}
+  }
+  donnees = donnees || [];
+  const ordre = { "en_cours": 0, "a_voir": 1, "fini": 2 };
+  donnees.sort((a, b) => (ordre[a.statut] ?? 9) - (ordre[b.statut] ?? 9));
+  if (donnees.length === 0) {
+    liste.innerHTML = '<p class="section-vide">Aucun drama pour l\'instant. Ajoute le premier !</p>';
+    return;
+  }
+  const labels = { "a_voir": "À voir", "en_cours": "En cours", "fini": "Vu" };
+  donnees.forEach(d => {
+    const div = document.createElement("div");
+    div.className = "drama-carte drama-" + (d.statut || "a_voir");
+    const etoiles = (d.note != null && d.note > 0)
+      ? "★".repeat(d.note) + "☆".repeat(5 - d.note)
+      : "";
+    div.innerHTML = `
+      <div class="drama-emoji">${d.emoji || "🎬"}</div>
+      <div class="drama-info">
+        <h3 class="drama-titre">${escapeHtml(d.titre)}</h3>
+        <div class="drama-meta">
+          <span class="drama-badge drama-badge-${d.statut}">${labels[d.statut] || "À voir"}</span>
+          ${etoiles ? `<span class="drama-note">${etoiles}</span>` : ""}
+        </div>
+        ${d.commentaire ? `<p class="drama-commentaire">${escapeHtml(d.commentaire)}</p>` : ""}
+      </div>
+      <button class="drama-supprimer" onclick="supprimerDrama('${d.id}')" aria-label="Supprimer">✕</button>
+    `;
+    liste.appendChild(div);
+  });
+}
+
+async function ajouterDrama() {
+  const titre = document.getElementById("drama-titre-input").value.trim();
+  if (!titre) return;
+  const statut = document.getElementById("drama-statut-select").value;
+  const note = parseInt(document.getElementById("drama-note-input").value) || 0;
+  const emoji = document.getElementById("drama-emoji-input").value.trim() || "🎬";
+  const commentaire = document.getElementById("drama-commentaire-input").value.trim();
+  const data = { titre, statut, note, emoji, commentaire };
+  if (supabaseDispo()) {
+    try { await db.inserer("dramas", data); } catch(e) {}
+  }
+  document.getElementById("drama-titre-input").value = "";
+  document.getElementById("drama-commentaire-input").value = "";
+  document.getElementById("drama-emoji-input").value = "";
+  document.getElementById("drama-note-input").value = "0";
+  await afficherDramas();
+}
+
+async function supprimerDrama(id) {
+  if (!supabaseDispo()) return;
+  try { await db.supprimer("dramas", id); } catch(e) {}
+  await afficherDramas();
+}
+
+
+/* ================================================================
+   "CE SOIR JE ME SENS…" 🌙
+================================================================ */
+const HUMEURS_DISPONIBLES = [
+  { emoji: "🌸", label: "douce" },
+  { emoji: "🌙", label: "fatiguée" },
+  { emoji: "☁️", label: "lointaine" },
+  { emoji: "✨", label: "légère" },
+  { emoji: "🌧️", label: "triste" },
+  { emoji: "🔥", label: "intense" },
+  { emoji: "🍃", label: "calme" },
+  { emoji: "💫", label: "rêveuse" }
+];
+
+async function initHumeurs() {
+  const boutons = document.getElementById("humeurs-boutons");
+  if (boutons && boutons.children.length === 0) {
+    HUMEURS_DISPONIBLES.forEach(h => {
+      const b = document.createElement("button");
+      b.className = "humeur-btn";
+      b.innerHTML = `<span class="humeur-emoji">${h.emoji}</span><span class="humeur-label">${h.label}</span>`;
+      b.onclick = () => enregistrerHumeur(h.emoji, h.label);
+      boutons.appendChild(b);
+    });
+  }
+  await afficherTimelineHumeurs();
+}
+
+async function enregistrerHumeur(emoji, label) {
+  if (!supabaseDispo()) return;
+  try {
+    await db.inserer("humeurs", { emoji, label });
+    const conf = document.getElementById("humeurs-confirmation");
+    if (conf) {
+      conf.textContent = `${emoji} bien noté.`;
+      conf.classList.add("visible");
+      setTimeout(() => conf.classList.remove("visible"), 2500);
+    }
+    await afficherTimelineHumeurs();
+  } catch(e) { console.warn("humeur:", e); }
+}
+
+async function afficherTimelineHumeurs() {
+  const fil = document.getElementById("humeurs-fil");
+  if (!fil) return;
+  fil.innerHTML = "";
+  let liste = [];
+  if (supabaseDispo()) {
+    try { liste = await db.lire("humeurs"); } catch(e) {}
+  }
+  liste = (liste || []).slice().reverse().slice(0, 14);
+  if (liste.length === 0) {
+    fil.innerHTML = '<p class="section-vide">Rien noté pour l\'instant.</p>';
+    return;
+  }
+  liste.forEach(h => {
+    const div = document.createElement("div");
+    div.className = "humeur-ligne";
+    const date = h.created_at
+      ? new Date(h.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })
+      : "";
+    div.innerHTML = `
+      <span class="humeur-ligne-emoji">${h.emoji}</span>
+      <span class="humeur-ligne-label">${h.label || ""}</span>
+      <span class="humeur-ligne-date">${date}</span>
+    `;
+    fil.appendChild(div);
+  });
+}
+
+
+/* ================================================================
+   Routeur : patch de naviguer() pour brancher les nouvelles sections
+================================================================ */
+(function patchNaviguer() {
+  if (typeof naviguer !== "function") return;
+  const _ori = naviguer;
+  naviguer = function(cible) {
+    const r = _ori.call(this, cible);
+    setTimeout(() => {
+      if (cible === "mots")      initMots();
+      if (cible === "creations") initCreations();
+      if (cible === "dramas")    initDramas();
+      if (cible === "humeurs")   initHumeurs();
+    }, 350);
+    return r;
+  };
+})();
+
+// Auto-deep-link /secret-juillet → naviguer vers capsules
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    if (location.pathname.includes("secret-juillet") || location.hash === "#secret-juillet") {
+      if (typeof naviguer === "function") naviguer("capsules");
+    }
+  }, 1500);
+});

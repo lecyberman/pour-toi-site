@@ -47,6 +47,10 @@
     <button onclick="naviguer('albums')"     data-page="albums"     aria-label="Albums photos">✦ Albums</button>
     <button onclick="naviguer('voyages')"    data-page="voyages"    aria-label="Voyages">✦ Voyages</button>
     <button onclick="naviguer('souhaits')"   data-page="souhaits"   aria-label="Liste de souhaits">✦ Souhaits</button>
+    <button onclick="naviguer('mots')"       data-page="mots"       aria-label="Nos mots à nous">✦ Nos mots</button>
+    <button onclick="naviguer('creations')"  data-page="creations"  aria-label="Ses créations">✦ Créations</button>
+    <button onclick="naviguer('dramas')"     data-page="dramas"     aria-label="Nos dramas">✦ Dramas</button>
+    <button onclick="naviguer('humeurs')"    data-page="humeurs"    aria-label="Ce soir je me sens">✦ Humeurs</button>
     <button onclick="naviguer('accueil')"    class="btn-retour"     aria-label="Retour accueil">⌂</button>
   </nav>
 
@@ -433,6 +437,170 @@
               aria-label="Continuer">
         Continuer →
       </button>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       SECTION — NOS MOTS À NOUS (PIN-gated)
+  ============================================================ -->
+  <section id="mots" class="page" aria-label="Nos mots à nous">
+    <div class="section-inner mots-inner">
+      <h2 class="section-titre">Nos mots à nous</h2>
+      <p class="section-sous-titre">Un espace tranquille, juste pour nous deux.</p>
+
+      <!-- Gate PIN -->
+      <div id="mots-gate" class="mots-gate">
+        <p class="mots-gate-texte">Cet espace est privé. Entre le code pour y accéder.</p>
+        <button class="btn-entrer" onclick="demanderPinMots()">Ouvrir notre journal 🔑</button>
+      </div>
+
+      <!-- Contenu (révélé après PIN) -->
+      <div id="mots-contenu" class="mots-contenu" hidden>
+        <div class="mots-form">
+          <div class="mots-auteur-choix" role="group" aria-label="Qui écrit ?">
+            <button class="mots-auteur-btn actif" data-auteur="elle" onclick="basculerAuteurMot('elle')">Elle</button>
+            <button class="mots-auteur-btn"        data-auteur="lui"  onclick="basculerAuteurMot('lui')">Lui</button>
+          </div>
+          <textarea id="mots-texte" class="mots-textarea" rows="4"
+                    placeholder="Ce que tu veux dire, ou rien du tout…" aria-label="Ton message"></textarea>
+          <div class="mots-actions">
+            <label for="mots-image-input" class="mots-image-btn" aria-label="Ajouter une image">+ image</label>
+            <input id="mots-image-input" type="file" accept="image/*" hidden
+                   onchange="uploadImageMot(this)" />
+            <div id="mots-image-apercu" class="mots-image-apercu"></div>
+            <button class="btn-entrer mots-envoyer" onclick="envoyerMot()">Déposer ✦</button>
+          </div>
+          <p id="mots-erreur" class="mots-erreur" role="status" aria-live="polite"></p>
+        </div>
+
+        <!-- Fil chronologique -->
+        <div id="mots-fil" class="mots-fil" role="feed" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION — SES CRÉATIONS 🎨
+  ============================================================ -->
+  <section id="creations" class="page" aria-label="Ses créations">
+    <div class="section-inner">
+      <h2 class="section-titre">Ses créations</h2>
+      <p class="section-sous-titre">Ton espace à toi. Dessins, photos, choses que tu fais.</p>
+
+      <details class="creations-form-wrap">
+        <summary class="creations-form-toggle">+ Ajouter une création</summary>
+        <div class="creations-form">
+          <input id="creation-titre-input" type="text" placeholder="Titre (facultatif)" class="creation-input" />
+          <textarea id="creation-desc-input" rows="2" placeholder="Quelques mots… (facultatif)" class="creation-input"></textarea>
+          <label for="creation-image-input" class="mots-image-btn">+ image</label>
+          <input id="creation-image-input" type="file" accept="image/*" hidden onchange="uploadImageCreation(this)" />
+          <div id="creation-image-apercu" class="creation-image-apercu"></div>
+          <button class="btn-entrer" onclick="envoyerCreation()">Ajouter ✦</button>
+        </div>
+      </details>
+
+      <div id="creations-grille" class="creations-grille" role="list" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION — NOS DRAMAS 📺
+  ============================================================ -->
+  <section id="dramas" class="page" aria-label="Nos dramas">
+    <div class="section-inner">
+      <h2 class="section-titre">Nos dramas</h2>
+      <p class="section-sous-titre">Ce qu'on regarde, ce qu'on a aimé, ce qu'on veut voir.</p>
+
+      <details class="dramas-form-wrap">
+        <summary class="dramas-form-toggle">+ Ajouter un drama</summary>
+        <div class="dramas-form">
+          <input id="drama-titre-input" type="text" placeholder="Titre du drama" class="drama-input" />
+          <div class="drama-form-grille">
+            <select id="drama-statut-select" class="drama-input">
+              <option value="a_voir">À voir</option>
+              <option value="en_cours">En cours</option>
+              <option value="fini">Vu</option>
+            </select>
+            <input id="drama-emoji-input" type="text" maxlength="4" placeholder="Emoji 🎬" class="drama-input drama-input-emoji" />
+            <input id="drama-note-input" type="number" min="0" max="5" value="0" placeholder="Note /5" class="drama-input drama-input-note" />
+          </div>
+          <textarea id="drama-commentaire-input" rows="2" placeholder="Ce qu'on en pense (facultatif)" class="drama-input"></textarea>
+          <button class="btn-entrer" onclick="ajouterDrama()">Ajouter ✦</button>
+        </div>
+      </details>
+
+      <div id="dramas-liste" class="dramas-liste" role="list" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION — CE SOIR JE ME SENS… 🌙
+  ============================================================ -->
+  <section id="humeurs" class="page" aria-label="Ce soir je me sens">
+    <div class="section-inner">
+      <h2 class="section-titre">Ce soir je me sens…</h2>
+      <p class="section-sous-titre">Pas besoin de mots. Touche juste celui qui te ressemble.</p>
+
+      <div id="humeurs-boutons" class="humeurs-boutons" role="group" aria-label="Choisis une humeur"></div>
+      <p id="humeurs-confirmation" class="humeurs-confirmation" role="status" aria-live="polite"></p>
+
+      <h3 class="humeurs-fil-titre">Les jours d'avant</h3>
+      <div id="humeurs-fil" class="humeurs-fil" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER discret avec icône 🔑 admin
+  ============================================================ -->
+  <footer class="footer-discret" aria-label="Pied de page">
+    <button class="footer-cle" onclick="ouvrirAdminAvecPin()" aria-label="Accès admin" title="🔑">🔑</button>
+  </footer>
+
+  <!-- ============================================================
+       MODALE — PIN PAVÉ NUMÉRIQUE
+  ============================================================ -->
+  <div id="pin-modal" class="pin-modal" role="dialog" aria-modal="true" aria-labelledby="pin-titre" hidden>
+    <div class="pin-fond" onclick="fermerPin()" aria-hidden="true"></div>
+    <div class="pin-boite">
+      <h2 id="pin-titre" class="pin-titre">Entrer le code</h2>
+      <div class="pin-dots" aria-hidden="true">
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+      </div>
+      <p id="pin-message" class="pin-message" role="status" aria-live="polite"></p>
+      <div class="pin-pave" role="group" aria-label="Pavé numérique">
+        <button class="pin-touche" onclick="tapeChiffre('1')">1</button>
+        <button class="pin-touche" onclick="tapeChiffre('2')">2</button>
+        <button class="pin-touche" onclick="tapeChiffre('3')">3</button>
+        <button class="pin-touche" onclick="tapeChiffre('4')">4</button>
+        <button class="pin-touche" onclick="tapeChiffre('5')">5</button>
+        <button class="pin-touche" onclick="tapeChiffre('6')">6</button>
+        <button class="pin-touche" onclick="tapeChiffre('7')">7</button>
+        <button class="pin-touche" onclick="tapeChiffre('8')">8</button>
+        <button class="pin-touche" onclick="tapeChiffre('9')">9</button>
+        <button class="pin-touche pin-touche-vide" disabled aria-hidden="true"></button>
+        <button class="pin-touche" onclick="tapeChiffre('0')">0</button>
+        <button class="pin-touche pin-touche-effacer" onclick="effacerChiffre()" aria-label="Effacer">⌫</button>
+      </div>
+      <button class="pin-annuler" onclick="fermerPin()">Annuler</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODALE — LETTRE JUILLET (capsule 💍)
+  ============================================================ -->
+  <div id="lettre-juillet" class="lettre-juillet" role="dialog" aria-modal="true" aria-labelledby="lettre-juillet-titre" hidden>
+    <div class="lettre-fond" aria-hidden="true">
+      <span class="petal p1">🌸</span><span class="petal p2">🌸</span><span class="petal p3">🌸</span>
+      <span class="petal p4">🌸</span><span class="petal p5">🌸</span>
+    </div>
+    <div class="lettre-boite">
+      <button class="lettre-fermer" onclick="fermerLettreJuillet()" aria-label="Fermer">✕</button>
+      <h2 id="lettre-juillet-titre" class="lettre-titre">Une lettre pour toi</h2>
+      <div id="lettre-juillet-corps" class="lettre-corps"></div>
     </div>
   </div>
 
