@@ -217,6 +217,7 @@ body.mode-dessin canvas#dessin-ciel { display: block; }
   backdrop-filter: blur(4px);
 }
 .nav-bas button:hover { background: rgba(213,200,232,.22); }
+.nav-bas[hidden] { display: none; }
 .nav-bas #btn-retour {
   font-size: .85rem;
   padding: .55rem 1rem;
@@ -375,7 +376,9 @@ body.mode-dessin #outils-dessin { display: flex; }
   font-family: var(--font-corps);
 }
 
-.reponse-boutons { margin-top: 1.4rem; }
+.reponse-boutons { margin-top: 1.4rem; transition: opacity .8s ease; }
+.scene-contenu.a-repondu .reponse-boutons { opacity: 0; pointer-events: none; height: 0; margin: 0; overflow: hidden; }
+.scene-contenu.a-repondu { transform: translateY(9vh); transition: transform 1.6s cubic-bezier(.2,.8,.2,1); }
 #msg-reponse { margin-top: 1.4rem; opacity: 0; transition: opacity 1s ease; }
 #msg-reponse.visible { opacity: 1; }
 #msg-reponse p {
@@ -752,13 +755,12 @@ const scenePlage = `
   <rect y="148" width="460" height="70" fill="url(#pl-mer)"/>
   <path d="M0 150 q30 -5 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0" fill="none" stroke="rgba(213,200,232,.5)" stroke-width="1.6"/>
   <path d="M0 168 q40 -6 80 0 t80 0 t80 0 t80 0 t80 0 t80 0" fill="none" stroke="rgba(213,200,232,.28)" stroke-width="1.3"/>
-  <path d="M60 152 q14 8 22 24 q4 10 2 22 l14 -4 q4 -22 -6 -40 q-6 -10 -16 -14 z" fill="rgba(246,238,216,.14)"/>
   <path d="M0 208 Q120 186 250 202 Q360 214 460 200 V260 H0 Z" fill="url(#pl-sable)"/>
   <path d="M40 212 q60 -10 130 -4 M240 208 q80 -6 160 -2" stroke="rgba(245,240,232,.16)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
   <!-- elle, debout -->
   <g>
     <circle cx="296" cy="128" r="10" fill="#171028"/>
-    <path d="M292 118 q-8 -6 -4 -14 q8 4 8 10 q4 -8 12 -8 q0 10 -10 13" fill="#171028"/>
+    <circle cx="299" cy="114" r="6" fill="#171028"/>
     <path d="M296 138 q-11 8 -14 26 l-4 42 q18 8 36 0 l-4 -42 q-3 -18 -14 -26 z" fill="#171028"/>
     <path d="M288 148 q-8 8 -8 20" stroke="rgba(213,200,232,.45)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
     <path d="M296 138 q-11 8 -14 26 l-4 42" stroke="rgba(213,200,232,.5)" stroke-width="1.2" fill="none"/>
@@ -1336,6 +1338,8 @@ document.getElementById("btn-effacer").addEventListener("click", () => {
 ================================================================ */
 function repondre(quoi) {
   const msg = document.getElementById("msg-reponse");
+  const carte = msg.closest(".scene-contenu");
+  if (quoi === "oui" && carte) setTimeout(() => carte.classList.add("a-repondu"), 2600);
   if (quoi === "oui") {
     coeurComplet = true;
     nbAllumees = constellation.length;
