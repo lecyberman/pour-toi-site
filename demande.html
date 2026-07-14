@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Trois ans, et une question</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --lavande:   #d5c8e8;
+  --lavande-2: #b8a8d4;
+  --rose:      #e8c8d0;
+  --dore:      #f0d9a8;
+  --blanc:     #fdfaf5;
+  --encre:     #efe6da;
+  --font-titre: 'Cormorant Garamond', Georgia, serif;
+  --font-corps: 'Lato', 'Helvetica Neue', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-corps);
+  color: var(--encre);
+  background: #070512;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+canvas#ocean { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+canvas#dessin-ciel { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 2; display: none; }
+body.mode-dessin canvas#dessin-ciel { display: block; }
+
+/* ---------- scènes ---------- */
+.scene {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5vh 6vw 16vh;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.1s ease;
+  z-index: 3;
+}
+.scene.active { opacity: 1; }
+.scene.active .scene-contenu { pointer-events: auto; }
+.scene-contenu {
+  max-width: 640px;
+  max-height: 78vh;
+  overflow-y: auto;
+  text-align: center;
+  color: var(--blanc);
+  padding: 1.4rem 1.2rem;
+  border-radius: 22px;
+  background: rgba(10, 7, 26, .42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(213,200,232,.14);
+  scrollbar-width: thin;
+}
+.scene-titre {
+  font-family: var(--font-titre);
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(1.7rem, 5vw, 2.8rem);
+  margin-bottom: 1.2rem;
+  color: var(--blanc);
+  opacity: 0;
+  animation: apparaitre 1.4s ease forwards;
+}
+.scene p {
+  font-family: var(--font-titre);
+  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+  line-height: 1.75;
+  color: var(--encre);
+  margin-bottom: 1rem;
+  opacity: 0;
+  animation: apparaitre 1.4s ease forwards;
+}
+.scene p:nth-of-type(1) { animation-delay: .5s; }
+.scene p:nth-of-type(2) { animation-delay: 1.3s; }
+.scene p:nth-of-type(3) { animation-delay: 2.1s; }
+.scene p:nth-of-type(4) { animation-delay: 2.9s; }
+@keyframes apparaitre {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- vignettes dessinées ---------- */
+.vignette {
+  width: min(60vw, 220px);
+  height: auto;
+  margin: 0 auto 1.2rem;
+  display: block;
+  opacity: 0;
+  animation: apparaitre 1s ease forwards;
+  animation-delay: .15s;
+  filter: drop-shadow(0 0 10px rgba(213,200,232,.25));
+}
+.vignette [pathLength] {
+  fill: none;
+  stroke: #ddcdf2;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: tracer 2s ease forwards;
+}
+.vignette [pathLength]:nth-child(2) { animation-delay: .35s; }
+.vignette [pathLength]:nth-child(3) { animation-delay: .7s; }
+.vignette [pathLength]:nth-child(4) { animation-delay: 1.05s; }
+.vignette [pathLength]:nth-child(5) { animation-delay: 1.3s; }
+.vignette [pathLength]:nth-child(6) { animation-delay: 1.55s; }
+.vignette [pathLength]:nth-child(7) { animation-delay: 1.75s; }
+.vignette [pathLength]:nth-child(8) { animation-delay: 1.95s; }
+.vignette [pathLength]:nth-child(9) { animation-delay: 2.1s; }
+.vignette [pathLength]:nth-child(10) { animation-delay: 2.25s; }
+@keyframes tracer { to { stroke-dashoffset: 0; } }
+.vignette .doux { stroke: var(--rose); }
+.vignette .or   { stroke: var(--dore); }
+
+.photo-frame {
+  width: min(78vw, 340px);
+  margin: 0 auto 1.4rem;
+  border-radius: 14px;
+  border: 1px solid rgba(245,240,232,.35);
+  overflow: hidden;
+  opacity: 0;
+  animation: apparaitre 1.2s ease forwards;
+}
+.photo-frame img { width: 100%; display: block; }
+
+/* ---------- boutons ---------- */
+.btn {
+  font-family: var(--font-corps);
+  font-size: .95rem;
+  letter-spacing: .04em;
+  color: var(--blanc);
+  background: rgba(213,200,232,.14);
+  border: 1px solid rgba(213,200,232,.5);
+  padding: .85rem 2.1rem;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all .35s ease;
+  margin: .4rem;
+  opacity: 0;
+  animation: apparaitre 1.2s ease forwards;
+  animation-delay: 1.8s;
+}
+.btn:hover { background: rgba(213,200,232,.3); transform: translateY(-2px); }
+.btn-principal { background: rgba(213,200,232,.25); border-color: rgba(213,200,232,.8); }
+
+.date-badge {
+  font-size: .78rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--lavande);
+  margin-bottom: .9rem;
+  opacity: 0;
+  animation: apparaitre 1.2s ease forwards;
+}
+.note-douce {
+  font-size: .92rem !important;
+  line-height: 1.7 !important;
+  color: var(--lavande) !important;
+  font-family: var(--font-corps) !important;
+  font-style: italic;
+  margin-top: 1.4rem;
+}
+.astuce {
+  position: fixed;
+  bottom: 12.5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  font-family: var(--font-titre);
+  font-style: italic;
+  font-size: .95rem;
+  color: rgba(213,200,232,.75);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  text-align: center;
+  width: 90vw;
+}
+.astuce.visible { opacity: 1; }
+
+/* ---------- navigation ---------- */
+.nav-bas {
+  position: fixed;
+  bottom: 5.2vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  opacity: 0;
+  animation: apparaitre 1s ease forwards;
+  animation-delay: 2.6s;
+}
+.nav-bas button {
+  background: rgba(10,7,26,.5);
+  border: 1px solid rgba(213,200,232,.35);
+  color: rgba(245,240,232,.9);
+  font-family: var(--font-titre);
+  font-style: italic;
+  font-size: 1.05rem;
+  cursor: pointer;
+  letter-spacing: .05em;
+  padding: .7rem 1.6rem;
+  border-radius: 40px;
+  transition: all .3s ease;
+  backdrop-filter: blur(4px);
+}
+.nav-bas button:hover { background: rgba(213,200,232,.22); }
+.nav-bas #btn-retour {
+  font-size: .85rem;
+  padding: .55rem 1rem;
+  opacity: .55;
+  border-color: rgba(213,200,232,.18);
+}
+.progression {
+  position: fixed;
+  bottom: 2.2vh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 7px;
+  z-index: 4;
+}
+.progression span {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(245,240,232,.25);
+  transition: background .4s ease, transform .4s ease;
+}
+.progression span.actif { background: rgba(245,240,232,.9); transform: scale(1.35); }
+.progression span.passe { background: rgba(213,200,232,.55); }
+
+#toggle-son {
+  position: fixed;
+  top: 3vh; right: 4vw;
+  z-index: 5;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.2);
+  color: var(--blanc);
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* ---------- bouteille ---------- */
+#bouteille {
+  position: fixed;
+  z-index: 3;
+  width: clamp(64px, 12vw, 96px);
+  cursor: pointer;
+  display: none;
+  filter: drop-shadow(0 0 14px rgba(240,217,168,.55));
+  animation: lueurBouteille 2.6s ease-in-out infinite;
+  transition: opacity .8s ease;
+}
+@keyframes lueurBouteille {
+  0%,100% { filter: drop-shadow(0 0 10px rgba(240,217,168,.4)); }
+  50%     { filter: drop-shadow(0 0 22px rgba(240,217,168,.85)); }
+}
+
+/* ---------- lettre ---------- */
+#lettre {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 5vw;
+  background: rgba(5,3,14,.55);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+#lettre.visible { display: flex; }
+#lettre.montree { opacity: 1; }
+.lettre-papier {
+  max-width: 660px;
+  max-height: 88vh;
+  overflow-y: auto;
+  text-align: center;
+  padding: 2.2rem 1.8rem 2rem;
+  border-radius: 20px;
+  background: linear-gradient(165deg, rgba(26,18,44,.96), rgba(14,9,30,.96));
+  border: 1px solid rgba(240,217,168,.35);
+  box-shadow: 0 0 60px rgba(240,217,168,.12), 0 20px 60px rgba(0,0,0,.5);
+  transform: translateY(26px) scale(.97);
+  transition: transform 1.2s cubic-bezier(.2,.8,.2,1);
+  scrollbar-width: thin;
+}
+#lettre.montree .lettre-papier { transform: translateY(0) scale(1); }
+.lettre-papier h2 {
+  font-family: var(--font-titre);
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  margin-bottom: 1.3rem;
+}
+.lettre-papier p {
+  font-family: var(--font-titre);
+  font-size: clamp(1.05rem, 2.4vw, 1.28rem);
+  line-height: 1.78;
+  margin-bottom: 1rem;
+}
+.lettre-papier .question-finale {
+  font-size: clamp(1.3rem, 3.4vw, 1.7rem);
+  font-style: italic;
+  color: var(--dore);
+  margin: 1.4rem 0;
+  text-shadow: 0 0 24px rgba(240,217,168,.35);
+}
+.scene-plage {
+  width: min(86vw, 460px);
+  margin: 1.2rem auto;
+  display: block;
+  border-radius: 14px;
+}
+#anneau-lueur {
+  animation: pulserAnneau 2.4s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+@keyframes pulserAnneau {
+  0%,100% { opacity: .5; transform: scale(1); }
+  50%     { opacity: 1;  transform: scale(1.25); }
+}
+
+/* ---------- outils dessin final ---------- */
+#outils-dessin {
+  position: fixed;
+  top: 3vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: none;
+  align-items: center;
+  gap: .6rem;
+  background: rgba(10,7,26,.6);
+  border: 1px solid rgba(213,200,232,.25);
+  padding: .5rem .9rem;
+  border-radius: 40px;
+  backdrop-filter: blur(6px);
+}
+body.mode-dessin #outils-dessin { display: flex; }
+.couleur {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform .2s ease;
+}
+.couleur.active { border-color: #fff; transform: scale(1.15); }
+.couleur:nth-child(1) { background: radial-gradient(circle at 35% 35%, #f2e9ff, #b8a8d4); }
+.couleur:nth-child(2) { background: radial-gradient(circle at 35% 35%, #ffe9ef, #e8a8bc); }
+.couleur:nth-child(3) { background: radial-gradient(circle at 35% 35%, #fff3d9, #f0d9a8); }
+#btn-effacer {
+  background: none;
+  border: 1px solid rgba(213,200,232,.4);
+  color: var(--encre);
+  font-size: .8rem;
+  padding: .45rem .9rem;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: var(--font-corps);
+}
+
+.reponse-boutons { margin-top: 1.4rem; }
+#msg-reponse { margin-top: 1.4rem; opacity: 0; transition: opacity 1s ease; }
+#msg-reponse.visible { opacity: 1; }
+#msg-reponse p {
+  font-family: var(--font-titre);
+  font-size: 1.25rem;
+  color: var(--encre);
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+@media (max-width: 480px) {
+  .scene { padding: 4vh 5vw 17vh; }
+  .scene-contenu { max-height: 72vh; padding: 1.1rem .9rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vignette [pathLength] { animation-duration: .01ms; stroke-dashoffset: 0; }
+  #bouteille { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="ocean"></canvas>
+<canvas id="dessin-ciel"></canvas>
+
+<button id="toggle-son" aria-label="Couper le son">🔊</button>
+<audio id="musique" loop preload="none">
+  <source src="assets/musique-demande.mp3" type="audio/mpeg" />
+  <source src="assets/musique.mp3" type="audio/mpeg" />
+</audio>
+
+<div id="scenes"></div>
+<div class="astuce" id="astuce"></div>
+
+<!-- bouteille à la mer -->
+<svg id="bouteille" viewBox="0 0 90 130" aria-label="Une bouteille à la mer">
+  <g>
+    <path d="M38 14 h14 v6 h-14 z" fill="#c9a06a" stroke="#8c6a3f" stroke-width="1.5"/>
+    <path d="M36 20 h18 l2 18 c8 6 12 14 12 24 v48 a10 10 0 0 1 -10 10 h-26 a10 10 0 0 1 -10 -10 v-48 c0 -10 4 -18 12 -24 z"
+          fill="rgba(180,215,225,.28)" stroke="rgba(220,240,245,.85)" stroke-width="2"/>
+    <path d="M40 52 q14 -6 12 6 q-2 10 -14 8 q-8 -2 -4 -9 q3 -5 6 -5" fill="none" stroke="#f0e6c8" stroke-width="2"/>
+    <path d="M34 56 l24 0 l-2 38 l-20 0 z" fill="rgba(240,230,200,.15)" stroke="rgba(240,230,200,.5)" stroke-width="1"/>
+    <path d="M28 40 q6 -10 14 -14" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+  </g>
+</svg>
+
+<!-- lettre de la demande -->
+<div id="lettre" role="dialog" aria-modal="true">
+  <div class="lettre-papier" id="lettre-papier"></div>
+</div>
+
+<!-- outils du dessin final -->
+<div id="outils-dessin">
+  <div class="couleur active" data-couleur="lavande" aria-label="Poussière lavande"></div>
+  <div class="couleur" data-couleur="rose" aria-label="Poussière rose"></div>
+  <div class="couleur" data-couleur="dore" aria-label="Poussière dorée"></div>
+  <button id="btn-effacer">effacer</button>
+</div>
+
+<div class="nav-bas" id="nav-bas" hidden>
+  <button id="btn-retour" aria-label="Revenir en arrière">←</button>
+  <button id="btn-suivant">continuer →</button>
+</div>
+<div class="progression" id="progression"></div>
+
+<script>
+"use strict";
+/* ================================================================
+   ✏️  LE RÉCIT — modifier ici si besoin
+   Chaque scène : titre, texte[], svg (vignette dessinée), image
+   (optionnel : "assets/ta-photo.jpg" remplace la vignette)
+================================================================ */
+const SVGNS = 'xmlns="http://www.w3.org/2000/svg"';
+const V = (inner) => `<svg class="vignette" viewBox="0 0 140 110" ${SVGNS} aria-hidden="true">${inner}</svg>`;
+
+const vignettes = {
+  fantome: V(`
+    <path pathLength="100" d="M45 88 V50 a25 25 0 0 1 50 0 V88 l-8-7 -9 7 -8-7 -9 7 -8-7 z"/>
+    <circle pathLength="100" cx="61" cy="52" r="2.6"/>
+    <circle pathLength="100" cx="79" cy="52" r="2.6"/>
+    <path pathLength="100" class="doux" d="M28 30 a9 9 0 1 1 14 8 l-7 6 v-6 a9 9 0 0 1 -7 -8" />
+    <path pathLength="100" d="M104 26 q8 0 8 7 q0 7 -8 7 h-6 l-5 5 v-5 q-5 -1 -5 -7 q0 -7 8 -7 z"/>
+    <path pathLength="100" d="M100 33 h10"/>
+  `),
+  telephone: V(`
+    <rect pathLength="100" x="52" y="18" width="36" height="66" rx="8"/>
+    <path pathLength="100" d="M64 26 h12"/>
+    <path pathLength="100" d="M40 12 L100 92"/>
+    <path pathLength="100" class="doux" d="M104 42 a7 7 0 0 1 12 5 q0 8 -12 14 q-12 -6 -12 -14 a7 7 0 0 1 12 -5"/>
+    <path pathLength="100" d="M66 74 h8"/>
+  `),
+  patience: V(`
+    <circle pathLength="100" cx="46" cy="52" r="20"/>
+    <path pathLength="100" d="M38 46 q4 -4 8 0"/>
+    <path pathLength="100" d="M52 46 q4 -4 8 0"/>
+    <path pathLength="100" d="M38 62 q8 -6 16 0"/>
+    <circle pathLength="100" cx="96" cy="52" r="20"/>
+    <path pathLength="100" d="M88 48 h6"/>
+    <path pathLength="100" d="M100 48 h6"/>
+    <path pathLength="100" d="M88 60 h16"/>
+    <path pathLength="100" class="doux" d="M62 30 q8 -10 16 0"/>
+  `),
+  train: V(`
+    <path pathLength="100" d="M45 78 V38 a25 22 0 0 1 50 0 v40 z"/>
+    <rect pathLength="100" x="55" y="34" width="30" height="18" rx="4"/>
+    <circle pathLength="100" cx="70" cy="64" r="5"/>
+    <path pathLength="100" d="M45 78 L30 96 M95 78 L110 96"/>
+    <path pathLength="100" d="M38 88 h64 M32 96 h76"/>
+    <path pathLength="100" class="doux" d="M70 12 q3 4 0 8 q-3 4 0 8"/>
+  `),
+  brume: V(`
+    <path pathLength="100" d="M20 42 q15 -10 30 0 t30 0 t30 0"/>
+    <path pathLength="100" d="M26 58 q15 -10 30 0 t30 0 t28 0"/>
+    <path pathLength="100" d="M20 74 q15 -10 30 0 t30 0 t30 0"/>
+    <path pathLength="100" class="or" d="M104 18 a10 10 0 1 0 8 16 a8 8 0 0 1 -8 -16"/>
+  `),
+  robe: V(`
+    <path pathLength="100" d="M62 20 h16 l4 16 l-6 6 l10 40 q-16 8 -32 0 l10 -40 l-6 -6 z"/>
+    <path pathLength="100" d="M58 26 q-8 6 -10 16 M82 26 q8 6 10 16"/>
+    <path pathLength="100" class="or" d="M34 34 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z"/>
+    <path pathLength="100" class="or" d="M106 56 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z"/>
+    <path pathLength="100" class="doux" d="M64 52 a4 4 0 0 1 6 3 q0 4 -6 7 q-6 -3 -6 -7 a4 4 0 0 1 6 -3"/>
+  `),
+  messages: V(`
+    <path pathLength="100" d="M24 26 q0 -8 8 -8 h34 q8 0 8 8 v16 q0 8 -8 8 h-24 l-8 8 v-8 q-10 0 -10 -8 z"/>
+    <path pathLength="100" class="doux" d="M45 30 a4 4 0 0 1 7 3 q0 4 -7 8 q-7 -4 -7 -8 a4 4 0 0 1 7 -3"/>
+    <path pathLength="100" d="M66 60 q0 -8 8 -8 h34 q8 0 8 8 v14 q0 8 -8 8 q0 6 0 8 l-8 -8 h-26 q-8 0 -8 -8 z"/>
+    <path pathLength="100" d="M80 64 q5 -4 8 0 q2 3 -2 6 l-2 2 M86 78 l0 .5"/>
+  `),
+  bougie: V(`
+    <path pathLength="100" d="M60 46 h20 v40 h-20 z"/>
+    <path pathLength="100" d="M70 38 v8"/>
+    <path pathLength="100" class="or" d="M70 22 q6 8 0 14 q-6 -6 0 -14"/>
+    <path pathLength="100" d="M46 86 h48"/>
+    <path pathLength="100" class="doux" d="M28 60 a5 5 0 0 1 8 4 q0 5 -8 9 q-8 -4 -8 -9 a5 5 0 0 1 8 -4"/>
+    <path pathLength="100" class="doux" d="M112 60 a5 5 0 0 1 8 4 q0 5 -8 9 q-8 -4 -8 -9 a5 5 0 0 1 8 -4"/>
+  `),
+  nuage: V(`
+    <path pathLength="100" d="M36 68 a14 14 0 0 1 4 -27 a18 18 0 0 1 34 -6 a16 16 0 0 1 26 12 a12 12 0 0 1 -4 21 z"/>
+    <path pathLength="100" class="or" d="M110 22 a9 9 0 1 0 7 14 a7 7 0 0 1 -7 -14"/>
+    <path pathLength="100" d="M46 84 h10 M66 84 h10 M86 84 h10"/>
+  `),
+  crayon: V(`
+    <path pathLength="100" d="M88 16 l14 14 l-48 48 l-18 4 l4 -18 z"/>
+    <path pathLength="100" d="M84 22 l12 12"/>
+    <path pathLength="100" d="M40 78 l-4 4"/>
+    <circle pathLength="100" class="doux" cx="36" cy="38" r="6"/>
+    <path pathLength="100" class="doux" d="M36 26 v-6 M36 56 v-6 M24 38 h-6 M54 38 h-6 M27 29 l-4 -4 M49 29 l4 -4 M27 47 l-4 4 M49 47 l4 4"/>
+  `),
+  vague_oeil: V(`
+    <path pathLength="100" d="M20 55 q50 -40 100 0 q-50 40 -100 0 z"/>
+    <path pathLength="100" d="M50 55 q10 -8 20 0 t20 0"/>
+    <path pathLength="100" d="M56 42 q14 -8 28 0"/>
+    <path pathLength="100" class="or" d="M70 20 l1.5 4 4 1.5 -4 1.5 -1.5 4 -1.5 -4 -4 -1.5 4 -1.5 z"/>
+  `),
+  colombe: V(`
+    <path pathLength="100" d="M32 58 q20 -12 38 -4 q4 -14 20 -16 q-4 8 -2 12 q14 0 24 10 q-20 4 -34 2 q-10 16 -32 14 q6 -6 6 -12 q-12 0 -20 -6 z"/>
+    <path pathLength="100" d="M64 46 q8 -18 26 -22 q-6 10 -6 18"/>
+    <circle pathLength="100" cx="84" cy="42" r="1.4"/>
+    <path pathLength="100" class="doux" d="M28 26 a4 4 0 0 1 7 3 q0 4 -7 7 q-7 -3 -7 -7 a4 4 0 0 1 7 -3"/>
+  `),
+  lettre_etoile: V(`
+    <rect pathLength="100" x="34" y="40" width="72" height="48" rx="6"/>
+    <path pathLength="100" d="M34 44 l36 26 l36 -26"/>
+    <path pathLength="100" class="or" d="M70 10 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 z"/>
+    <path pathLength="100" class="doux" d="M24 24 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1 z"/>
+    <path pathLength="100" class="doux" d="M114 20 l1 3 3 1 -3 1 -1 3 -1 -3 -3 -1 3 -1 z"/>
+  `)
+};
+
+const recit = [
+  {
+    type: "intro",
+    badge: "Amis depuis 2019 — ensemble depuis le 15 juillet 2023",
+    titre: "Trois ans.",
+    texte: ["Aujourd'hui, on fête ça. Même de loin.", "J'ai quelque chose à te dire — laisse-moi un instant."],
+    boutonTexte: "Commencer ✦",
+    astuce: "Tu peux toucher l'eau, elle te répondra. Les étoiles aussi. ✦"
+  },
+  {
+    type: "texte",
+    titre: "2019",
+    svg: "fantome",
+    image: null,
+    texte: [
+      "Je postais des trucs débiles dans ma story. Toi, tu répondais à chaque fois pour te plaindre — trop sexuel, trop brutal, jamais contente.",
+      "C'est comme ça qu'on a commencé à parler. Vraiment parler."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "Même quand mon compte a sauté",
+    svg: "telephone",
+    image: null,
+    texte: [
+      "Mon compte à blagues a fini banni. On a continué sur mon vrai compte, comme si de rien n'était.",
+      "Tu m'as raconté ton histoire. Un chagrin qui ne voulait pas partir, quelqu'un que tu n'arrivais pas à oublier.",
+      "Je t'ai dit, à moitié en rigolant : « Je vais te faire tomber amoureuse de moi. »",
+      "Je plaisantais. Puis j'ai continué à te parler, encore et encore, et à force ce n'était plus une blague."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "Ce que tu ne dirais pas toi-même",
+    svg: "patience",
+    image: null,
+    texte: [
+      "Pendant longtemps, tu avais vraiment du mal à me supporter. Je crois que je peux le dire sans trop me tromper.",
+      "Et je continuais quand même. Pas pour t'agacer — enfin, pas seulement.",
+      "Quatre ans d'amitié, à ce rythme-là. Sans savoir où ça allait. Sans savoir que ça allait quelque part."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "2022, Lyon",
+    svg: "train",
+    image: null,
+    texte: [
+      "On s'est vus pour la première fois en vrai, à Lyon."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "Puis, le silence",
+    svg: "brume",
+    image: null,
+    texte: [
+      "Entre 2022 et 2023, il y a eu un moment de froid. On ne se parlait plus vraiment.",
+      "Je ne sais pas ce qu'on attendait. Peut-être juste le bon moment."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "Et puis, un 15 juillet",
+    svg: "robe",
+    image: null,
+    texte: [
+      "Vers le milieu de l'année 2023, on a recommencé à se parler. Et cette fois, on a décidé de se revoir.",
+      "Le 15 juillet 2023, tu es descendue du train. Robe blanche, toute belle.",
+      "On est allés manger. Et cette nuit-là, tout a vraiment commencé."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "Onze jours après",
+    svg: "messages",
+    image: null,
+    texte: [
+      "Le 26 juillet 2023, onze jours après qu'on se soit enfin dit la vérité, tu doutais. Tu te demandais si on devrait vraiment se marier un jour, si tu étais la femme qu'il me fallait.",
+      "Je t'ai répondu la seule chose que je savais avec certitude : « Ça fait quatre ans qu'on se parle. On a eu des désaccords, des disputes. Regarde — on est toujours là. »",
+      "On y est encore, trois ans plus tard."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "Ce que tu m'as appris sur l'amour",
+    svg: "bougie",
+    image: null,
+    texte: [
+      "Tu m'as parlé de tes arrière-grands-parents, un des seuls mariages heureux que tu connaissais. S'asseoir ensemble chaque soir, peu importe la journée. Main dans la main. S'écouter, mutuellement.",
+      "Tu m'as dit : « L'amour ne suffit pas. Il faut de la compréhension, de l'écoute, et beaucoup de patience. L'égo n'a pas sa place dans un couple. »",
+      "Tu m'as dit aussi : « L'amour, c'est reposant. Avec la bonne personne, le temps passe vite, on est heureux et en paix. »",
+      "Je t'ai écoutée. C'est exactement cet amour-là que je veux construire avec toi."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "Ce qu'on a construit, doucement",
+    svg: "nuage",
+    image: null,
+    texte: [
+      "Ces moments où on n'a rien à faire, rien à prouver. Juste être là. C'est ce que je préfère.",
+      "Avec toi, le silence n'est pas vide. Il est doux. Il dit des choses que les mots ne savent pas dire.",
+      "Quand le temps ralentit et qu'on reste ensemble sans but — ces instants-là, je les garde précieusement."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "Ce que j'aime chez toi",
+    svg: "crayon",
+    image: null,
+    texte: [
+      "Quand tu dessines, tu n'es plus tout à fait là — et pourtant tu es entièrement toi.",
+      "Tu ressens les choses profondément. Ce n'est pas une faiblesse — c'est ce qui te rend si vivante, si vraie.",
+      "La façon dont tu observes le monde, les détails, les petits riens. Tu vois des choses que les autres ne voient pas."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "Ce que je vois en toi",
+    svg: "vague_oeil",
+    image: null,
+    texte: [
+      "Tu traverses des choses difficiles avec une grâce que tu ne vois pas en toi. Moi, je la vois.",
+      "Ce que tu crées avec tes mains, ce n'est pas « juste » du dessin. C'est une façon d'exister.",
+      "Pas interprétée. Pas corrigée. Pas simplifiée. Juste vue, telle que tu es. Et ce que je vois est beau."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "Ce que j'ai appris",
+    svg: "colombe",
+    image: null,
+    texte: [
+      "J'ai appris que le monde peut être trop fort pour toi parfois — et que ce n'est pas une plainte. C'est une réalité, et j'apprends à en tenir compte.",
+      "J'ai appris que ton besoin de temps, de silence, d'espace, ce n'est jamais un rejet. C'est une autre façon d'aimer, et j'essaie de la parler.",
+      "J'ai appris que tu n'as jamais à te justifier d'être toi. Pas avec moi."
+    ]
+  },
+  {
+    type: "texte",
+    titre: "Je te l'avais déjà dit",
+    svg: "lettre_etoile",
+    image: null,
+    texte: [
+      "Un soir, sans grande occasion, je t'ai écrit :",
+      "« Je sais que tu es la femme de ma vie, et tu seras ma femme, point barre. »",
+      "Je le pensais déjà. Je le pense encore plus fort aujourd'hui."
+    ]
+  },
+  {
+    type: "demande",
+    titre: "Alors voilà.",
+    texte: [
+      "Ça fait sept ans qu'on se connaît. Quatre ans où tu me supportais à peine. Et trois ans aujourd'hui qu'on s'aime pour de vrai — trois ans de silences doux, de rires inattendus, de dimanches sans rien et qui étaient tout, et de cette paix dont tu m'as parlé.",
+      "Tu es loin ce soir, et moi je n'ai pas su attendre.",
+      "Alors je te le demande maintenant, comme je peux, avec ce que j'ai : mes mots, la mer, et tout ce que je ressens pour toi."
+    ],
+    question: "Dadoucherie… est-ce que tu veux passer ta vie avec moi ?",
+    note: "Je sais que tu voulais une demande au bord de la mer, juste nous deux, sans personne autour. Cette page n'est pas ça. Ce n'est qu'une promesse, en attendant. Le vrai moment, on se le doit encore — face à la mer, tous les deux, dès que tu pourras venir. Je te le promets."
+  },
+  {
+    type: "fin",
+    titre: "Prends ton temps.",
+    texte: [
+      "Il n'y a pas de bonne ou de mauvaise réponse ce soir. Juste toi, et ce que tu ressens.",
+      "Et si tu veux, dessine dans le ciel. Il est à toi."
+    ],
+    astuce: "Dessine avec ton doigt dans le ciel étoilé ✦"
+  }
+];
+
+/* ================================================================
+   LA SCÈNE DE LA PLAGE — silhouette à genoux, la bague à la main
+================================================================ */
+const scenePlage = `
+<svg class="scene-plage" viewBox="0 0 460 260" ${SVGNS} role="img" aria-label="Une demande au bord de la mer">
+  <defs>
+    <linearGradient id="pl-ciel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b0820"/><stop offset="1" stop-color="#241640"/>
+    </linearGradient>
+    <linearGradient id="pl-mer" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a2050"/><stop offset="1" stop-color="#141030"/>
+    </linearGradient>
+    <linearGradient id="pl-sable" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a2c50"/><stop offset="1" stop-color="#241a38"/>
+    </linearGradient>
+    <radialGradient id="pl-lune" cx=".5" cy=".5" r=".5">
+      <stop offset=".35" stop-color="rgba(250,244,225,.95)"/><stop offset="1" stop-color="rgba(250,244,225,0)"/>
+    </radialGradient>
+    <radialGradient id="pl-anneau" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="rgba(255,230,160,.9)"/><stop offset="1" stop-color="rgba(255,230,160,0)"/>
+    </radialGradient>
+  </defs>
+  <rect width="460" height="150" fill="url(#pl-ciel)"/>
+  <circle cx="82" cy="52" r="34" fill="url(#pl-lune)"/>
+  <circle cx="82" cy="52" r="17" fill="#f6eed8"/>
+  <g fill="#efe6da">
+    <circle cx="180" cy="30" r="1.1"/><circle cx="240" cy="52" r="1.4"/><circle cx="300" cy="24" r="1.1"/>
+    <circle cx="352" cy="58" r="1.3"/><circle cx="410" cy="34" r="1.1"/><circle cx="146" cy="70" r="1"/>
+    <circle cx="266" cy="86" r="1"/><circle cx="390" cy="80" r="1.2"/><circle cx="430" cy="60" r="1"/>
+  </g>
+  <path d="M330 26 l26 12" stroke="rgba(245,240,232,.6)" stroke-width="1.2" stroke-linecap="round"/>
+  <rect y="148" width="460" height="70" fill="url(#pl-mer)"/>
+  <path d="M0 150 q30 -5 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0" fill="none" stroke="rgba(213,200,232,.5)" stroke-width="1.6"/>
+  <path d="M0 168 q40 -6 80 0 t80 0 t80 0 t80 0 t80 0 t80 0" fill="none" stroke="rgba(213,200,232,.28)" stroke-width="1.3"/>
+  <path d="M60 152 q14 8 22 24 q4 10 2 22 l14 -4 q4 -22 -6 -40 q-6 -10 -16 -14 z" fill="rgba(246,238,216,.14)"/>
+  <path d="M0 208 Q120 186 250 202 Q360 214 460 200 V260 H0 Z" fill="url(#pl-sable)"/>
+  <path d="M40 212 q60 -10 130 -4 M240 208 q80 -6 160 -2" stroke="rgba(245,240,232,.16)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <!-- elle, debout -->
+  <g>
+    <circle cx="296" cy="128" r="10" fill="#171028"/>
+    <path d="M292 118 q-8 -6 -4 -14 q8 4 8 10 q4 -8 12 -8 q0 10 -10 13" fill="#171028"/>
+    <path d="M296 138 q-11 8 -14 26 l-4 42 q18 8 36 0 l-4 -42 q-3 -18 -14 -26 z" fill="#171028"/>
+    <path d="M288 148 q-8 8 -8 20" stroke="rgba(213,200,232,.45)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <path d="M296 138 q-11 8 -14 26 l-4 42" stroke="rgba(213,200,232,.5)" stroke-width="1.2" fill="none"/>
+  </g>
+  <!-- lui, un genou à terre -->
+  <g>
+    <circle cx="212" cy="152" r="9" fill="#171028"/>
+    <path d="M208 160 q-12 4 -14 18 l-2 14 -10 0 q-4 0 -4 6 l0 4 22 0 2 -14 8 0 6 14 14 0 -8 -22 q-3 -14 -14 -20 z" fill="#171028"/>
+    <path d="M214 166 q12 -4 24 -5 l10 -1" stroke="#171028" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <path d="M214 166 q12 -4 24 -5" stroke="rgba(213,200,232,.5)" stroke-width="1.2" fill="none"/>
+    <path d="M208 160 q-12 4 -14 18" stroke="rgba(213,200,232,.5)" stroke-width="1.2" fill="none"/>
+  </g>
+  <!-- la bague -->
+  <circle id="anneau-lueur" cx="254" cy="157" r="14" fill="url(#pl-anneau)"/>
+  <circle cx="254" cy="158" r="4.6" fill="none" stroke="#f0d9a8" stroke-width="2"/>
+  <path d="M254 150 l1.6 -4 M250 152 l-3 -3 M258 152 l3 -3" stroke="#f6eed8" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- petit cœur entre eux -->
+  <path d="M254 108 a5 5 0 0 1 8 4 q0 5 -8 10 q-8 -5 -8 -10 a5 5 0 0 1 8 -4"
+        fill="none" stroke="rgba(232,200,208,.8)" stroke-width="1.6"/>
+</svg>`;
+
+/* ================================================================
+   MOTEUR — océan vivant, constellation, bouteille, récit
+================================================================ */
+const reduireMouvement = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const canvas = document.getElementById("ocean");
+const ctx = canvas.getContext("2d");
+let W = 0, H = 0, DPR = 1, T = 0;
+const HORIZON = 0.56;
+
+let etoiles = [], filantes = [], ondulations = [], paillettes = [], eclats = [];
+let constellation = [], nbAllumees = 1, coeurComplet = false;
+
+/* ---- vagues : 4 nappes superposées ---- */
+const nappes = [
+  { base: .615, amp: 5,  freq: .011, vit: .55, phase: 0,   haut: "#3d3268", bas: "#2a2250", alpha: .9 },
+  { base: .70,  amp: 8,  freq: .009, vit: .8,  phase: 2.1, haut: "#332a5e", bas: "#221b46", alpha: .95 },
+  { base: .80,  amp: 12, freq: .0075,vit: 1.05,phase: 4.2, haut: "#2a2252", bas: "#191238", alpha: 1 },
+  { base: .92,  amp: 15, freq: .006, vit: 1.3, phase: 1.1, haut: "#211a44", bas: "#120d28", alpha: 1 }
+];
+function vagueY(x, n, t) {
+  const l = nappes[n], s = H / 700;
+  return H * l.base
+    + Math.sin(x * l.freq + t * l.vit + l.phase) * l.amp * s
+    + Math.sin(x * l.freq * .43 + t * l.vit * .62 + l.phase * 2) * l.amp * .55 * s
+    + Math.sin(x * l.freq * 2.3 + t * l.vit * 1.7) * l.amp * .18 * s;
+}
+
+function redimensionner() {
+  DPR = Math.min(window.devicePixelRatio || 1, 1.6);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  genererEtoiles();
+  genererConstellation();
+  redimDessin();
+}
+
+function genererEtoiles() {
+  etoiles = [];
+  const n = Math.floor((W * H) / 4200);
+  for (let i = 0; i < n; i++) {
+    etoiles.push({
+      x: Math.random() * W,
+      y: Math.random() * H * (HORIZON - .02),
+      r: Math.random() * 1.25 + .3,
+      o: Math.random() * .65 + .2,
+      d: Math.random() * 6
+    });
+  }
+}
+
+/* ---- constellation en forme de cœur : une étoile par chapitre ---- */
+function genererConstellation() {
+  constellation = [];
+  const n = recit.length - 1; // la dernière scène complète le cœur
+  const cx = W * .5, cy = H * .26;
+  const sc = Math.min(W * .020, H * .011);
+  for (let i = 0; i < n; i++) {
+    const th = (i / n) * Math.PI * 2 + Math.PI;
+    const hx = 16 * Math.pow(Math.sin(th), 3);
+    const hy = -(13 * Math.cos(th) - 5 * Math.cos(2 * th) - 2 * Math.cos(3 * th) - Math.cos(4 * th));
+    constellation.push({ x: cx + hx * sc, y: cy + hy * sc });
+  }
+}
+
+function lancerFilante(x0, y0) {
+  if (reduireMouvement) return;
+  const x = x0 !== undefined ? x0 : Math.random() * W * .8 + W * .1;
+  const y = y0 !== undefined ? y0 : Math.random() * H * .3 + H * .05;
+  const a = Math.PI * (.72 + Math.random() * .16);
+  filantes.push({ x, y, vx: Math.cos(a) * 7, vy: -Math.sin(a) * 7 * -1, vie: 1 });
+}
+function eclatDe(x, y, couleur, n) {
+  for (let i = 0; i < (n || 14); i++) {
+    const a = Math.random() * Math.PI * 2, v = Math.random() * 2.2 + .5;
+    eclats.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - .6, vie: 1, c: couleur || "240,217,168" });
+  }
+}
+
+/* ---- fond, ciel, lune ---- */
+function peindreCiel() {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, "#050310");
+  g.addColorStop(.42, "#0e0a20");
+  g.addColorStop(HORIZON, "#251a44");
+  g.addColorStop(HORIZON + .001, "#2e2658");
+  g.addColorStop(1, "#0d0a20");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  const neb = ctx.createRadialGradient(W * .3, H * .34, 0, W * .3, H * .34, W * .4);
+  neb.addColorStop(0, "rgba(130,95,170,.10)");
+  neb.addColorStop(1, "transparent");
+  ctx.fillStyle = neb;
+  ctx.fillRect(0, 0, W, H * HORIZON);
+
+  etoiles.forEach((e, i) => {
+    const s = i % 4 === 0 ? e.o * (.45 + .55 * Math.sin(T * 1.4 + e.d)) : e.o;
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,242,210,${Math.max(0, s)})`;
+    ctx.fill();
+  });
+
+  // lune
+  const lx = W * .76, ly = H * .17, lr = Math.min(W, H) * .052;
+  const halo = ctx.createRadialGradient(lx, ly, lr * .4, lx, ly, lr * 4.2);
+  halo.addColorStop(0, "rgba(250,244,225,.30)");
+  halo.addColorStop(1, "transparent");
+  ctx.fillStyle = halo;
+  ctx.fillRect(lx - lr * 5, ly - lr * 5, lr * 10, lr * 10);
+  ctx.beginPath();
+  ctx.arc(lx, ly, lr, 0, Math.PI * 2);
+  ctx.fillStyle = "#f6eed8";
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(lx - lr * .3, ly - lr * .2, lr * .16, 0, Math.PI * 2);
+  ctx.arc(lx + lr * .25, ly + lr * .3, lr * .11, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(200,185,160,.35)";
+  ctx.fill();
+  return { lx, ly, lr };
+}
+
+/* ---- constellation ---- */
+function peindreConstellation() {
+  if (nbAllumees < 2) return;
+  ctx.save();
+  ctx.lineWidth = 1;
+  for (let i = 0; i < Math.min(nbAllumees, constellation.length) - 1; i++) {
+    const a = constellation[i], b = constellation[i + 1];
+    ctx.strokeStyle = "rgba(213,200,232,.30)";
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
+  if (coeurComplet) {
+    const a = constellation[constellation.length - 1], b = constellation[0];
+    ctx.strokeStyle = "rgba(232,200,208,.45)";
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
+  for (let i = 0; i < Math.min(nbAllumees, constellation.length); i++) {
+    const p = constellation[i];
+    const puls = coeurComplet ? (.75 + .25 * Math.sin(T * 2 + i)) : 1;
+    const r = (i === nbAllumees - 1 && !coeurComplet ? 3.2 : 2.2) * puls;
+    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 4);
+    g.addColorStop(0, "rgba(240,222,255,.9)");
+    g.addColorStop(1, "transparent");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(p.x, p.y, r * 4, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#f2e9ff";
+    ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* ---- la mer ---- */
+function peindreMer(lune) {
+  for (let n = 0; n < nappes.length; n++) {
+    const l = nappes[n];
+    ctx.beginPath();
+    ctx.moveTo(-4, vagueY(0, n, T));
+    for (let x = 0; x <= W + 8; x += 8) ctx.lineTo(x, vagueY(x, n, T));
+    ctx.lineTo(W + 4, H + 4); ctx.lineTo(-4, H + 4); ctx.closePath();
+    const g = ctx.createLinearGradient(0, H * l.base - 30, 0, H);
+    g.addColorStop(0, l.haut); g.addColorStop(1, l.bas);
+    ctx.globalAlpha = l.alpha;
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // écume sur la crête
+    if (n >= 1) {
+      ctx.beginPath();
+      ctx.moveTo(0, vagueY(0, n, T));
+      for (let x = 0; x <= W; x += 8) ctx.lineTo(x, vagueY(x, n, T));
+      ctx.strokeStyle = `rgba(230,222,250,${n === nappes.length - 1 ? .30 : .16})`;
+      ctx.lineWidth = 1.3;
+      ctx.stroke();
+    }
+  }
+
+  // reflet de lune : traits brisés qui scintillent
+  const rx = lune.lx;
+  ctx.save();
+  for (let y = H * HORIZON + 8; y < H; y += 10) {
+    const prof = (y - H * HORIZON) / (H * (1 - HORIZON));
+    const larg = lune.lr * (0.7 + prof * 2.6);
+    const jit = Math.sin(y * .35 + T * 2.4) * larg * .5 + Math.sin(y * .13 - T * 1.6) * larg * .3;
+    const a = .34 * (1 - prof * .75) * (.6 + .4 * Math.sin(T * 3 + y));
+    if (a <= 0.02) continue;
+    ctx.strokeStyle = `rgba(250,240,215,${a})`;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(rx + jit - larg * (.3 + .2 * Math.sin(y + T)), y);
+    ctx.lineTo(rx + jit + larg * (.3 + .2 * Math.cos(y - T)), y);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // paillettes (bioluminescence discrète)
+  if (!reduireMouvement && Math.random() < .12) {
+    const x = Math.random() * W;
+    paillettes.push({ x, y: vagueY(x, 2 + (Math.random() < .5 ? 1 : 0), T) + Math.random() * 20, vie: 1 });
+  }
+  paillettes = paillettes.filter(p => (p.vie -= .012) > 0);
+  paillettes.forEach(p => {
+    ctx.fillStyle = `rgba(190,220,255,${p.vie * .5})`;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 1.1, 0, Math.PI * 2); ctx.fill();
+  });
+
+  // ondulations du toucher
+  ondulations = ondulations.filter(o => (o.vie -= .011) > 0);
+  ondulations.forEach(o => {
+    o.r += 1.6;
+    ctx.strokeStyle = `rgba(215,230,255,${o.vie * .5})`;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.ellipse(o.x, o.y, o.r, o.r * .32, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    if (o.vie > .5) {
+      ctx.strokeStyle = `rgba(215,230,255,${(o.vie - .5) * .6})`;
+      ctx.beginPath();
+      ctx.ellipse(o.x, o.y, o.r * .55, o.r * .18, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  });
+}
+
+function peindreFilantes() {
+  filantes = filantes.filter(f => (f.vie -= .016) > 0 && f.y < H * HORIZON);
+  filantes.forEach(f => {
+    f.x += f.vx; f.y += f.vy;
+    const g = ctx.createLinearGradient(f.x, f.y, f.x - f.vx * 9, f.y - f.vy * 9);
+    g.addColorStop(0, `rgba(255,248,225,${f.vie})`);
+    g.addColorStop(1, "transparent");
+    ctx.strokeStyle = g;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(f.x, f.y);
+    ctx.lineTo(f.x - f.vx * 9, f.y - f.vy * 9);
+    ctx.stroke();
+  });
+  eclats = eclats.filter(e => (e.vie -= .02) > 0);
+  eclats.forEach(e => {
+    e.x += e.vx; e.y += e.vy; e.vy += .03;
+    ctx.fillStyle = `rgba(${e.c},${e.vie})`;
+    ctx.beginPath(); ctx.arc(e.x, e.y, 1.5 * e.vie + .4, 0, Math.PI * 2); ctx.fill();
+  });
+}
+
+/* ---- boucle ---- */
+let derniereFilante = 0;
+function boucle(ts) {
+  T += reduireMouvement ? .004 : .011;
+  const lune = peindreCiel();
+  peindreConstellation();
+  peindreMer(lune);
+  peindreFilantes();
+  majBouteille();
+  if (!reduireMouvement && ts - derniereFilante > 9000 + Math.random() * 9000) {
+    derniereFilante = ts;
+    lancerFilante();
+  }
+  requestAnimationFrame(boucle);
+}
+
+/* ---- toucher l'eau et le ciel ---- */
+function toucherScene(x, y) {
+  if (y > H * HORIZON) {
+    ondulations.push({ x, y, r: 4, vie: 1 });
+    if (ondulations.length > 14) ondulations.shift();
+    for (let i = 0; i < 5; i++)
+      paillettes.push({ x: x + (Math.random() - .5) * 30, y: y + (Math.random() - .5) * 10, vie: 1 });
+  } else {
+    eclatDe(x, y, "220,205,255", 8);
+    if (Math.random() < .5) lancerFilante(x, y);
+  }
+}
+document.body.addEventListener("pointerdown", (e) => {
+  if (document.body.classList.contains("mode-dessin")) return;
+  const cible = e.target;
+  if (cible.closest("button") || cible.closest(".scene-contenu") || cible.closest("#bouteille") || cible.closest("#lettre")) return;
+  toucherScene(e.clientX, e.clientY);
+});
+
+/* ================================================================
+   RÉCIT — affichage des scènes (à son rythme, jamais forcée)
+================================================================ */
+const conteneur = document.getElementById("scenes");
+const progression = document.getElementById("progression");
+const navBas = document.getElementById("nav-bas");
+const astuce = document.getElementById("astuce");
+let index = 0;
+
+recit.forEach((s, i) => {
+  const div = document.createElement("div");
+  div.className = "scene";
+  div.id = `scene-${i}`;
+  conteneur.appendChild(div);
+  progression.appendChild(document.createElement("span"));
+});
+
+function rendreScene(i) {
+  const s = recit[i];
+  const el = document.getElementById(`scene-${i}`);
+  if (el.dataset.rendu) return;
+  el.dataset.rendu = "1";
+
+  let html = `<div class="scene-contenu">`;
+  if (s.badge) html += `<div class="date-badge">${s.badge}</div>`;
+  if (s.titre) html += `<h2 class="scene-titre">${s.titre}</h2>`;
+  if (s.image) {
+    html += `<div class="photo-frame"><img src="${s.image}" alt=""/></div>`;
+  } else if (s.svg && vignettes[s.svg]) {
+    html += vignettes[s.svg];
+  }
+  (s.texte || []).forEach(t => { html += `<p>${t}</p>`; });
+
+  if (s.type === "intro") {
+    html += `<button class="btn btn-principal" onclick="avancer()">${s.boutonTexte || "Continuer ✦"}</button>`;
+  }
+  if (s.type === "fin") {
+    html += `<div class="reponse-boutons">
+      <button class="btn btn-principal" onclick="repondre('oui')">Oui ✦</button>
+      <button class="btn" onclick="repondre('temps')">J'ai besoin d'un instant</button>
+    </div>
+    <div id="msg-reponse"></div>`;
+  }
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+function relancerVignette(el) {
+  el.querySelectorAll(".vignette [pathLength]").forEach(p => {
+    p.style.animation = "none";
+    void p.getBoundingClientRect();
+    p.style.animation = "";
+  });
+}
+
+function majProgression() {
+  [...progression.children].forEach((d, i) => {
+    d.classList.toggle("actif", i === index);
+    d.classList.toggle("passe", i < index);
+  });
+}
+
+function afficherScene(i) {
+  document.querySelectorAll(".scene").forEach(s => s.classList.remove("active"));
+  cacherBouteille();
+  document.body.classList.remove("mode-dessin");
+  const s = recit[i];
+
+  if (s.type === "demande") {
+    majProgression();
+    navBas.hidden = true;
+    montrerAstuce("Regarde… quelque chose dérive sur l'eau. ✦", 0);
+    setTimeout(montrerBouteille, 1600);
+    return;
+  }
+
+  rendreScene(i);
+  const el = document.getElementById(`scene-${i}`);
+  el.classList.add("active");
+  relancerVignette(el);
+  majProgression();
+
+  navBas.hidden = (s.type !== "texte");
+  if (s.type === "texte") {
+    navBas.style.animation = "none";
+    void navBas.offsetWidth;
+    navBas.style.animation = "";
+  }
+
+  if (s.astuce) montrerAstuce(s.astuce, 2600);
+  if (s.type === "fin") activerDessin();
+
+  // une étoile du cœur s'allume à chaque chapitre
+  const cible = Math.min(i + 1, constellation.length);
+  if (cible > nbAllumees) {
+    nbAllumees = cible;
+    const p = constellation[nbAllumees - 1];
+    if (p) eclatDe(p.x, p.y, "230,215,255", 10);
+  }
+}
+
+let astuceTimer = null;
+function montrerAstuce(txt, delai) {
+  clearTimeout(astuceTimer);
+  astuceTimer = setTimeout(() => {
+    astuce.textContent = txt;
+    astuce.classList.add("visible");
+    astuceTimer = setTimeout(() => astuce.classList.remove("visible"), 7000);
+  }, delai || 0);
+}
+
+function avancer() {
+  if (index < recit.length - 1) {
+    index++;
+    lancerFilante();
+    afficherScene(index);
+  }
+}
+function reculer() {
+  if (index > 0 && recit[index].type !== "demande") {
+    index--;
+    afficherScene(index);
+  }
+}
+document.getElementById("btn-suivant").addEventListener("click", avancer);
+document.getElementById("btn-retour").addEventListener("click", reculer);
+document.addEventListener("keydown", (e) => {
+  const s = recit[index];
+  if ((e.key === "ArrowRight" || e.key === " ") && s.type === "texte") { e.preventDefault(); avancer(); }
+  if (e.key === "ArrowLeft" && s.type === "texte") { e.preventDefault(); reculer(); }
+});
+
+/* ================================================================
+   LA BOUTEILLE À LA MER
+================================================================ */
+const bouteille = document.getElementById("bouteille");
+let bouteilleActive = false, bouteilleDepart = 0;
+
+function montrerBouteille() {
+  bouteilleActive = true;
+  bouteilleDepart = performance.now();
+  bouteille.style.display = "block";
+  bouteille.style.opacity = "1";
+}
+function cacherBouteille() {
+  bouteilleActive = false;
+  bouteille.style.display = "none";
+}
+function majBouteille() {
+  if (!bouteilleActive) return;
+  const el = performance.now() - bouteilleDepart;
+  const p = Math.min(1, el / 9000);
+  const ease = 1 - Math.pow(1 - p, 3);
+  const xf = -.14 + (.52 - -.14) * ease;
+  const x = xf * W;
+  const y = vagueY(x, 2, T);
+  const pente = (vagueY(x + 12, 2, T) - vagueY(x - 12, 2, T)) / 24;
+  const rot = Math.atan(pente) * 57.3 * .8 + Math.sin(T * 1.8) * 4;
+  const wB = bouteille.getBoundingClientRect().width || 80;
+  bouteille.style.left = (x - wB / 2) + "px";
+  bouteille.style.top = (y - wB * 1.05) + "px";
+  bouteille.style.transform = `rotate(${rot}deg)`;
+}
+bouteille.addEventListener("click", ouvrirBouteille);
+bouteille.addEventListener("touchstart", (e) => { e.preventDefault(); ouvrirBouteille(); }, { passive: false });
+
+function ouvrirBouteille() {
+  if (!bouteilleActive) return;
+  const r = bouteille.getBoundingClientRect();
+  eclatDe(r.left + r.width / 2, r.top + r.height / 3, "240,217,168", 26);
+  bouteille.style.opacity = "0";
+  setTimeout(cacherBouteille, 700);
+  astuce.classList.remove("visible");
+  setTimeout(montrerLettre, 500);
+}
+
+/* ---- la lettre ---- */
+const lettre = document.getElementById("lettre");
+const lettrePapier = document.getElementById("lettre-papier");
+function montrerLettre() {
+  const s = recit.find(sc => sc.type === "demande");
+  let html = `<h2>${s.titre}</h2>`;
+  s.texte.forEach(t => { html += `<p>${t}</p>`; });
+  html += scenePlage;
+  html += `<p class="question-finale">${s.question}</p>`;
+  html += `<p class="note-douce">${s.note}</p>`;
+  html += `<button class="btn btn-principal" style="animation-delay:.8s" onclick="fermerLettre()">continuer ✦</button>`;
+  lettrePapier.innerHTML = html;
+  lettre.classList.add("visible");
+  requestAnimationFrame(() => requestAnimationFrame(() => lettre.classList.add("montree")));
+  // le cœur s'illumine
+  nbAllumees = constellation.length;
+}
+function fermerLettre() {
+  lettre.classList.remove("montree");
+  setTimeout(() => lettre.classList.remove("visible"), 900);
+  index = recit.length - 1;
+  afficherScene(index);
+}
+
+/* ================================================================
+   LE CIEL À DESSINER — poussière d'étoiles sous ses doigts
+================================================================ */
+const dCanvas = document.getElementById("dessin-ciel");
+const dCtx = dCanvas.getContext("2d");
+const teintes = {
+  lavande: ["222,205,255", "185,165,225"],
+  rose:    ["255,215,228", "232,168,188"],
+  dore:    ["255,238,200", "240,217,168"]
+};
+let teinte = "lavande", enTrace = false, dernierPt = null;
+
+function redimDessin() {
+  // ne pas effacer son dessin si la taille n'a pas vraiment changé
+  if (dCanvas.width === Math.round(W * DPR) && dCanvas.height === Math.round(H * DPR)) return;
+  dCanvas.width = Math.round(W * DPR); dCanvas.height = Math.round(H * DPR);
+  dCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  dCtx.lineCap = "round";
+}
+function activerDessin() {
+  document.body.classList.add("mode-dessin");
+}
+function pointDessin(x, y, interp) {
+  const [c1, c2] = teintes[teinte];
+  dCtx.save();
+  dCtx.shadowColor = `rgba(${c1},.9)`;
+  dCtx.shadowBlur = 12;
+  dCtx.fillStyle = `rgba(${c1},.85)`;
+  dCtx.beginPath();
+  dCtx.arc(x, y, 2.4, 0, Math.PI * 2);
+  dCtx.fill();
+  dCtx.restore();
+  if (!interp && Math.random() < .3) {
+    dCtx.fillStyle = `rgba(${c2},${.4 + Math.random() * .5})`;
+    dCtx.beginPath();
+    dCtx.arc(x + (Math.random() - .5) * 16, y + (Math.random() - .5) * 16, Math.random() * 1.4 + .4, 0, Math.PI * 2);
+    dCtx.fill();
+  }
+}
+dCanvas.addEventListener("pointerdown", (e) => {
+  enTrace = true;
+  dernierPt = { x: e.clientX, y: e.clientY };
+  pointDessin(e.clientX, e.clientY);
+});
+dCanvas.addEventListener("pointermove", (e) => {
+  if (!enTrace) return;
+  const x = e.clientX, y = e.clientY;
+  const dx = x - dernierPt.x, dy = y - dernierPt.y;
+  const dist = Math.hypot(dx, dy), pas = 4;
+  for (let d = pas; d < dist; d += pas)
+    pointDessin(dernierPt.x + dx * d / dist, dernierPt.y + dy * d / dist, true);
+  pointDessin(x, y);
+  dernierPt = { x, y };
+});
+["pointerup", "pointercancel", "pointerleave"].forEach(ev =>
+  dCanvas.addEventListener(ev, () => { enTrace = false; }));
+
+document.querySelectorAll(".couleur").forEach(c => {
+  c.addEventListener("click", () => {
+    document.querySelectorAll(".couleur").forEach(x => x.classList.remove("active"));
+    c.classList.add("active");
+    teinte = c.dataset.couleur;
+  });
+});
+document.getElementById("btn-effacer").addEventListener("click", () => {
+  dCtx.clearRect(0, 0, W, H);
+});
+
+/* ================================================================
+   LA RÉPONSE
+================================================================ */
+function repondre(quoi) {
+  const msg = document.getElementById("msg-reponse");
+  if (quoi === "oui") {
+    coeurComplet = true;
+    nbAllumees = constellation.length;
+    constellation.forEach((p, i) => setTimeout(() => eclatDe(p.x, p.y, "255,225,235", 8), i * 90));
+    for (let i = 0; i < 7; i++) setTimeout(() => lancerFilante(), i * 450);
+    msg.innerHTML = `<p>Alors on se le doit, ce moment au bord de l'eau, rien que nous deux. Regarde le ciel — notre histoire y dessine un cœur, maintenant. Je t'aime. À très vite. ✦</p>`;
+  } else {
+    msg.innerHTML = `<p>Prends tout le temps qu'il te faut. Je serai là, quoi que tu répondes, quand tu répondes. Je t'aime déjà, telle que tu es.</p>`;
+  }
+  msg.classList.add("visible");
+}
+
+/* ================================================================
+   MUSIQUE
+================================================================ */
+const musique = document.getElementById("musique");
+const toggleSon = document.getElementById("toggle-son");
+let sonActif = true;
+document.body.addEventListener("click", function demarrerMusique() {
+  musique.volume = .55;
+  musique.play().catch(() => {});
+}, { once: true });
+toggleSon.addEventListener("click", () => {
+  sonActif = !sonActif;
+  musique.muted = !sonActif;
+  toggleSon.textContent = sonActif ? "🔊" : "🔇";
+});
+
+/* ---- départ ---- */
+window.addEventListener("resize", redimensionner);
+redimensionner();
+afficherScene(0);
+requestAnimationFrame(boucle);
+</script>
+</body>
+</html>
