@@ -2731,7 +2731,7 @@ initCapsules = function() {
           <div class="capsule-ouverte-corps">
             ${paragraphes}
             <div class="capsule-juillet-actions">
-              <button class="btn-entrer btn-juillet" onclick="ouvrirLettreJuillet()">Et si c'était pour toujours ? 💍</button>
+              <button class="btn-entrer btn-juillet" onclick="allerALaDemande()">Et si c'était pour toujours ? 💍</button>
             </div>
           </div>
         </div>`;
@@ -2783,6 +2783,13 @@ initCapsules = function() {
     liste.appendChild(div);
   });
 };
+
+// Le reste de l'histoire — la page de la demande, au bord de la mer 🌊
+function allerALaDemande() {
+  document.body.style.transition = "opacity 1.1s ease";
+  document.body.style.opacity = "0";
+  setTimeout(() => { window.location.href = "/demande"; }, 1100);
+}
 
 function ouvrirLettreJuillet() {
   const modal = document.getElementById("lettre-juillet");
