@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Le livre de nous</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --carte:#FCF8FA; --encre:#46394F; --encre-douce:#7A6E82;
+    --corail:#E1806F; --miel:#E4B266;
+    --display:'Fraunces', Georgia, serif;
+    --body:'Nunito Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);color:var(--encre);background:#EFE9F3;line-height:1.65;}
+  .outils{
+    position:sticky;top:0;z-index:10;background:rgba(252,248,250,.95);
+    border-bottom:1px solid rgba(70,57,79,.1);padding:12px 18px;
+    display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;
+  }
+  .outils button, .outils select{
+    font-family:var(--body);font-weight:700;font-size:.9rem;border-radius:100px;
+    padding:9px 18px;cursor:pointer;border:1px solid rgba(70,57,79,.15);
+    background:#fff;color:var(--encre);
+  }
+  .outils .imprimer{background:var(--corail);color:#fff;border-color:var(--corail);}
+  .livre{max-width:640px;margin:0 auto;padding:30px 22px 80px;}
+  .couverture{
+    text-align:center;padding:70px 20px 60px;
+  }
+  .couverture .annee{font-size:.85rem;font-weight:700;letter-spacing:.3em;color:var(--corail);text-transform:uppercase;}
+  .couverture h1{font-family:var(--display);font-weight:500;font-size:clamp(2.4rem,9vw,3.6rem);margin:14px 0 8px;}
+  .couverture .sous{color:var(--encre-douce);font-style:italic;font-family:var(--display);font-size:1.1rem;}
+  .chiffres{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:36px;}
+  .chiffre{text-align:center;min-width:110px;}
+  .chiffre .n{font-family:var(--display);font-size:2rem;color:var(--corail);font-weight:600;}
+  .chiffre .l{font-size:.78rem;color:var(--encre-douce);}
+  .chapitre{margin-top:50px;page-break-before:always;}
+  .chapitre h2{
+    font-family:var(--display);font-weight:500;font-size:1.6rem;margin-bottom:6px;
+  }
+  .chapitre .intro{color:var(--encre-douce);font-size:.92rem;margin-bottom:20px;font-style:italic;}
+  .bloc{
+    background:var(--carte);border:1px solid rgba(70,57,79,.08);border-radius:16px;
+    padding:18px 20px;margin-bottom:14px;page-break-inside:avoid;
+  }
+  .bloc .texte{white-space:pre-wrap;font-size:1rem;}
+  .bloc .meta{font-size:.8rem;color:var(--encre-douce);margin-top:10px;}
+  .bloc .qui{font-weight:700;color:var(--corail);font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;}
+  .infinie{font-family:var(--display);font-size:1.08rem;line-height:1.85;}
+  .infinie .elle{color:#B05A7A;}
+  .vide{color:var(--encre-douce);font-style:italic;}
+  .fin{
+    text-align:center;margin-top:60px;padding-top:40px;
+    font-family:var(--display);font-style:italic;font-size:1.15rem;color:var(--corail);
+    page-break-before:always;
+  }
+  @media print{
+    .outils{display:none;}
+    body{background:#fff;}
+    .bloc{border:1px solid #ddd;}
+  }
+</style>
+</head>
+<body>
+
+<div class="outils">
+  <select id="choixAnnee"></select>
+  <button class="imprimer" onclick="window.print()">🖨️ Imprimer / enregistrer en PDF</button>
+</div>
+
+<div class="livre">
+  <div class="couverture">
+    <div class="annee" id="couvAnnee"></div>
+    <h1>Le livre<br>de nous</h1>
+    <p class="sous">Tout ce qu'on s'est écrit cette année-là, gardé pour toujours.</p>
+    <div class="chiffres" id="chiffres"></div>
+  </div>
+
+  <div class="chapitre" id="chapMots">
+    <h2>Ses mots</h2>
+    <p class="intro">Ce qu'elle a déposé sur la page, avec ses mots à elle.</p>
+    <div class="zone"></div>
+  </div>
+
+  <div class="chapitre" id="chapInfinie">
+    <h2>La lettre infinie</h2>
+    <p class="intro">Écrite à deux, une phrase à la fois. L'encre sombre, c'est Mathieu. Le rose, c'est elle.</p>
+    <div class="zone"></div>
+  </div>
+
+  <div class="chapitre" id="chapQds">
+    <h2>Les questions du dimanche</h2>
+    <p class="intro">Une question par semaine, deux réponses sans se concerter.</p>
+    <div class="zone"></div>
+  </div>
+
+  <div class="chapitre" id="chapVersions">
+    <h2>Notre histoire, dans ses mots</h2>
+    <p class="intro">Les chapitres de la frise, racontés par elle.</p>
+    <div class="zone"></div>
+  </div>
+
+  <div class="chapitre" id="chapLettres">
+    <h2>Les lettres qui se sont ouvertes</h2>
+    <p class="intro">Écrites à l'avance, déverrouillées par le temps.</p>
+    <div class="zone"></div>
+  </div>
+
+  <p class="fin" id="finLivre"></p>
+</div>
+
+<script>
+(function(){
+  var DB_URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var DB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  function dbLire(t,f){
+    return fetch(DB_URL+'/rest/v1/'+t+'?'+(f||''),{headers:{'apikey':DB_KEY,'Authorization':'Bearer '+DB_KEY}})
+      .then(function(r){return r.json();}).catch(function(){return [];});
+  }
+  function dateFr(iso){
+    return new Date(iso).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  }
+  function filtre(annee){ return 'created_at=gte.'+annee+'-01-01&created_at=lt.'+(annee+1)+'-01-01'; }
+
+  var anneeCourante = new Date().getFullYear();
+  var params = new URLSearchParams(location.search);
+  var annee = parseInt(params.get('annee'),10) || anneeCourante;
+
+  var choix = document.getElementById('choixAnnee');
+  for(var y=2026; y<=anneeCourante; y++){
+    var o=document.createElement('option'); o.value=y; o.textContent='Année '+y;
+    if(y===annee) o.selected=true;
+    choix.appendChild(o);
+  }
+  choix.addEventListener('change', function(){ location.search='?annee='+choix.value; });
+
+  document.getElementById('couvAnnee').textContent = annee;
+  document.getElementById('finLivre').textContent = 'Fin de l\'année ' + annee + '. La suite s\'écrit en ce moment même. Ton Mathieu.';
+
+  function remplir(chapId, rows, rendre){
+    var z = document.querySelector('#'+chapId+' .zone');
+    z.innerHTML='';
+    if(!rows || !rows.length){
+      z.innerHTML = '<p class="vide">Rien cette année-là dans ce chapitre. Les pages blanches comptent aussi.</p>';
+      return;
+    }
+    rows.forEach(function(r){ z.appendChild(rendre(r)); });
+  }
+  function blocTexte(texte, qui, meta){
+    var d=document.createElement('div'); d.className='bloc';
+    if(qui){ var q=document.createElement('div'); q.className='qui'; q.textContent=qui; d.appendChild(q); }
+    var t=document.createElement('div'); t.className='texte'; t.textContent=texte; d.appendChild(t);
+    if(meta){ var m=document.createElement('div'); m.className='meta'; m.textContent=meta; d.appendChild(m); }
+    return d;
+  }
+
+  // Ses mots
+  dbLire('dadoucherie_mots','order=created_at.asc&'+filtre(annee)).then(function(rows){
+    remplir('chapMots', rows, function(r){
+      return blocTexte(r.message, null, dateFr(r.created_at));
+    });
+  });
+
+  // Lettre infinie (intégrale, pas seulement l'année : c'est un livre en cours)
+  dbLire('lettre_infinie','order=created_at.asc').then(function(rows){
+    var z=document.querySelector('#chapInfinie .zone');
+    z.innerHTML='';
+    if(!rows||!rows.length){ z.innerHTML='<p class="vide">La première phrase attend encore.</p>'; return; }
+    var d=document.createElement('div'); d.className='bloc infinie';
+    rows.forEach(function(r){
+      var s=document.createElement('span');
+      s.textContent=r.texte+' ';
+      if(r.auteur==='elle') s.className='elle';
+      d.appendChild(s);
+    });
+    z.appendChild(d);
+  });
+
+  // Questions du dimanche : groupées par semaine
+  dbLire('qds','order=created_at.asc&'+filtre(annee)).then(function(rows){
+    var z=document.querySelector('#chapQds .zone');
+    z.innerHTML='';
+    if(!rows||!rows.length){ z.innerHTML='<p class="vide">Rien cette année-là dans ce chapitre. Les pages blanches comptent aussi.</p>'; return; }
+    var semaines={};
+    rows.forEach(function(r){ (semaines[r.semaine]=semaines[r.semaine]||[]).push(r); });
+    Object.keys(semaines).sort().forEach(function(s){
+      var d=document.createElement('div'); d.className='bloc';
+      var q=document.createElement('div'); q.className='qui'; q.textContent='Semaine '+s.split('S')[1];
+      d.appendChild(q);
+      semaines[s].forEach(function(r){
+        var t=document.createElement('div'); t.className='texte';
+        t.textContent=(r.auteur==='elle'?'Elle : ':'Mathieu : ')+r.texte;
+        t.style.marginBottom='8px';
+        d.appendChild(t);
+      });
+      z.appendChild(d);
+    });
+  });
+
+  // Sa version des souvenirs
+  var nomsEtapes={snap:'L\'ajout Snap', lyon:'Lyon, 1er janvier 2020', nuit:'La nuit du 15 juillet', voyages:'Nos voyages'};
+  dbLire('histoire_versions','order=created_at.asc&'+filtre(annee)).then(function(rows){
+    remplir('chapVersions', rows, function(r){
+      return blocTexte(r.texte, nomsEtapes[r.etape]||r.etape, dateFr(r.created_at));
+    });
+  });
+
+  // Lettres ouvertes cette année-là
+  dbLire('lettres','order=date_ouverture.asc&date_ouverture=gte.'+annee+'-01-01&date_ouverture=lte.'+annee+'-12-31').then(function(rows){
+    rows=(rows||[]).filter(function(l){ return new Date(l.date_ouverture+'T00:00:00')<=new Date(); });
+    remplir('chapLettres', rows, function(l){
+      return blocTexte(l.texte, l.titre, 'ouverte le '+dateFr(l.date_ouverture+'T00:00:00'));
+    });
+  });
+
+  // Chiffres de couverture
+  Promise.all([
+    dbLire('dadoucherie_journal','select=type&'+filtre(annee)),
+    dbLire('dadoucherie_mots','select=id&'+filtre(annee)),
+    dbLire('lettre_infinie','select=id')
+  ]).then(function(r){
+    var j=r[0]||[];
+    var compte={visite:0,coeur:0,billets:0};
+    j.forEach(function(x){ if(compte[x.type]!==undefined) compte[x.type]++; });
+    var data=[
+      {n:compte.visite,l:'visites de sa page'},
+      {n:compte.coeur,l:'appuis sur le cœur'},
+      {n:(r[1]||[]).length,l:'mots d\'elle'},
+      {n:(r[2]||[]).length,l:'phrases du livre à deux'}
+    ];
+    var z=document.getElementById('chiffres');
+    data.forEach(function(x){
+      var d=document.createElement('div'); d.className='chiffre';
+      d.innerHTML='<div class="n">'+x.n+'</div><div class="l">'+x.l+'</div>';
+      z.appendChild(d);
+    });
+  });
+})();
+</script>
+</body>
+</html>

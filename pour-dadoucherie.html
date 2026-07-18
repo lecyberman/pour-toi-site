@@ -956,6 +956,40 @@
     a.hidden = false;
   });
 
+  // Les saisons : le décor suit le calendrier tout seul
+  (function(){
+    var mois = new Date().getMonth();
+    if(mois === 11 || mois === 0){ // décembre-janvier : la neige
+      decors[periode].tombe = decors[periode].tombe.concat(['❄️','❄️','⛄']);
+      if(mois === 11){
+        var p = document.createElement('p');
+        p.className = 'soft';
+        p.textContent = "C'est décembre : la page a sorti les décorations toute seule. Les guirlandes sont invisibles mais je te jure qu'elles y sont.";
+        document.getElementById('greetBody').appendChild(p);
+      }
+    } else if(mois >= 2 && mois <= 4){ // printemps : explosion florale
+      decors[periode].tombe = decors[periode].tombe.concat(['🌷','🌼','🌺']);
+    } else if(mois === 9 || mois === 10){ // automne : feuilles
+      decors[periode].tombe = decors[periode].tombe.concat(['🍂','🍁']);
+    }
+  })();
+
+  // La page remarque son absence, sans jamais culpabiliser
+  try{
+    var cle = 'dadou_derniere_visite';
+    var derniereVisite = parseInt(localStorage.getItem(cle) || '0', 10);
+    if(derniereVisite){
+      var joursAbsente = Math.floor((Date.now() - derniereVisite) / 86400000);
+      if(joursAbsente >= 7){
+        var pa = document.createElement('p');
+        pa.className = 'soft';
+        pa.textContent = joursAbsente + " jours sans toi ici. Tout allait bien ? Moi je t'attendais, tranquillement, comme les étoiles. Elles ne s'impatientent jamais, elles brillent, c'est tout.";
+        document.getElementById('greetBody').appendChild(pa);
+      }
+    }
+    localStorage.setItem(cle, String(Date.now()));
+  }catch(e){}
+
   // Météo vivante : la page regarde le vrai ciel au-dessus d'elle (Open-Meteo, sans clé)
   (function(){
     function appliquerMeteo(code){
