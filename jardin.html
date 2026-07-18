@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Le jardin de nous</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{ --display:'Fraunces', Georgia, serif; --body:'Nunito Sans', system-ui, sans-serif; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);background:#EAF0E2;color:#3E4636;overflow-x:hidden;}
+  #scene{position:relative;width:100vw;height:100dvh;}
+  #jardin{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  .titre{
+    position:absolute;top:9vh;left:0;right:0;text-align:center;padding:0 22px;pointer-events:none;
+  }
+  .titre .eyebrow{font-size:.76rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#7C8B67;margin-bottom:10px;}
+  .titre h1{font-family:var(--display);font-weight:500;font-size:clamp(1.7rem,6vw,2.4rem);color:#44503A;}
+  .titre p{margin-top:10px;font-size:.98rem;color:#5E6B4F;max-width:460px;margin-left:auto;margin-right:auto;line-height:1.6;}
+  .etiquette{
+    position:absolute;z-index:5;max-width:230px;
+    background:rgba(252,251,246,.95);border:1px solid rgba(90,100,70,.2);
+    border-radius:13px;padding:11px 14px;
+    box-shadow:0 14px 30px -18px rgba(60,70,45,.5);
+    opacity:0;pointer-events:none;transition:opacity .4s ease;
+  }
+  .etiquette.visible{opacity:1;}
+  .etiquette .mois{font-family:var(--display);font-style:italic;color:#A8683F;font-size:1rem;margin-bottom:3px;}
+  .etiquette .txt{font-size:.85rem;color:#5E6B4F;line-height:1.5;}
+  .sous{
+    background:#F4F6EC;padding:44px 22px 60px;text-align:center;
+  }
+  .sous .inner{max-width:520px;margin:0 auto;}
+  .sous p{font-size:1.02rem;line-height:1.7;color:#4A5540;margin-bottom:14px;}
+  .sous .soft{font-size:.92rem;color:#7C8B67;}
+  .sous a{
+    display:inline-block;margin-top:18px;font-weight:700;font-size:.95rem;
+    color:#A8683F;text-decoration:none;border:1.5px solid rgba(168,104,63,.45);
+    border-radius:100px;padding:12px 26px;transition:background .3s,color .3s;
+  }
+  .sous a:hover{background:#A8683F;color:#FCFBF6;}
+  .indice{
+    position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+    font-size:.8rem;color:#7C8B67;pointer-events:none;
+  }
+</style>
+</head>
+<body>
+<!-- Ici, rien ne fane. C'est le principe. -->
+
+<div id="scene">
+  <canvas id="jardin"></canvas>
+  <div class="titre">
+    <div class="eyebrow">il pousse tout seul</div>
+    <h1>Le jardin de nous</h1>
+    <p>Une fleur s'ouvre ici chaque mois depuis le 1er janvier 2020, à Lyon. Personne ne les plante, personne ne peut les cueillir. Touche-les : chacune se souvient de son mois.</p>
+  </div>
+  <div class="etiquette" id="etiquette"><div class="mois"></div><div class="txt"></div></div>
+  <div class="indice">touche une fleur 🌸</div>
+</div>
+
+<div class="sous">
+  <div class="inner">
+    <p>Les fleurs dorées, tu les reconnaîtras : ce sont nos dates. Janvier 2020. Juillet 2023. Juillet 2026. Les papillons, eux, font ce qu'ils veulent, comme toi.</p>
+    <p class="soft">Reviens le mois prochain : une nouvelle fleur t'attendra. C'est mathématique, donc c'est une promesse d'ingénieur.</p>
+    <a href="/histoire">retourner à notre histoire ✨</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  var canvas = document.getElementById('jardin');
+  var ctx = canvas.getContext('2d');
+  var W,H,DPR;
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio||1,2);
+    var r = canvas.parentElement.getBoundingClientRect();
+    W=r.width; H=r.height;
+    canvas.width=W*DPR; canvas.height=H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    planterFleurs();
+  }
+  function rnd(a,b){return a+Math.random()*(b-a);}
+  // pseudo-aléatoire déterministe : le jardin est le même à chaque visite
+  function graine(n){ var x=Math.sin(n*127.1+311.7)*43758.5453; return x-Math.floor(x); }
+
+  var MOIS_FR=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  var DEBUT = new Date(2020,0,1);
+  function nbMois(){
+    var n=new Date();
+    return (n.getFullYear()-2020)*12 + n.getMonth() + 1; // janvier 2020 = 1
+  }
+  function estDoree(i){ // i = index 0-based
+    var y=2020+Math.floor(i/12), m=i%12;
+    return (m===0 && y===2020) || (m===6 && y===2023) || (m===6 && y===2026);
+  }
+
+  var PALETTE=[[233,160,180],[224,140,150],[238,190,150],[205,160,210],[240,205,120],[190,170,220],[236,150,130]];
+  var fleurs=[];
+  function planterFleurs(){
+    fleurs=[];
+    var n=nbMois();
+    var solY=H*0.9;
+    for(var i=0;i<n;i++){
+      var g1=graine(i+1), g2=graine(i*3+7), g3=graine(i*7+13);
+      var x = W*0.06 + g1*W*0.88;
+      var rangee = Math.floor(g2*3); // 3 rangées de profondeur
+      var y = solY - rangee*H*0.045 - g3*H*0.02;
+      var doree = estDoree(i);
+      fleurs.push({
+        i:i, x:x, y:y,
+        tige: H*(0.09+g2*0.075) * (doree?1.25:1),
+        taille: (9+g3*6) * (doree?1.5:1) * Math.min(1.6, W/900+0.7),
+        petales: 5+Math.floor(g1*3),
+        c: doree ? [244,196,92] : PALETTE[Math.floor(g2*PALETTE.length)],
+        coeur: doree ? [180,120,40] : [120,90,60],
+        ph: g1*6.28,
+        doree: doree,
+        naissance: i*0.05 // apparition en cascade
+      });
+    }
+  }
+
+  /* papillons */
+  var papillons=[];
+  for(var i=0;i<3;i++){
+    papillons.push({x:rnd(0.2,0.8), y:rnd(0.25,0.5), a:rnd(0,6.28), v:rnd(0.0008,0.0015),
+                    pose:0, cible:null, ph:rnd(0,6.28), teinte:i});
+  }
+
+  var t0=performance.now();
+  var chargement=0;
+
+  function dessinerFleur(f,t){
+    var pousse = reduce ? 1 : Math.min(1, Math.max(0,(chargement - f.naissance)/0.9));
+    if(pousse<=0) return;
+    var sway = reduce?0:Math.sin(t*1.1+f.ph)*0.05;
+    var hx=f.x + Math.sin(t*0.9+f.ph)*(reduce?0:2.5);
+    var tigeH=f.tige*pousse;
+    var topY=f.y-tigeH;
+    // tige
+    ctx.strokeStyle='rgba(96,120,72,.85)';
+    ctx.lineWidth=1.6;
+    ctx.beginPath();
+    ctx.moveTo(f.x,f.y);
+    ctx.quadraticCurveTo(f.x+sway*40, f.y-tigeH*0.55, hx+sway*30, topY);
+    ctx.stroke();
+    // feuille
+    ctx.fillStyle='rgba(110,140,80,.8)';
+    ctx.beginPath();
+    ctx.ellipse(f.x+4, f.y-tigeH*0.4, 6*pousse, 2.6*pousse, 0.6, 0, Math.PI*2);
+    ctx.fill();
+    // pétales
+    var cx=hx+sway*30, cy=topY;
+    var s=f.taille*pousse;
+    var rot = sway;
+    for(var p=0;p<f.petales;p++){
+      var ang = rot + p*(Math.PI*2/f.petales) + (f.doree ? t*0.15*(reduce?0:1) : 0);
+      ctx.save();
+      ctx.translate(cx,cy);
+      ctx.rotate(ang);
+      ctx.fillStyle='rgba('+f.c[0]+','+f.c[1]+','+f.c[2]+',.92)';
+      ctx.beginPath();
+      ctx.ellipse(0,-s*0.55, s*0.34, s*0.6, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+    if(f.doree){
+      var halo=ctx.createRadialGradient(cx,cy,0,cx,cy,s*1.7);
+      halo.addColorStop(0,'rgba(250,215,120,.35)');
+      halo.addColorStop(1,'rgba(250,215,120,0)');
+      ctx.fillStyle=halo;
+      ctx.beginPath(); ctx.arc(cx,cy,s*1.7,0,Math.PI*2); ctx.fill();
+    }
+    // cœur
+    ctx.fillStyle='rgba('+f.coeur[0]+','+f.coeur[1]+','+f.coeur[2]+',1)';
+    ctx.beginPath(); ctx.arc(cx,cy,s*0.24,0,Math.PI*2); ctx.fill();
+    f.cx=cx; f.cy=cy; f.s=s;
+  }
+
+  function dessinerPapillon(b,t){
+    // errance douce, parfois se pose sur une fleur
+    if(!reduce){
+      if(b.pose>0){
+        b.pose-=0.008;
+        if(b.cible){ b.x += (b.cible.cx/W - b.x)*0.08; b.y += ((b.cible.cy-8)/H - b.y)*0.08; }
+      } else {
+        if(Math.random()<0.002 && fleurs.length){
+          b.cible = fleurs[Math.floor(Math.random()*fleurs.length)];
+          b.pose = 1;
+        }
+        b.a += (graine(Math.floor(t)+b.teinte)-0.5)*0.3;
+        b.x += Math.cos(b.a)*b.v; b.y += Math.sin(b.a)*b.v*0.6;
+        if(b.x<0.05||b.x>0.95) b.a=Math.PI-b.a;
+        if(b.y<0.15||b.y>0.75) b.a=-b.a;
+      }
+    }
+    var x=b.x*W, y=b.y*H + (b.pose>0?0:Math.sin(t*3+b.ph)*4);
+    var flap = b.pose>0 ? 0.25+0.1*Math.sin(t*4) : Math.abs(Math.sin(t*10+b.ph));
+    var couleurs=[[236,150,170],[150,170,230],[240,200,110]];
+    var c=couleurs[b.teinte%3];
+    ctx.save();
+    ctx.translate(x,y);
+    for(var cote=-1;cote<=1;cote+=2){
+      ctx.save();
+      ctx.scale(cote*(0.4+0.6*flap),1);
+      ctx.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+',.85)';
+      ctx.beginPath(); ctx.ellipse(6,-3,6,4.4,-0.4,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(5,3,4.6,3.4,0.4,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+    ctx.fillStyle='rgba(70,60,55,.9)';
+    ctx.beginPath(); ctx.ellipse(0,0,1.5,5,0,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  function dessiner(now){
+    var t=(now-t0)/1000;
+    chargement = Math.min(5, t*0.9);
+    // ciel doux
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#DFECF2');
+    g.addColorStop(0.55,'#EAF0E2');
+    g.addColorStop(1,'#E2EAD4');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    // soleil discret
+    var so=ctx.createRadialGradient(W*0.82,H*0.16,0,W*0.82,H*0.16,H*0.24);
+    so.addColorStop(0,'rgba(255,244,200,.8)');
+    so.addColorStop(1,'rgba(255,244,200,0)');
+    ctx.fillStyle=so; ctx.fillRect(0,0,W,H);
+    // collines
+    ctx.fillStyle='#D3DFBC';
+    ctx.beginPath(); ctx.moveTo(0,H*0.86);
+    for(var x=0;x<=W;x+=20){ ctx.lineTo(x, H*0.86 + Math.sin(x*0.004)*H*0.02); }
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#C6D4AC';
+    ctx.beginPath(); ctx.moveTo(0,H*0.92);
+    for(var x=0;x<=W;x+=20){ ctx.lineTo(x, H*0.92 + Math.sin(x*0.006+2)*H*0.015); }
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+    // herbe fine
+    ctx.strokeStyle='rgba(110,140,80,.4)';
+    ctx.lineWidth=1;
+    for(var i=0;i<60;i++){
+      var gx=graine(i+500)*W, gy=H*0.9+graine(i+900)*H*0.06;
+      var sw=reduce?0:Math.sin(t*1.3+i)*2;
+      ctx.beginPath(); ctx.moveTo(gx,gy); ctx.quadraticCurveTo(gx+sw,gy-8,gx+sw*1.6,gy-14); ctx.stroke();
+    }
+    // fleurs (rangées du fond d'abord)
+    fleurs.slice().sort(function(a,b){return a.y-b.y;}).forEach(function(f){ dessinerFleur(f,t); });
+    // papillons
+    papillons.forEach(function(b){ dessinerPapillon(b,t); });
+    requestAnimationFrame(dessiner);
+  }
+
+  /* étiquette au toucher */
+  var etiquette=document.getElementById('etiquette');
+  var etiTimer=null;
+  function toucher(cx,cy){
+    var meilleure=null, dmin=1e9;
+    fleurs.forEach(function(f){
+      if(f.cx===undefined) return;
+      var dx=cx-f.cx, dy=cy-f.cy, d=dx*dx+dy*dy;
+      if(d<dmin){ dmin=d; meilleure=f; }
+    });
+    if(!meilleure || dmin>45*45){ etiquette.classList.remove('visible'); return; }
+    var y=2020+Math.floor(meilleure.i/12), m=meilleure.i%12;
+    var num=meilleure.i+1;
+    etiquette.querySelector('.mois').textContent = MOIS_FR[m]+' '+y;
+    var txt;
+    if(meilleure.doree && y===2020) txt='La toute première. Lyon, la première fois que je t\'ai vue. Évidemment qu\'elle est dorée.';
+    else if(meilleure.doree && y===2023) txt='Le mois de notre nuit. Celle où on s\'est tout dit jusqu\'au matin.';
+    else if(meilleure.doree && y===2026) txt='Tu sais très bien pourquoi celle-là brille. 💍';
+    else txt='Notre '+num+'e mois. Fleur n°'+num+', poussée toute seule, comme nous.';
+    etiquette.querySelector('.txt').textContent=txt;
+    etiquette.style.left=Math.min(W-250, Math.max(10, meilleure.cx-115))+'px';
+    etiquette.style.top=Math.max(10, meilleure.cy-105)+'px';
+    etiquette.classList.add('visible');
+    clearTimeout(etiTimer);
+    etiTimer=setTimeout(function(){etiquette.classList.remove('visible');},5000);
+  }
+  canvas.addEventListener('click', function(e){
+    var r=canvas.getBoundingClientRect();
+    toucher(e.clientX-r.left, e.clientY-r.top);
+  });
+
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(dessiner);
+})();
+</script>
+</body>
+</html>
