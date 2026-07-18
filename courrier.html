@@ -100,6 +100,17 @@
     </div>
 
     <div class="carte">
+      <h2>Lettres à retardement 🕰️</h2>
+      <p class="note" style="margin-bottom:10px;">Écris maintenant, elle ouvrira à la date choisie. D'ici là, elle voit une enveloppe scellée avec un compte à rebours en dodos.</p>
+      <input type="text" id="lTitre" placeholder="Titre de la lettre (ex : Pour ton 1er janvier)" />
+      <textarea id="lTexte" placeholder="La lettre elle-même. Prends ton temps, tu écris au futur…" style="min-height:110px;"></textarea>
+      <input type="text" id="lDate" placeholder="Date d'ouverture (AAAA-MM-JJ, ex : 2027-01-01)" inputmode="numeric" />
+      <button class="btn" id="lBtn">Sceller la lettre</button>
+      <p class="ok" id="lOk">Scellée. Le temps fera le reste. 🕰️</p>
+      <div id="lettresZone" style="margin-top:16px;"></div>
+    </div>
+
+    <div class="carte">
       <h2>Le tableau de bord</h2>
       <div class="stats" id="stats"></div>
     </div>
@@ -155,6 +166,7 @@
   try{ if(localStorage.getItem('courrier_ok')==='1') ouvrir(); }catch(e){}
 
   function charger(){
+    chargerLettres();
     // Ses mots + accusé de lecture
     dbLire('dadoucherie_mots','order=created_at.desc').then(function(rows){
       var z = document.getElementById('motsZone');
@@ -223,6 +235,40 @@
       if(rien) z.innerHTML = '<p class="vide">Rien encore dans la frise ni au jeu du dimanche.</p>';
     });
   }
+
+  // Lettres à retardement
+  function chargerLettres(){
+    dbLire('lettres','order=date_ouverture.asc').then(function(rows){
+      var z = document.getElementById('lettresZone');
+      z.innerHTML = '';
+      if(!rows || !rows.length) return;
+      rows.forEach(function(l){
+        var d = document.createElement('div'); d.className='mot';
+        var ouverte = new Date(l.date_ouverture + 'T00:00:00') <= new Date();
+        var etat = ouverte
+          ? (l.lue_le ? 'ouverte et lue par elle ✓' : 'déverrouillée, pas encore lue')
+          : 'scellée jusqu\'au ' + new Date(l.date_ouverture+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+        d.innerHTML = '<div class="texte" style="font-weight:700;"></div><div class="meta">' + etat + '</div>';
+        d.querySelector('.texte').textContent = (ouverte?'📬 ':'✉️ ') + l.titre;
+        z.appendChild(d);
+      });
+    });
+  }
+  document.getElementById('lBtn').addEventListener('click', function(){
+    var titre = document.getElementById('lTitre').value.trim();
+    var texte = document.getElementById('lTexte').value.trim();
+    var date  = document.getElementById('lDate').value.trim();
+    if(!titre || !texte || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+    dbInserer('lettres',{titre:titre, texte:texte, date_ouverture:date}).then(function(){
+      document.getElementById('lTitre').value='';
+      document.getElementById('lTexte').value='';
+      document.getElementById('lDate').value='';
+      var ok = document.getElementById('lOk');
+      ok.style.display='block';
+      setTimeout(function(){ok.style.display='none';},4000);
+      chargerLettres();
+    });
+  });
 
   // Mot du jour
   document.getElementById('mdjBtn').addEventListener('click', function(){

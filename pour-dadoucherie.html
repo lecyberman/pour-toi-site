@@ -390,6 +390,24 @@
     font-style:italic;margin-top:12px;text-align:left;
   }
 
+  /* --- Lettres à retardement --- */
+  .enveloppes{margin-top:18px;}
+  .env{
+    background:#F7EFF5;border:1px solid rgba(70,57,79,.1);border-radius:14px;
+    padding:14px 16px;margin-bottom:10px;
+  }
+  .env .t{font-weight:700;font-size:.98rem;}
+  .env .etat{font-size:.86rem;color:var(--encre-douce);margin-top:3px;}
+  .env button{
+    margin-top:9px;font-family:var(--body);font-weight:700;font-size:.9rem;
+    background:var(--corail);color:#fff;border:none;border-radius:100px;
+    padding:9px 18px;cursor:pointer;
+  }
+  .env .contenu{
+    margin-top:12px;font-size:1rem;white-space:pre-wrap;
+    border-top:1px dashed rgba(70,57,79,.18);padding-top:12px;
+  }
+
   /* --- Confettis (cœurs, billets) --- */
   .confetti{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden;}
   .confetti span{
@@ -449,6 +467,7 @@
     <p class="special" id="motDuJour" hidden></p>
     <div id="greetBody"></div>
     <p class="soft" id="visites" hidden></p>
+    <div class="enveloppes" id="enveloppes"></div>
     <p class="soft">Petit secret : ce site vit à la même heure que toi. Ouvre-le un matin, il sera doux et fleuri. Ouvre-le un soir, il rougit. Ouvre-le en pleine nuit, il allume les étoiles. Comme moi, en fait : je change d'humeur, mais je t'aime à toutes les heures.</p>
     <div class="actions">
       <button class="btn btn-primary" data-go="1">Je commence</button>
@@ -935,6 +954,46 @@
       a.textContent = 'Ton dernier mot est bien arrivé. Il attend Mathieu dans sa boîte 🤍';
     }
     a.hidden = false;
+  });
+
+  // Lettres à retardement : enveloppes scellées et lettres ouvertes
+  dbLireDadou('lettres','order=date_ouverture.asc').then(function(rows){
+    if(!rows || !rows.length) return;
+    var zone = document.getElementById('enveloppes');
+    rows.forEach(function(l){
+      var env = document.createElement('div');
+      env.className = 'env';
+      var ouverte = new Date(l.date_ouverture + 'T00:00:00') <= new Date();
+      if(!ouverte){
+        var dodos = Math.ceil((new Date(l.date_ouverture+'T00:00:00') - Date.now()) / 86400000);
+        env.innerHTML = '<div class="t">✉️ Une lettre scellée t\'attend</div>' +
+          '<div class="etat">Elle s\'ouvrira dans ' + dodos + ' dodo' + (dodos>1?'s':'') +
+          ', le ' + new Date(l.date_ouverture+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) +
+          '. Impossible de tricher, j\'ai vérifié.</div>';
+      } else {
+        env.innerHTML = '<div class="t">📬 « ' + l.titre.replace(/</g,'&lt;') + ' »</div>' +
+          '<div class="etat">Cette lettre vient de se déverrouiller. Elle a attendu ce jour exact pour toi.</div>';
+        var b = document.createElement('button');
+        b.textContent = 'Ouvrir la lettre';
+        b.addEventListener('click', function(){
+          b.style.display = 'none';
+          var c = document.createElement('div');
+          c.className = 'contenu';
+          c.textContent = l.texte;
+          env.appendChild(c);
+          pluie(['💌','🤍','✨'], 20, 15);
+          if(!l.lue_le){
+            fetch(DB_URL + '/rest/v1/lettres?id=eq.' + l.id, {
+              method:'PATCH',
+              headers:{'Content-Type':'application/json','apikey':DB_KEY,'Authorization':'Bearer '+DB_KEY,'Prefer':'return=minimal'},
+              body:JSON.stringify({lue_le:new Date().toISOString()})
+            }).catch(function(){});
+          }
+        });
+        env.appendChild(b);
+      }
+      zone.appendChild(env);
+    });
   });
 
   // Visite : on la note, puis on lui dit combien de fois elle est venue
