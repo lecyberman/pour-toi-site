@@ -390,6 +390,26 @@
     font-style:italic;margin-top:12px;text-align:left;
   }
 
+  /* --- Mode douceur (idée 99) --- */
+  body.douceur{--corail:#D9917F;--corail-clair:#EBBCA9;}
+  body.douceur .step{font-size:1.08em;line-height:1.75;}
+  body.douceur .ciel span{animation-duration:26s !important;}
+  body.douceur .rail{opacity:.3;}
+  .btn-douceur{
+    position:fixed;bottom:12px;left:14px;z-index:20;
+    background:var(--carte);border:1px solid rgba(70,57,79,.12);
+    border-radius:100px;padding:8px 14px;
+    font-family:var(--body);font-weight:600;font-size:.8rem;
+    color:var(--encre-douce);cursor:pointer;
+    box-shadow:0 8px 20px -12px rgba(70,57,79,.5);
+  }
+  .btn-douceur:hover{color:var(--corail);}
+  .cocon{
+    background:#FBF2F0;border-radius:14px;padding:15px 17px;
+    font-size:1rem;line-height:1.7;margin:14px 0 0;display:none;
+  }
+  body.douceur .cocon{display:block;}
+
   /* --- Lettres à retardement --- */
   .enveloppes{margin-top:18px;}
   .env{
@@ -592,6 +612,7 @@
 <p class="portes">psst… il existe d'autres portes : <a href="/histoire">notre histoire</a> · <a href="/jeux">nos jeux</a> · <a href="/nuit">notre nuit 🌌</a> · <a href="/ocean">la mer 🌊</a> · <a href="/jardin">le jardin 🌸</a> · <a href="/feu">le feu 🔥</a> · <a href="/au-cas-ou">au cas où 🕊️</a></p>
 <p class="artisan" id="artisan"></p>
 
+<button class="btn-douceur" id="btnDouceur">🕯️ j'ai besoin de douceur</button>
 <button class="piece" id="piece" aria-label="une pièce dorée">🪙</button>
 <div class="tresor-msg" id="tresorMsg"></div>
 
@@ -955,6 +976,52 @@
     }
     a.hidden = false;
   });
+
+  // Idée 99 : le mode douceur
+  (function(){
+    var btn = document.getElementById('btnDouceur');
+    var cocon = document.createElement('p');
+    cocon.className = 'cocon';
+    cocon.textContent = "D'accord. On ralentit tout. Respire un coup. Quoi qu'il se passe aujourd'hui, ça ne change rien à l'essentiel : tu es aimée, exactement comme tu es, exactement aujourd'hui. Le reste peut attendre demain. Reste ici le temps qu'il faut, la page ne bouge pas, moi non plus.";
+    document.getElementById('greetBody').appendChild(cocon);
+    btn.addEventListener('click', function(){
+      var actif = document.body.classList.toggle('douceur');
+      btn.textContent = actif ? '🕯️ douceur activée' : '🕯️ j\'ai besoin de douceur';
+      if(actif && navigator.vibrate) navigator.vibrate(15);
+      if(actif) dbInserer('dadoucherie_journal', {type:'douceur', periode:periode});
+    });
+  })();
+
+  // Idée 32 : le toast du vendredi soir
+  (function(){
+    var d = new Date();
+    if(d.getDay() !== 5 || d.getHours() < 17) return;
+    dbLireDadou('gratitudes','order=created_at.desc&limit=1').then(function(rows){
+      var p = document.createElement('p');
+      p.className = 'soft';
+      if(rows && rows.length){
+        p.textContent = "🥂 C'est vendredi soir : on trinque. Cette semaine, on lève nos verres à ceci, pioché dans notre pot de gratitude : « merci pour " + rows[0].texte + " ». Santé, nous.";
+      } else {
+        p.textContent = "🥂 C'est vendredi soir : on trinque. À nous, à cette semaine qui se termine, et au pot de gratitude qui attend son premier merci dans nos jeux.";
+      }
+      document.getElementById('greetBody').appendChild(p);
+    });
+  })();
+
+  // Idée 41 : le tap secret — cinq touches sur le titre
+  (function(){
+    var taps = [];
+    document.getElementById('greetTitle').addEventListener('click', function(){
+      var t = Date.now();
+      taps = taps.filter(function(x){ return t - x < 3000; });
+      taps.push(t);
+      if(taps.length >= 5){
+        taps = [];
+        pluie(['🤍','💗','🦋','✨','🌸','🪙','💌'], 60, 18);
+        if(navigator.vibrate) navigator.vibrate([20,40,20]);
+      }
+    });
+  })();
 
   // Idée 4 : les mois-anniversaires (le 1er et le 15 de chaque mois)
   (function(){

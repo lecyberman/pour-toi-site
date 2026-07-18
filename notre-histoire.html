@@ -194,6 +194,13 @@
 
   </div>
 
+  <div class="chap" style="margin-top:34px;">
+    <p class="quand">collection en cours</p>
+    <h2>Les premiers de chaque chose</h2>
+    <p class="soft">Les « premières fois » sont l'ADN d'un couple. On les collectionne ici, et la liste n'est jamais finie : ajoute les tiens.</p>
+    <div id="premiersZone" style="margin-top:14px;"></div>
+  </div>
+
   <p class="liens">d'autres portes : <a href="/dadoucherie">pour toi</a> · <a href="/jeux">nos jeux</a></p>
   <p class="artisan" id="artisan"></p>
 </div>
@@ -260,6 +267,42 @@
       }
     });
   });
+
+  // Les premiers de chaque chose (idée 28)
+  function chargerPremiers(){
+    var z = document.getElementById('premiersZone');
+    dbLire('premiers','order=created_at.asc').then(function(rows){
+      z.innerHTML = '';
+      (rows||[]).forEach(function(p){
+        var d = document.createElement('div');
+        d.style.cssText = 'background:#FBF2F0;border-radius:13px;padding:13px 16px;margin-bottom:10px;';
+        var t = document.createElement('div');
+        t.style.cssText = 'font-family:var(--display);font-style:italic;color:var(--corail);font-size:1.02rem;margin-bottom:3px;';
+        t.textContent = '✦ ' + p.titre;
+        var h = document.createElement('div');
+        h.style.fontSize = '.95rem';
+        h.textContent = p.histoire || '';
+        d.appendChild(t); d.appendChild(h);
+        z.appendChild(d);
+      });
+      var it = document.createElement('input');
+      it.type='text'; it.placeholder='Un premier à ajouter (ex : Premier fou rire)';
+      it.style.cssText='width:100%;border:1px solid rgba(70,57,79,.16);border-radius:12px;padding:12px 14px;font-family:var(--body);font-size:.96rem;margin-bottom:8px;background:#fff;';
+      var ta = document.createElement('textarea');
+      ta.placeholder='Raconte-le en deux phrases…';
+      ta.style.cssText='width:100%;border:1px solid rgba(70,57,79,.16);border-radius:12px;padding:12px 14px;font-family:var(--body);font-size:.96rem;resize:vertical;min-height:60px;margin-bottom:8px;background:#fff;line-height:1.5;';
+      var b = document.createElement('button');
+      b.className='btn'; b.textContent='Ajouter à la collection';
+      b.addEventListener('click', function(){
+        var titre=it.value.trim();
+        if(!titre) return;
+        b.disabled=true;
+        dbInserer('premiers',{titre:titre, histoire:ta.value.trim()||null, auteur:'elle'}).then(chargerPremiers);
+      });
+      z.appendChild(it); z.appendChild(ta); z.appendChild(b);
+    });
+  }
+  chargerPremiers();
 
   // Pièce d'or (2/3)
   var piece = document.getElementById('piece');

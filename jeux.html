@@ -150,6 +150,23 @@
     <div id="liZone"></div>
   </div>
 
+  <!-- LE DICTIONNAIRE DE NOUS -->
+  <div class="carte">
+    <h2>Le dictionnaire de nous 📖</h2>
+    <p class="desc">Notre langue privée, mot par mot. Chaque couple a la sienne : la nôtre mérite un dictionnaire officiel.</p>
+    <div id="dicoZone"></div>
+  </div>
+
+  <!-- L'ARBITRE DU SOIR -->
+  <div class="carte">
+    <h2>L'arbitre du soir ⚖️</h2>
+    <p class="desc">Qui choisit le film ? Le resto ? Le drama ? L'arbitre tranche, et il a de la mémoire : il rééquilibre tout seul.</p>
+    <input type="text" id="arbSujet" placeholder="On décide quoi ? (ex : le film de ce soir)" style="width:100%;border:1px solid rgba(70,57,79,.16);border-radius:13px;padding:12px 14px;font-family:inherit;font-size:.98rem;margin-bottom:10px;" />
+    <button class="btn" id="arbBtn">Tranche pour nous</button>
+    <p id="arbVerdict" style="font-family:var(--display);font-size:1.15rem;color:var(--corail);margin-top:12px;display:none;"></p>
+    <p class="desc" id="arbStats" style="margin-top:8px;"></p>
+  </div>
+
   <!-- LE POT DE GRATITUDE -->
   <div class="carte">
     <h2>Le pot de gratitude 🫙</h2>
@@ -397,6 +414,69 @@
     });
   }
   chargerQds();
+
+  /* ============ LE DICTIONNAIRE DE NOUS ============ */
+  function chargerDico(){
+    var z = document.getElementById('dicoZone');
+    dbLire('dico','order=created_at.asc').then(function(rows){
+      z.innerHTML = '';
+      (rows||[]).forEach(function(m){
+        var d = document.createElement('div');
+        d.className = 'qds-reponse';
+        d.innerHTML = '<div class="a"></div><div></div>';
+        d.querySelector('.a').textContent = m.mot;
+        d.children[1].textContent = m.definition;
+        z.appendChild(d);
+      });
+      var im = document.createElement('input');
+      im.type='text'; im.placeholder='Le mot ou l\'expression';
+      im.style.cssText='width:100%;border:1px solid rgba(70,57,79,.16);border-radius:13px;padding:12px 14px;font-family:inherit;font-size:.98rem;margin-bottom:8px;';
+      var ta = document.createElement('textarea');
+      ta.placeholder = 'Sa définition officielle…';
+      ta.style.minHeight='52px';
+      var b = document.createElement('button');
+      b.className='btn'; b.textContent='Ajouter au dictionnaire';
+      b.addEventListener('click', function(){
+        var mot=im.value.trim(), def=ta.value.trim();
+        if(!mot||!def) return;
+        b.disabled=true;
+        dbInserer('dico',{mot:mot, definition:def, auteur:joueur}).then(chargerDico);
+      });
+      z.appendChild(im); z.appendChild(ta); z.appendChild(b);
+    });
+  }
+  chargerDico();
+
+  /* ============ L'ARBITRE DU SOIR ============ */
+  function statsArbitre(){
+    dbLire('arbitre','select=choix').then(function(rows){
+      rows = rows||[];
+      var e=0,m=0;
+      rows.forEach(function(r){ if(r.choix==='elle') e++; else m++; });
+      if(rows.length){
+        document.getElementById('arbStats').textContent = 'Historique : elle a décidé '+e+' fois, Mathieu '+m+' fois. L\'arbitre veille à l\'équilibre.';
+      }
+    });
+  }
+  statsArbitre();
+  document.getElementById('arbBtn').addEventListener('click', function(){
+    var sujet = document.getElementById('arbSujet').value.trim() || 'la décision du soir';
+    dbLire('arbitre','select=choix&order=created_at.desc&limit=6').then(function(rows){
+      rows = rows||[];
+      var e=0,m=0;
+      rows.forEach(function(r){ if(r.choix==='elle') e++; else m++; });
+      // rééquilibrage doux : plus tu as décidé récemment, moins tu as de chances
+      var pElle = 0.5 + (m-e)*0.12;
+      pElle = Math.max(0.12, Math.min(0.88, pElle));
+      var gagnant = Math.random() < pElle ? 'elle' : 'mathieu';
+      dbInserer('arbitre',{choix:gagnant, sujet:sujet});
+      var v = document.getElementById('arbVerdict');
+      v.textContent = '⚖️ Verdict pour « '+sujet+'» : c\'est ' + (gagnant==='elle'?'ELLE':'MATHIEU') + ' qui décide. Sans appel. Le perdant a droit à un câlin de consolation.';
+      v.style.display='block';
+      pluie(['⚖️','✨'],10,14);
+      setTimeout(statsArbitre, 400);
+    });
+  });
 
   /* ============ LE POT DE GRATITUDE ============ */
   function chargerGratitudes(){
