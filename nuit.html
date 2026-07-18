@@ -396,12 +396,15 @@
   window.addEventListener('click', function(e){ toucherCiel(e.clientX, e.clientY); });
 
   /* ---------- Apparition des textes ---------- */
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(en){
-      if(en.isIntersecting) en.target.classList.add('vu');
+  function verifierMoments(){
+    document.querySelectorAll('.moment').forEach(function(m){
+      var r = m.getBoundingClientRect();
+      if(r.top < H*0.8 && r.bottom > H*0.2) m.classList.add('vu');
     });
-  }, {threshold:0.35});
-  document.querySelectorAll('.moment').forEach(function(m){ io.observe(m); });
+  }
+  window.addEventListener('scroll', verifierMoments, {passive:true});
+  setInterval(verifierMoments, 700);
+  verifierMoments();
 
   // l'indice disparaît dès qu'on descend
   window.addEventListener('scroll', function(){
