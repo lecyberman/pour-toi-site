@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Notre histoire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brume:#EFE9F3; --brume-2:#F7ECE8; --carte:#FCF8FA;
+    --encre:#46394F; --encre-douce:#7A6E82;
+    --corail:#E1806F; --corail-clair:#F0AFA1; --miel:#E4B266;
+    --display:'Fraunces', Georgia, serif;
+    --body:'Nunito Sans', system-ui, sans-serif;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--body); color:var(--encre);
+    background:
+      radial-gradient(120% 90% at 15% 0%, var(--brume-2) 0%, transparent 55%),
+      radial-gradient(120% 90% at 90% 100%, #EFE7F0 0%, transparent 50%),
+      var(--brume);
+    min-height:100dvh; padding:30px 18px 60px;
+    line-height:1.65; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  .page{max-width:640px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{font-weight:700;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--corail);margin:0 0 10px;text-align:center;}
+  h1{font-family:var(--display);font-weight:500;font-size:clamp(1.9rem,7vw,2.6rem);text-align:center;margin:0 0 8px;letter-spacing:-.01em;}
+  .sous{text-align:center;color:var(--encre-douce);font-size:1rem;margin:0 0 30px;}
+
+  /* Compteurs */
+  .compteurs{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:0 0 40px;}
+  .cpt{
+    background:var(--carte);border:1px solid rgba(70,57,79,.08);border-radius:18px;
+    padding:16px 22px;text-align:center;min-width:140px;
+    box-shadow:0 14px 34px -24px rgba(70,57,79,.5);
+  }
+  .cpt .n{font-family:var(--display);font-size:1.9rem;color:var(--corail);font-weight:600;line-height:1.1;}
+  .cpt .l{font-size:.8rem;color:var(--encre-douce);margin-top:4px;}
+
+  /* Frise */
+  .frise{position:relative;padding-left:26px;}
+  .frise:before{content:"";position:absolute;left:8px;top:10px;bottom:10px;width:2px;background:var(--corail-clair);border-radius:2px;}
+  .chap{
+    position:relative;background:var(--carte);
+    border:1px solid rgba(70,57,79,.07);border-radius:20px;
+    padding:24px 24px 20px;margin:0 0 26px;
+    box-shadow:0 18px 46px -32px rgba(70,57,79,.55);
+  }
+  .chap:before{
+    content:"";position:absolute;left:-24px;top:28px;width:14px;height:14px;border-radius:50%;
+    background:var(--corail);border:3px solid var(--brume);
+  }
+  .chap .quand{font-family:var(--display);font-style:italic;color:var(--corail);font-size:1.05rem;margin:0 0 8px;}
+  .chap h2{font-family:var(--display);font-weight:500;font-size:1.45rem;margin:0 0 12px;line-height:1.2;}
+  .chap p{margin:0 0 13px;font-size:1.02rem;}
+  .chap p:last-child{margin-bottom:0;}
+  .soft{color:var(--encre-douce);font-size:.94rem;}
+  .chanson{
+    display:inline-block;background:#F4ECF2;border-radius:100px;padding:6px 14px;
+    font-size:.86rem;color:var(--encre-douce);margin-top:4px;
+  }
+
+  /* Sa version */
+  .saversion{margin-top:16px;border-top:1px dashed rgba(70,57,79,.15);padding-top:14px;}
+  .saversion .titre{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--corail);margin-bottom:8px;}
+  .saversion textarea{
+    width:100%;border:1px solid rgba(70,57,79,.16);border-radius:12px;
+    padding:12px 14px;font-family:var(--body);font-size:.98rem;color:var(--encre);
+    background:#fff;resize:vertical;min-height:70px;margin-bottom:8px;line-height:1.5;
+  }
+  .saversion textarea:focus{outline:3px solid var(--miel);outline-offset:1px;}
+  .saversion .elle{
+    background:#FBF2F0;border-radius:12px;padding:12px 14px;font-size:.98rem;
+    font-style:italic;color:var(--encre);
+  }
+  .btn{
+    font-family:var(--body);font-weight:700;font-size:.95rem;border:none;border-radius:100px;
+    padding:11px 20px;cursor:pointer;background:var(--corail);color:#fff;
+    box-shadow:0 10px 22px -12px rgba(225,128,111,.8);
+    transition:transform .18s var(--ease);
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:focus-visible{outline:3px solid var(--miel);outline-offset:3px;}
+
+  /* Pièce d'or */
+  .piece{
+    position:fixed;bottom:14px;left:14px;font-size:20px;opacity:.28;cursor:pointer;
+    z-index:10;transition:opacity .3s, transform .3s;user-select:none;background:none;border:none;padding:4px;
+  }
+  .piece:hover{opacity:.9;transform:scale(1.2) rotate(12deg);}
+  .tresor-msg{
+    position:fixed;bottom:52px;left:14px;right:14px;max-width:340px;z-index:11;
+    background:linear-gradient(135deg,#FBF3DF,#F6E7C4);border:1px solid rgba(180,140,60,.3);
+    border-radius:14px;padding:13px 16px;font-size:.93rem;color:#6B5320;
+    box-shadow:0 14px 30px -18px rgba(107,83,32,.5);display:none;
+  }
+
+  .liens{margin-top:44px;text-align:center;font-size:.92rem;color:var(--encre-douce);}
+  .liens a{color:var(--corail);text-decoration:none;font-weight:600;}
+  .artisan{text-align:center;font-size:.8rem;color:var(--encre-douce);opacity:.75;margin-top:26px;font-style:italic;}
+
+  .ciel{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden;}
+  .ciel span{position:absolute;top:-6vh;animation:derive linear forwards;}
+  @keyframes derive{
+    0%{transform:translateY(0) translateX(0) rotate(0);}
+    50%{transform:translateY(58vh) translateX(-3vw) rotate(-8deg);}
+    100%{transform:translateY(115vh) translateX(2vw) rotate(8deg);}
+  }
+  @media (prefers-reduced-motion:reduce){ .ciel{display:none;} *{animation:none !important;} }
+</style>
+</head>
+<body>
+<!-- si tu lis ce code source : oui, même ici je t'aime. -->
+<div class="ciel" id="ciel" aria-hidden="true"></div>
+
+<div class="page">
+  <p class="eyebrow">chapitre par chapitre</p>
+  <h1>Notre histoire</h1>
+  <p class="sous">Elle continue de s'écrire pendant que tu lis.</p>
+
+  <div class="compteurs">
+    <div class="cpt"><div class="n" id="cLyon">…</div><div class="l">jours depuis Lyon</div></div>
+    <div class="cpt"><div class="n" id="cNuit">…</div><div class="l">jours depuis notre nuit</div></div>
+    <div class="cpt"><div class="n">∞</div><div class="l">jours devant nous</div></div>
+  </div>
+
+  <div class="frise">
+
+    <div class="chap" data-etape="snap">
+      <p class="quand">il y a 7 ans</p>
+      <h2>Un ajout sur Snap</h2>
+      <p>Tout commence par une notification. Une parmi des centaines ce jour-là, sauf que celle-là allait changer toute la suite. On s'est mis à se parler, puis à se parler tous les jours, puis à ne plus savoir s'arrêter. Les messages disparaissaient en dix secondes ; toi, tu es restée.</p>
+      <p class="soft">Le meilleur ajout de ma vie, et j'ai pourtant ajouté beaucoup de monde.</p>
+      <div class="saversion" data-etape="snap">
+        <div class="titre">Ta version à toi</div>
+        <div class="zone"></div>
+      </div>
+    </div>
+
+    <div class="chap" data-etape="lyon">
+      <p class="quand">1er janvier 2020 · Lyon</p>
+      <h2>La première fois en vrai</h2>
+      <p>Premier jour de l'année, première fois de nous. Le monde entier prenait des résolutions qu'il allait abandonner en février ; moi j'en ai pris une seule en te voyant arriver, et je la tiens encore. Il n'y a pas eu d'effet spécial, pas de musique de film. Juste une certitude, arrivée sans prévenir : c'était toi.</p>
+      <span class="chanson">🎵 notre chanson de cette époque : à toi de me la rappeler</span>
+      <div class="saversion" data-etape="lyon">
+        <div class="titre">Ta version à toi</div>
+        <div class="zone"></div>
+      </div>
+    </div>
+
+    <div class="chap" data-etape="nuit">
+      <p class="quand">15 juillet 2023</p>
+      <h2>La nuit où on s'est tout dit</h2>
+      <p>La deuxième fois qu'on se voyait. On a parlé. De nos sentiments, de nos peurs, de nos envies, de tout ce qu'on gardait depuis des années. Le soleil s'est levé et on parlait encore. Certaines nuits font plus avancer une vie que des années entières : celle-là est la nôtre.</p>
+      <p class="soft">C'est cette nuit-là que « toi et moi » est devenu « nous ».</p>
+      <div class="saversion" data-etape="nuit">
+        <div class="titre">Ta version à toi</div>
+        <div class="zone"></div>
+      </div>
+    </div>
+
+    <div class="chap" data-etape="voyages">
+      <p class="quand">Monaco · Malte · Barcelone</p>
+      <h2>Nos échappées</h2>
+      <p>Trois villes, trois ambiances, une constante : toi en face de moi. Monaco et ses billets qui t'ont fait rêver tout haut (je note tout, tu sais). Malte et sa lumière. Barcelone et ses soirées qui ne voulaient pas finir. On a ramené mille souvenirs et zéro regret.</p>
+      <p class="soft">La liste des prochaines villes est ouverte. Elle est même déjà commencée.</p>
+      <div class="saversion" data-etape="voyages">
+        <div class="titre">Ton souvenir préféré de voyage</div>
+        <div class="zone"></div>
+      </div>
+    </div>
+
+    <div class="chap" data-etape="demande">
+      <p class="quand">juillet 2026</p>
+      <h2>Le plus beau chapitre</h2>
+      <p>Je n'en dis pas plus ici. Tu sais. Nous savons.</p>
+      <p class="soft">💍</p>
+    </div>
+
+    <div class="chap" data-etape="aujourdhui">
+      <p class="quand">aujourd'hui</p>
+      <h2>Et ça continue</h2>
+      <p>Cette page s'allongera avec nous. De nouveaux chapitres viendront s'écrire ici, les uns après les autres, et un jour on relira tout ça ensemble en se disant qu'on ne savait encore rien de la suite. J'ai hâte d'avoir la suite.</p>
+    </div>
+
+  </div>
+
+  <p class="liens">d'autres portes : <a href="/dadoucherie">pour toi</a> · <a href="/jeux">nos jeux</a></p>
+  <p class="artisan" id="artisan"></p>
+</div>
+
+<button class="piece" id="piece" aria-label="une pièce dorée">🪙</button>
+<div class="tresor-msg" id="tresorMsg"></div>
+
+<script>
+(function(){
+  var DB_URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var DB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  function hdrs(extra){
+    var h = {'apikey':DB_KEY,'Authorization':'Bearer '+DB_KEY,'Content-Type':'application/json'};
+    for(var k in (extra||{})) h[k]=extra[k];
+    return h;
+  }
+  function dbLire(table, filtre){
+    return fetch(DB_URL+'/rest/v1/'+table+'?'+(filtre||''), {headers:hdrs()})
+      .then(function(r){return r.json();}).catch(function(){return [];});
+  }
+  function dbInserer(table, data){
+    return fetch(DB_URL+'/rest/v1/'+table, {method:'POST',headers:hdrs({'Prefer':'return=minimal'}),body:JSON.stringify(data)}).catch(function(){});
+  }
+
+  // Compteurs
+  var j = 86400000;
+  document.getElementById('cLyon').textContent = Math.floor((Date.now()-new Date(2020,0,1).getTime())/j);
+  document.getElementById('cNuit').textContent = Math.floor((Date.now()-new Date(2023,6,15).getTime())/j);
+
+  // Sa version des souvenirs
+  document.querySelectorAll('.saversion').forEach(function(sv){
+    var etape = sv.dataset.etape;
+    var zone = sv.querySelector('.zone');
+    dbLire('histoire_versions','etape=eq.'+etape+'&order=created_at.desc&limit=1').then(function(rows){
+      if(rows && rows.length){
+        var d = document.createElement('div');
+        d.className='elle';
+        d.textContent = '« ' + rows[0].texte + ' »';
+        zone.appendChild(d);
+        var s = document.createElement('p');
+        s.className='soft'; s.style.marginTop='8px';
+        s.textContent = 'Merci de l\'avoir écrit. Je le relis, tu sais.';
+        zone.appendChild(s);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.placeholder = 'Raconte ce moment avec tes mots à toi…';
+        var b = document.createElement('button');
+        b.className='btn'; b.textContent='Je te le confie';
+        b.addEventListener('click', function(){
+          var t = ta.value.trim();
+          if(!t) return;
+          b.disabled = true; b.textContent = 'Envoi…';
+          dbInserer('histoire_versions',{etape:etape, auteur:'elle', texte:t}).then(function(){
+            zone.innerHTML='';
+            var d=document.createElement('div'); d.className='elle';
+            d.textContent='« '+t+' »';
+            zone.appendChild(d);
+            var s=document.createElement('p'); s.className='soft'; s.style.marginTop='8px';
+            s.textContent='C\'est gardé. Nos deux versions vivent ici maintenant.';
+            zone.appendChild(s);
+          });
+        });
+        zone.appendChild(ta); zone.appendChild(b);
+      }
+    });
+  });
+
+  // Pièce d'or (2/3)
+  var piece = document.getElementById('piece');
+  var msg = document.getElementById('tresorMsg');
+  piece.addEventListener('click', function(){
+    piece.style.display='none';
+    if(navigator.vibrate) navigator.vibrate(30);
+    dbInserer('tresor',{piece:'histoire'}).then(function(){
+      return dbLire('tresor','select=piece');
+    }).then(function(rows){
+      var uniques = {};
+      (rows||[]).forEach(function(r){uniques[r.piece]=1;});
+      var n = Object.keys(uniques).length;
+      if(n>=3){
+        msg.textContent = '🏆 3 pièces sur 3 ! Le trésor est complet. Va voir Mathieu et dis-lui « jackpot » : il te doit une vraie récompense. Il sait laquelle.';
+      } else {
+        msg.textContent = '🪙 Une pièce dorée ! ('+n+'/3) Il y en a d\'autres, cachées ailleurs sur le site. Ouvre l\'œil…';
+      }
+      msg.style.display='block';
+      setTimeout(function(){msg.style.display='none';}, 9000);
+    });
+  });
+
+  // Signature artisan du jour
+  var artisans = [
+    "fait main, pour toi, depuis 2020 — aujourd'hui encore.",
+    "chaque pixel de cette page a pensé à toi avant toi.",
+    "site garanti sans intelligence artificielle dans les sentiments.",
+    "construit un soir où tu me manquais.",
+    "aucune étoile n'a été maltraitée pour cette page.",
+    "relu douze fois. pensé à toi les douze fois.",
+    "version " + (new Date().getFullYear()-2019) + ".0 de nous. mises à jour illimitées."
+  ];
+  document.getElementById('artisan').textContent = artisans[new Date().getDay()];
+
+  // Pétales discrets
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(!reduce){
+    var ciel = document.getElementById('ciel');
+    var chars = ['🌸','✨','🦋'];
+    setInterval(function(){
+      if(ciel.childElementCount>12) return;
+      var s=document.createElement('span');
+      s.textContent = chars[Math.floor(Math.random()*chars.length)];
+      s.style.left = Math.random()*100+'vw';
+      s.style.fontSize = (12+Math.random()*12)+'px';
+      s.style.opacity = .5+Math.random()*.35;
+      s.style.animationDuration = (13+Math.random()*9)+'s';
+      ciel.appendChild(s);
+      s.addEventListener('animationend', function(){s.remove();});
+    }, 1800);
+  }
+
+  // L'onglet qui parle
+  var titreNormal = document.title;
+  document.addEventListener('visibilitychange', function(){
+    document.title = document.hidden ? 'reviens 🥺' : titreNormal;
+  });
+})();
+</script>
+</body>
+</html>

@@ -370,6 +370,26 @@
   }
   .signoff.show{opacity:1;}
 
+  /* --- Pièce d'or cachée + signature artisan --- */
+  .piece{
+    position:fixed;bottom:12px;right:14px;font-size:19px;opacity:.22;cursor:pointer;
+    z-index:10;transition:opacity .3s, transform .3s;user-select:none;background:none;border:none;padding:4px;
+  }
+  .piece:hover{opacity:.9;transform:scale(1.2) rotate(12deg);}
+  .tresor-msg{
+    position:fixed;bottom:52px;right:14px;left:14px;max-width:340px;margin-left:auto;z-index:11;
+    background:linear-gradient(135deg,#FBF3DF,#F6E7C4);border:1px solid rgba(180,140,60,.3);
+    border-radius:14px;padding:13px 16px;font-size:.93rem;color:#6B5320;
+    box-shadow:0 14px 30px -18px rgba(107,83,32,.5);display:none;
+  }
+  .portes{text-align:center;font-size:.9rem;color:var(--encre-douce);margin:26px 0 0;z-index:2;}
+  .portes a{color:var(--corail);text-decoration:none;font-weight:600;}
+  .artisan{text-align:center;font-size:.78rem;color:var(--encre-douce);opacity:.75;margin:10px 0 0;font-style:italic;z-index:2;}
+  .secret{
+    background:#FBF2F0;border-radius:13px;padding:13px 16px;font-size:.96rem;
+    font-style:italic;margin-top:12px;text-align:left;
+  }
+
   /* --- Confettis (cœurs, billets) --- */
   .confetti{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden;}
   .confetti span{
@@ -396,6 +416,8 @@
 </style>
 </head>
 <body>
+
+<!-- Si tu lis ce code source, c'est que tu as fait Ctrl+U par curiosité. Alors sache-le : je t'aime aussi en HTML. Signé : l'ingénieur qui t'aime. -->
 
 <!-- Pour ajouter une musique douce : dépose un fichier "musique.mp3" à côté de ce fichier. Le bouton en haut à droite la lancera. Sans fichier, le bouton reste discret et sans effet. -->
 <audio id="audio" loop preload="none">
@@ -533,6 +555,7 @@
       <button class="btn btn-primary" id="loveBtn">Appuie ici 🤍</button>
       <p class="signoff" id="signoff">Ton Mathieu</p>
       <p class="soft" id="coeurCompte" hidden></p>
+      <p class="secret" id="secret" hidden>Trois fois sur mon cœur ? Alors tu as trouvé le passage secret. Ce message n'était pas prévu pour être lu, mais puisque tu es là : parfois je te regarde quand tu ne le vois pas, et je me dis que j'ai une chance folle. Voilà. C'était le secret. Il est à toi maintenant.</p>
     </div>
     <div class="repondre" id="repondre">
       <p class="soft">Et si tu veux me répondre, c'est juste ici. Prends toute la place qu'il te faut : tu sais très bien que j'aime tes pavés autant que tu aimes les miens. Ce que tu écris arrive directement chez moi, et nulle part ailleurs.</p>
@@ -544,6 +567,12 @@
   </section>
 
 </main>
+
+<p class="portes">psst… il existe d'autres portes : <a href="/histoire">notre histoire</a> · <a href="/jeux">nos jeux</a></p>
+<p class="artisan" id="artisan"></p>
+
+<button class="piece" id="piece" aria-label="une pièce dorée">🪙</button>
+<div class="tresor-msg" id="tresorMsg"></div>
 
 <script>
 (function(){
@@ -616,6 +645,30 @@
     body.appendChild(p);
   });
 
+  // La 25e heure : visible uniquement entre minuit et minuit et quart
+  var maintenant = new Date();
+  if(maintenant.getHours() === 0 && maintenant.getMinutes() < 15){
+    var p25 = document.createElement('p');
+    p25.textContent = "Et puisque tu es là entre minuit et minuit et quart, tu as droit au message de la 25e heure, que presque personne ne verra jamais : c'est toujours à cette heure-ci que tu me manques le plus fort. Voilà. Maintenant file dormir.";
+    p25.style.fontStyle = 'italic';
+    body.appendChild(p25);
+  }
+
+  // Pensée du jour : une par jour de la semaine, pour que deux matins ne se ressemblent pas
+  var pensees = [
+    "Pensée du dimanche : les dimanches ont ton visage, je n'y peux rien.",
+    "Pensée du lundi : la semaine commence, et toi tu es déjà ma meilleure nouvelle.",
+    "Pensée du mardi : j'ai vérifié, tu me manques même le mardi. C'est dire.",
+    "Pensée du mercredi : mi-semaine. Pile le bon moment pour te dire je t'aime.",
+    "Pensée du jeudi : jeudi, presque vendredi, bientôt toi.",
+    "Pensée du vendredi : ce soir, le programme c'est nous.",
+    "Pensée du samedi : les samedis sont fabriqués pour les gens comme nous."
+  ];
+  var pj = document.createElement('p');
+  pj.className = 'soft';
+  pj.textContent = pensees[maintenant.getDay()];
+  body.appendChild(pj);
+
   /* ============ 2. LE CIEL FÉÉRIQUE ============ */
   var ciel = document.getElementById('ciel');
   var decors = {
@@ -625,7 +678,6 @@
     soir:      { tombe:['🌸','🌹','💮','✨'], vole:['🦋'], brille:['✨','💫'] },
     nuit:      { tombe:['💫','✨'], vole:['🦋'], brille:['⭐','✨','🌟'] }
   };
-
   function elemFlotte(){
     var d = decors[periode];
     var s = document.createElement('span');
@@ -668,6 +720,7 @@
   }
 
   if(!reduce){
+    // premier décor immédiat
     for(var i=0;i<6;i++){ setTimeout(elemBrille, i*300); }
     elemVole();
     setInterval(function(){
@@ -706,8 +759,23 @@
   function go(n){
     n = Math.max(0, Math.min(total-1, n));
     current = n;
+    try{ localStorage.setItem('dadou_etape', String(current)); }catch(e){}
     render();
   }
+
+  // Reprendre où elle s'était arrêtée
+  try{
+    var derniere = parseInt(localStorage.getItem('dadou_etape') || '0', 10);
+    if(derniere > 0 && derniere < total){
+      var actions0 = document.querySelector('[data-step="0"] .actions');
+      var rb = document.createElement('button');
+      rb.className = 'btn btn-ghost';
+      rb.style.color = 'var(--corail)';
+      rb.textContent = 'reprendre où tu t\'étais arrêtée 🤍';
+      rb.addEventListener('click', function(){ go(derniere); });
+      actions0.appendChild(rb);
+    }
+  }catch(e){}
 
   document.querySelectorAll('[data-go]').forEach(function(btn){
     btn.addEventListener('click', function(){ go(+btn.dataset.go); });
@@ -769,9 +837,17 @@
 
   var loveBtn = document.getElementById('loveBtn');
   var signoff = document.getElementById('signoff');
+  var clicsCoeur = [];
   loveBtn.addEventListener('click', function(){
     signoff.classList.add('show');
     pluie(['🤍','💗','🩷','✨','🦋','🌸'], 26, 16);
+    // Passage secret : trois appuis rapprochés
+    var t = Date.now();
+    clicsCoeur = clicsCoeur.filter(function(x){ return t - x < 2500; });
+    clicsCoeur.push(t);
+    if(clicsCoeur.length >= 3){
+      document.getElementById('secret').hidden = false;
+    }
   });
 
   document.getElementById('restart').addEventListener('click', function(){
@@ -876,6 +952,50 @@
       document.getElementById('motMerci').hidden = false;
       pluie(['💌','🤍','🦋','✨'], 20, 15);
     });
+  });
+
+  /* ============ 6bis. PIÈCE D'OR, SIGNATURE, ONGLET ============ */
+
+  // Pièce d'or cachée (1/3)
+  var piece = document.getElementById('piece');
+  var tresorMsg = document.getElementById('tresorMsg');
+  piece.addEventListener('click', function(){
+    piece.style.display = 'none';
+    if(navigator.vibrate) navigator.vibrate(30);
+    dbInserer('tresor', {piece:'dadoucherie'}).then(function(){
+      return fetch(DB_URL + '/rest/v1/tresor?select=piece', {headers:{'apikey':DB_KEY,'Authorization':'Bearer '+DB_KEY}})
+        .then(function(r){ return r.json(); }).catch(function(){ return []; });
+    }).then(function(rows){
+      var u = {};
+      (rows||[]).forEach(function(r){ u[r.piece] = 1; });
+      var n = Object.keys(u).length;
+      if(n >= 3){
+        tresorMsg.textContent = '🏆 3 pièces sur 3 ! Le trésor est complet. Va dire « jackpot » à Mathieu : il te doit une vraie récompense, et il sait laquelle.';
+        pluie(['🪙','💰','✨'], 28, 16);
+      } else {
+        tresorMsg.textContent = '🪙 Une pièce dorée ! (' + n + '/3) Il y en a d\'autres cachées sur le site, une par page. Ouvre l\'œil…';
+      }
+      tresorMsg.style.display = 'block';
+      setTimeout(function(){ tresorMsg.style.display = 'none'; }, 9000);
+    });
+  });
+
+  // Signature artisan du jour
+  var artisans = [
+    "fait main, pour toi, depuis 2020 — aujourd'hui encore.",
+    "chaque pixel de cette page a pensé à toi avant toi.",
+    "site garanti sans mensonge : tout est vérifié dans mon cœur.",
+    "construit un soir où tu me manquais.",
+    "aucun papillon n'a été maltraité pour cette page.",
+    "relu douze fois. pensé à toi les douze fois.",
+    "version " + (new Date().getFullYear()-2019) + ".0 de nous. mises à jour illimitées."
+  ];
+  document.getElementById('artisan').textContent = artisans[new Date().getDay()];
+
+  // L'onglet qui parle
+  var titreNormal = document.title;
+  document.addEventListener('visibilitychange', function(){
+    document.title = document.hidden ? 'reviens 🥺' : titreNormal;
   });
 
   /* ============ 7. SON (optionnel, off par défaut) ============ */

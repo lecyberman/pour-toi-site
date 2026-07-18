@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Nos jeux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brume:#EFE9F3; --brume-2:#F7ECE8; --carte:#FCF8FA;
+    --encre:#46394F; --encre-douce:#7A6E82;
+    --corail:#E1806F; --corail-clair:#F0AFA1; --miel:#E4B266;
+    --display:'Fraunces', Georgia, serif;
+    --body:'Nunito Sans', system-ui, sans-serif;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--body); color:var(--encre);
+    background:
+      radial-gradient(120% 90% at 15% 0%, var(--brume-2) 0%, transparent 55%),
+      radial-gradient(120% 90% at 90% 100%, #EFE7F0 0%, transparent 50%),
+      var(--brume);
+    min-height:100dvh; padding:30px 18px 60px;
+    line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  .page{max-width:560px;margin:0 auto;}
+  .eyebrow{font-weight:700;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--corail);margin:0 0 10px;text-align:center;}
+  h1{font-family:var(--display);font-weight:500;font-size:clamp(1.9rem,7vw,2.5rem);text-align:center;margin:0 0 8px;}
+  .sous{text-align:center;color:var(--encre-douce);margin:0 0 30px;}
+  .carte{
+    background:var(--carte);border:1px solid rgba(70,57,79,.07);border-radius:20px;
+    padding:26px 24px;margin:0 0 24px;
+    box-shadow:0 18px 46px -32px rgba(70,57,79,.55);
+  }
+  h2{font-family:var(--display);font-weight:500;font-size:1.4rem;margin:0 0 6px;}
+  .desc{color:var(--encre-douce);font-size:.95rem;margin:0 0 18px;}
+  .q{font-weight:700;font-size:1.05rem;margin:0 0 12px;}
+  .opts{display:flex;flex-direction:column;gap:9px;margin-bottom:8px;}
+  .opt{
+    text-align:left;font-family:var(--body);font-size:.98rem;color:var(--encre);
+    background:#F4EEF3;border:1px solid rgba(70,57,79,.08);border-radius:13px;
+    padding:12px 15px;cursor:pointer;transition:transform .15s var(--ease), background .2s;
+  }
+  .opt:hover{transform:translateY(-1px);background:#F0E6EF;}
+  .opt.bonne{background:#E4F0DE;border-color:#9DBE8D;}
+  .opt.mauvaise{background:#F6E2DE;border-color:#E0A79C;}
+  .commentaire{font-size:.93rem;color:var(--encre-douce);font-style:italic;margin:6px 0 0;}
+  .btn{
+    font-family:var(--body);font-weight:700;font-size:.98rem;border:none;border-radius:100px;
+    padding:13px 24px;cursor:pointer;background:var(--corail);color:#fff;
+    box-shadow:0 10px 22px -12px rgba(225,128,111,.8);transition:transform .18s var(--ease);
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:disabled{opacity:.5;cursor:default;transform:none;}
+  .btn-ligne{margin-top:14px;text-align:center;}
+  .score{
+    text-align:center;font-family:var(--display);font-size:1.5rem;color:var(--corail);margin:10px 0 6px;
+  }
+  .verdict{text-align:center;font-size:1rem;margin:0;}
+  .badge{
+    display:inline-block;background:#F4ECF2;border-radius:100px;padding:5px 13px;
+    font-size:.82rem;color:var(--encre-douce);margin:2px 3px;
+  }
+
+  /* Qui de nous deux */
+  .duel{margin-bottom:18px;}
+  .duel .choix{display:flex;gap:8px;flex-wrap:wrap;}
+  .duel .choix button{
+    flex:1;min-width:90px;font-family:var(--body);font-weight:600;font-size:.92rem;
+    background:#F4EEF3;border:1px solid rgba(70,57,79,.1);border-radius:100px;
+    padding:10px 12px;cursor:pointer;color:var(--encre);transition:background .2s;
+  }
+  .duel .choix button:hover{background:#EFE3ED;}
+  .duel .choix button.actif{background:var(--corail);color:#fff;border-color:var(--corail);}
+  .duel .resultat{font-size:.9rem;color:var(--encre-douce);margin-top:7px;font-style:italic;}
+
+  .qui-joue{display:flex;gap:8px;justify-content:center;margin-bottom:20px;}
+  .qui-joue button{
+    font-family:var(--body);font-weight:700;font-size:.92rem;border-radius:100px;
+    padding:9px 20px;cursor:pointer;border:1px solid rgba(70,57,79,.15);
+    background:#F4EEF3;color:var(--encre);
+  }
+  .qui-joue button.actif{background:var(--corail);color:#fff;border-color:var(--corail);}
+
+  .qds-etat{background:#FBF2F0;border-radius:13px;padding:13px 15px;font-size:.95rem;margin-bottom:12px;}
+  .qds-reponse{background:#F4ECF2;border-radius:13px;padding:13px 15px;margin-bottom:10px;font-size:.97rem;}
+  .qds-reponse .a{font-weight:700;color:var(--corail);font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;}
+  textarea{
+    width:100%;border:1px solid rgba(70,57,79,.16);border-radius:13px;
+    padding:12px 14px;font-family:var(--body);font-size:.98rem;color:var(--encre);
+    background:#fff;resize:vertical;min-height:80px;margin-bottom:10px;line-height:1.5;
+  }
+  textarea:focus{outline:3px solid var(--miel);outline-offset:1px;}
+
+  .piece{
+    position:fixed;top:14px;right:14px;font-size:19px;opacity:.25;cursor:pointer;
+    z-index:10;transition:opacity .3s, transform .3s;user-select:none;background:none;border:none;padding:4px;
+  }
+  .piece:hover{opacity:.9;transform:scale(1.2) rotate(-12deg);}
+  .tresor-msg{
+    position:fixed;top:52px;right:14px;left:14px;max-width:340px;margin-left:auto;z-index:11;
+    background:linear-gradient(135deg,#FBF3DF,#F6E7C4);border:1px solid rgba(180,140,60,.3);
+    border-radius:14px;padding:13px 16px;font-size:.93rem;color:#6B5320;
+    box-shadow:0 14px 30px -18px rgba(107,83,32,.5);display:none;
+  }
+  .liens{margin-top:36px;text-align:center;font-size:.92rem;color:var(--encre-douce);}
+  .liens a{color:var(--corail);text-decoration:none;font-weight:600;}
+  .artisan{text-align:center;font-size:.8rem;color:var(--encre-douce);opacity:.75;margin-top:24px;font-style:italic;}
+  .confetti{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden;}
+  .confetti span{position:absolute;top:-40px;animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(108dvh) rotate(50deg);opacity:0;}}
+  @media (prefers-reduced-motion:reduce){ *{animation:none !important;} }
+</style>
+</head>
+<body>
+<!-- tu inspectes le code ? je t'aime aussi en Ctrl+U. -->
+
+<div class="page">
+  <p class="eyebrow">rien que pour nous</p>
+  <h1>Nos jeux</h1>
+  <p class="sous">Interdits à toute personne qui n'est pas nous.</p>
+
+  <!-- LE QUIZ DE NOUS -->
+  <div class="carte" id="quizCarte">
+    <h2>Le quiz de nous</h2>
+    <p class="desc">Huit questions. Aucune triche possible : les réponses sont dans ta mémoire (et dans mon cœur).</p>
+    <div id="quizZone"></div>
+  </div>
+
+  <!-- QUI DE NOUS DEUX -->
+  <div class="carte">
+    <h2>Qui de nous deux ?</h2>
+    <p class="desc">Réponds honnêtement. On comparera. Les désaccords se règleront autour d'un dîner.</p>
+    <div class="qui-joue" id="quiJoue">
+      <button data-a="elle" class="actif">C'est elle qui joue</button>
+      <button data-a="mathieu">C'est Mathieu</button>
+    </div>
+    <div id="duelZone"></div>
+  </div>
+
+  <!-- LA QUESTION DU DIMANCHE -->
+  <div class="carte">
+    <h2>La question du dimanche</h2>
+    <p class="desc">Une question par semaine. Les réponses ne se dévoilent que quand on a répondu tous les deux.</p>
+    <p class="q" id="qdsQuestion"></p>
+    <div id="qdsZone"></div>
+  </div>
+
+  <p class="liens">d'autres portes : <a href="/dadoucherie">pour toi</a> · <a href="/histoire">notre histoire</a></p>
+  <p class="artisan" id="artisan"></p>
+</div>
+
+<button class="piece" id="piece" aria-label="une pièce dorée">🪙</button>
+<div class="tresor-msg" id="tresorMsg"></div>
+
+<script>
+(function(){
+  var DB_URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var DB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  function hdrs(extra){
+    var h = {'apikey':DB_KEY,'Authorization':'Bearer '+DB_KEY,'Content-Type':'application/json'};
+    for(var k in (extra||{})) h[k]=extra[k];
+    return h;
+  }
+  function dbLire(t,f){return fetch(DB_URL+'/rest/v1/'+t+'?'+(f||''),{headers:hdrs()}).then(function(r){return r.json();}).catch(function(){return [];});}
+  function dbInserer(t,d){return fetch(DB_URL+'/rest/v1/'+t,{method:'POST',headers:hdrs({'Prefer':'return=minimal'}),body:JSON.stringify(d)}).catch(function(){});}
+
+  function pluie(chars, n){
+    var layer=document.createElement('div');layer.className='confetti';
+    for(var i=0;i<n;i++){
+      var s=document.createElement('span');
+      s.textContent=chars[Math.floor(Math.random()*chars.length)];
+      s.style.left=Math.random()*100+'vw';
+      s.style.fontSize=(15+Math.random()*14)+'px';
+      s.style.animationDuration=(2.6+Math.random()*2.4)+'s';
+      s.style.animationDelay=(Math.random()*.6)+'s';
+      layer.appendChild(s);
+    }
+    document.body.appendChild(layer);
+    setTimeout(function(){layer.remove();},7000);
+  }
+
+  /* ============ LE QUIZ DE NOUS ============ */
+  var quiz = [
+    { q:"Où est-ce qu'on s'est parlé pour la toute première fois ?",
+      opts:["Sur Snapchat","Sur Instagram","À une soirée","Dans une autre vie"], bonne:0,
+      com:"Un ajout Snap. La meilleure décision de nos deux téléphones." },
+    { q:"Quel jour je t'ai vue pour la première fois en vrai ?",
+      opts:["Le 14 février 2020","Le 1er janvier 2020","Le 15 juillet 2020","Un mardi quelconque"], bonne:1,
+      com:"Premier jour de l'année. Meilleure résolution de ma vie." },
+    { q:"Dans quelle ville ?",
+      opts:["Paris","Barcelone","Lyon","Monaco"], bonne:2,
+      com:"Lyon. Depuis, cette ville a un statut spécial dans mon cœur." },
+    { q:"Que s'est-il passé le 15 juillet 2023 ?",
+      opts:["On a raté un avion","On a parlé toute la nuit","On a gagné au loto","Rien, journée normale"], bonne:1,
+      com:"On s'est tout dit jusqu'au lever du soleil. La plus grande nuit blanche de l'histoire." },
+    { q:"Lequel de ces endroits on n'a PAS encore visité ensemble ?",
+      opts:["Monaco","Malte","Barcelone","Tokyo"], bonne:3,
+      com:"Pas encore. Note bien le « encore »." },
+    { q:"Quand je bosse, je pense à…",
+      opts:["Mon code","Toi","Ma pause déjeuner","Rien, je suis concentré"], bonne:1,
+      com:"Bug connu depuis des années. Correctif refusé définitivement." },
+    { q:"Qu'est-ce qui fait briller tes yeux presque autant que moi ?",
+      opts:["Les fleurs","Les papillons","Les billets","Les couchers de soleil"], bonne:2,
+      com:"On se dit tout ici. Et je t'aime aussi pour ça. 💸" },
+    { q:"Combien de temps je compte te garder ?",
+      opts:["Encore quelques années","Jusqu'à la retraite","Le temps que ça dure","L'infini, et on renégociera à la fin"], bonne:3,
+      com:"Contrat signé le 1er janvier 2020. Sans clause de sortie." }
+  ];
+  var qi = 0, score = 0;
+  var quizZone = document.getElementById('quizZone');
+  function montrerQuestion(){
+    quizZone.innerHTML = '';
+    if(qi >= quiz.length){ montrerScore(); return; }
+    var item = quiz[qi];
+    var q = document.createElement('p'); q.className='q';
+    q.textContent = (qi+1) + '/' + quiz.length + ' — ' + item.q;
+    quizZone.appendChild(q);
+    var opts = document.createElement('div'); opts.className='opts';
+    item.opts.forEach(function(o, idx){
+      var b = document.createElement('button'); b.className='opt'; b.textContent=o;
+      b.addEventListener('click', function(){
+        if(quizZone.dataset.repondu) return;
+        quizZone.dataset.repondu = '1';
+        var bons = opts.children[item.bonne];
+        bons.classList.add('bonne');
+        if(idx === item.bonne){ score++; } else { b.classList.add('mauvaise'); }
+        var c = document.createElement('p'); c.className='commentaire'; c.textContent = item.com;
+        quizZone.appendChild(c);
+        var suite = document.createElement('div'); suite.className='btn-ligne';
+        var sb = document.createElement('button'); sb.className='btn';
+        sb.textContent = (qi < quiz.length-1) ? 'Question suivante' : 'Mon score';
+        sb.addEventListener('click', function(){ qi++; delete quizZone.dataset.repondu; montrerQuestion(); });
+        suite.appendChild(sb); quizZone.appendChild(suite);
+      });
+      opts.appendChild(b);
+    });
+    quizZone.appendChild(opts);
+  }
+  function montrerScore(){
+    var s = document.createElement('p'); s.className='score';
+    s.textContent = score + ' / ' + quiz.length;
+    var v = document.createElement('p'); v.className='verdict';
+    if(score === quiz.length){ v.textContent = "Perfection. Évidemment. Viens réclamer ton bisou d'excellence, il est déjà prêt."; pluie(['🤍','✨','🩷'],24); }
+    else if(score >= 6){ v.textContent = "Très fort. Les points perdus seront révisés ensemble, en tête-à-tête, conditions à définir."; }
+    else if(score >= 4){ v.textContent = "Hmm. Correct, mais je vais devoir te raconter notre histoire plus souvent. Quel dommage. Vraiment."; }
+    else { v.textContent = "Bon. On reprend tout depuis le début : il était une fois un ajout Snap…"; }
+    quizZone.appendChild(s); quizZone.appendChild(v);
+    var r = document.createElement('div'); r.className='btn-ligne';
+    var rb = document.createElement('button'); rb.className='btn'; rb.textContent='Rejouer';
+    rb.addEventListener('click', function(){ qi=0; score=0; montrerQuestion(); });
+    r.appendChild(rb); quizZone.appendChild(r);
+    dbInserer('quiz_resultats',{score:score, total:quiz.length});
+  }
+  montrerQuestion();
+
+  /* ============ QUI DE NOUS DEUX ============ */
+  var duels = [
+    { id:'tetu',    q:'Qui est le plus têtu ?' },
+    { id:'retard',  q:'Qui est le plus souvent en retard ?' },
+    { id:'dodo',    q:"Qui s'endort en premier devant un drama ?" },
+    { id:'debat',   q:'Qui gagne les débats (officiellement) ?' },
+    { id:'gourmand',q:'Qui est le plus gourmand ?' },
+    { id:'argent',  q:"Qui aime le plus l'argent ? (question piège)" }
+  ];
+  var joueur = 'elle';
+  var quiJoue = document.getElementById('quiJoue');
+  quiJoue.querySelectorAll('button').forEach(function(b){
+    b.addEventListener('click', function(){
+      quiJoue.querySelectorAll('button').forEach(function(x){x.classList.remove('actif');});
+      b.classList.add('actif');
+      joueur = b.dataset.a;
+    });
+  });
+  var duelZone = document.getElementById('duelZone');
+  duels.forEach(function(d){
+    var w = document.createElement('div'); w.className='duel';
+    var q = document.createElement('p'); q.className='q'; q.textContent = d.q;
+    var ch = document.createElement('div'); ch.className='choix';
+    var res = document.createElement('p'); res.className='resultat';
+    ['Elle','Mathieu','Les deux'].forEach(function(o){
+      var b = document.createElement('button'); b.textContent = o;
+      b.addEventListener('click', function(){
+        ch.querySelectorAll('button').forEach(function(x){x.classList.remove('actif');});
+        b.classList.add('actif');
+        dbInserer('qui_de_nous',{question_id:d.id, auteur:joueur, choix:o}).then(function(){
+          majResultat();
+        });
+      });
+      ch.appendChild(b);
+    });
+    function majResultat(){
+      dbLire('qui_de_nous','question_id=eq.'+d.id+'&order=created_at.desc').then(function(rows){
+        var dernier = {};
+        (rows||[]).forEach(function(r){ if(!dernier[r.auteur]) dernier[r.auteur]=r.choix; });
+        if(dernier.elle && dernier.mathieu){
+          if(dernier.elle === dernier.mathieu){
+            res.textContent = 'Verdict : vous dites pareil (« '+dernier.elle+' »). Rare moment d\'unanimité, à encadrer.';
+          } else {
+            res.textContent = 'Divergence détectée : elle dit « '+dernier.elle+' », Mathieu dit « '+dernier.mathieu+' ». Débat obligatoire au prochain dîner.';
+          }
+        } else if(dernier.elle || dernier.mathieu){
+          var qui = dernier.elle ? 'Elle a' : 'Mathieu a';
+          res.textContent = qui + ' répondu. On attend l\'autre pour le verdict…';
+        }
+      });
+    }
+    majResultat();
+    w.appendChild(q); w.appendChild(ch); w.appendChild(res);
+    duelZone.appendChild(w);
+  });
+
+  /* ============ LA QUESTION DU DIMANCHE ============ */
+  var qdsListe = [
+    "C'était quoi ton moment préféré de la semaine ?",
+    "Une chose que l'autre a faite cette semaine et qui t'a fait sourire ?",
+    "Si on partait demain matin, tu choisis quelle ville ?",
+    "Un truc que tu n'as jamais osé me demander ?",
+    "Qu'est-ce qui t'a manqué cette semaine ?",
+    "On gagne 10 000 € aujourd'hui : on en fait quoi ? (réponse attendue avec impatience)",
+    "Quel souvenir de nous tu rejouerais ce soir si tu pouvais ?",
+    "Une chose que tu veux qu'on fasse avant la fin de l'année ?",
+    "Qu'est-ce que je fais qui te rend fière de nous ?",
+    "Si notre histoire était un film, il s'appellerait comment ?",
+    "Le petit détail de l'autre que tu ne dis jamais à voix haute ?",
+    "De quoi tu as envie pour nous, là, maintenant ?"
+  ];
+  function numSemaine(){
+    var d = new Date();
+    var debut = new Date(d.getFullYear(),0,1);
+    var s = Math.ceil(((d - debut)/86400000 + debut.getDay()+1)/7);
+    return d.getFullYear() + '-S' + s;
+  }
+  var semaine = numSemaine();
+  var idxQ = parseInt(semaine.split('S')[1],10) % qdsListe.length;
+  document.getElementById('qdsQuestion').textContent = qdsListe[idxQ];
+  var qdsZone = document.getElementById('qdsZone');
+
+  function chargerQds(){
+    qdsZone.innerHTML = '';
+    dbLire('qds','semaine=eq.'+semaine+'&order=created_at.asc').then(function(rows){
+      var dernier = {};
+      (rows||[]).forEach(function(r){ dernier[r.auteur] = r.texte; });
+      var lesDeux = dernier.elle && dernier.mathieu;
+      if(lesDeux){
+        ['elle','mathieu'].forEach(function(a){
+          var d = document.createElement('div'); d.className='qds-reponse';
+          d.innerHTML = '<div class="a">'+(a==='elle'?'Elle':'Mathieu')+'</div>';
+          var t = document.createElement('div'); t.textContent = dernier[a];
+          d.appendChild(t); qdsZone.appendChild(d);
+        });
+        var f = document.createElement('p'); f.className='desc';
+        f.textContent = 'Les deux réponses sont là. Nouvelle question dimanche prochain.';
+        qdsZone.appendChild(f);
+        return;
+      }
+      var moi = joueur;
+      if(dernier[moi]){
+        var e = document.createElement('div'); e.className='qds-etat';
+        e.textContent = 'Ta réponse est déposée 🤍 Elle se dévoilera quand l\'autre aura répondu aussi.';
+        qdsZone.appendChild(e);
+        return;
+      }
+      if(dernier.elle || dernier.mathieu){
+        var e2 = document.createElement('div'); e2.className='qds-etat';
+        e2.textContent = (dernier.elle ? 'Elle a' : 'Mathieu a') + ' déjà répondu… sa réponse t\'attend derrière la tienne.';
+        qdsZone.appendChild(e2);
+      }
+      var ta = document.createElement('textarea');
+      ta.placeholder = 'Ta réponse, sans filtre…';
+      var b = document.createElement('button'); b.className='btn'; b.textContent='Je dépose ma réponse';
+      b.addEventListener('click', function(){
+        var t = ta.value.trim(); if(!t) return;
+        b.disabled = true;
+        dbInserer('qds',{semaine:semaine, auteur:joueur, texte:t}).then(chargerQds);
+      });
+      qdsZone.appendChild(ta); qdsZone.appendChild(b);
+    });
+  }
+  chargerQds();
+
+  /* ============ PIÈCE D'OR (3/3 possibles ici) ============ */
+  var piece = document.getElementById('piece');
+  var msg = document.getElementById('tresorMsg');
+  piece.addEventListener('click', function(){
+    piece.style.display='none';
+    if(navigator.vibrate) navigator.vibrate(30);
+    dbInserer('tresor',{piece:'jeux'}).then(function(){
+      return dbLire('tresor','select=piece');
+    }).then(function(rows){
+      var u={}; (rows||[]).forEach(function(r){u[r.piece]=1;});
+      var n = Object.keys(u).length;
+      if(n>=3){
+        msg.textContent = '🏆 3 pièces sur 3 ! Trésor complet. Va dire « jackpot » à Mathieu : il te doit une vraie récompense, et il sait très bien laquelle.';
+        pluie(['🪙','💰','✨'],28);
+      } else {
+        msg.textContent = '🪙 Une pièce dorée ! ('+n+'/3) Les autres sont cachées ailleurs… une par page, ouvre l\'œil.';
+      }
+      msg.style.display='block';
+      setTimeout(function(){msg.style.display='none';}, 9000);
+    });
+  });
+
+  /* Signature + onglet */
+  var artisans = [
+    "fait main, pour toi, depuis 2020 — aujourd'hui encore.",
+    "les jeux sont truqués : tu gagnes mon cœur à tous les coups.",
+    "site garanti sans tricheur (sauf peut-être Mathieu au quiz).",
+    "construit un soir où tu me manquais.",
+    "règle n°1 : le perdant a droit à un câlin de consolation.",
+    "relu douze fois. pensé à toi les douze fois.",
+    "version " + (new Date().getFullYear()-2019) + ".0 de nous. mises à jour illimitées."
+  ];
+  document.getElementById('artisan').textContent = artisans[new Date().getDay()];
+  var titreNormal = document.title;
+  document.addEventListener('visibilitychange', function(){
+    document.title = document.hidden ? 'reviens 🥺' : titreNormal;
+  });
+})();
+</script>
+</body>
+</html>
