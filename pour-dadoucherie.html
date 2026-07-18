@@ -589,7 +589,7 @@
 
 </main>
 
-<p class="portes">psst… il existe d'autres portes : <a href="/histoire">notre histoire</a> · <a href="/jeux">nos jeux</a> · <a href="/nuit">notre nuit 🌌</a> · <a href="/ocean">la mer 🌊</a> · <a href="/jardin">le jardin 🌸</a> · <a href="/feu">le feu 🔥</a></p>
+<p class="portes">psst… il existe d'autres portes : <a href="/histoire">notre histoire</a> · <a href="/jeux">nos jeux</a> · <a href="/nuit">notre nuit 🌌</a> · <a href="/ocean">la mer 🌊</a> · <a href="/jardin">le jardin 🌸</a> · <a href="/feu">le feu 🔥</a> · <a href="/au-cas-ou">au cas où 🕊️</a></p>
 <p class="artisan" id="artisan"></p>
 
 <button class="piece" id="piece" aria-label="une pièce dorée">🪙</button>
@@ -955,6 +955,41 @@
     }
     a.hidden = false;
   });
+
+  // Météo vivante : la page regarde le vrai ciel au-dessus d'elle (Open-Meteo, sans clé)
+  (function(){
+    function appliquerMeteo(code){
+      // codes WMO : 51-67 pluie/bruine, 71-77 & 85-86 neige, 95+ orage
+      var pluieuse = (code>=51 && code<=67) || (code>=80 && code<=82) || code>=95;
+      var neigeuse = (code>=71 && code<=77) || code===85 || code===86;
+      if(!pluieuse && !neigeuse) return;
+      var msg = document.createElement('p');
+      msg.className = 'soft';
+      if(neigeuse){
+        msg.textContent = "Au fait, il neige chez toi. J'ai vérifié, oui. Regarde par la fenêtre, puis reviens : la page neige aussi, en solidarité.";
+        decors[periode].tombe = ['❄️','❄️','✨'];
+      } else {
+        msg.textContent = "Au fait, il pleut chez toi en ce moment. J'ai vérifié, oui, la page regarde le ciel. Programme officiel : plaid, boisson chaude, et moi qui t'aime depuis ici.";
+        decors[periode].tombe = ['💧','💧','🌸'];
+      }
+      document.getElementById('greetBody').appendChild(msg);
+    }
+    function chercher(lat, lon){
+      fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=weather_code')
+        .then(function(r){ return r.json(); })
+        .then(function(d){ if(d && d.current) appliquerMeteo(d.current.weather_code); })
+        .catch(function(){});
+    }
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        function(pos){ chercher(pos.coords.latitude, pos.coords.longitude); },
+        function(){ chercher(45.75, 4.85); }, // repli : Lyon, forcément
+        {timeout:4000, maximumAge:600000}
+      );
+    } else {
+      chercher(45.75, 4.85);
+    }
+  })();
 
   // Lettres à retardement : enveloppes scellées et lettres ouvertes
   dbLireDadou('lettres','order=date_ouverture.asc').then(function(rows){

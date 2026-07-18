@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Au cas où</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brume:#EFE9F3; --brume-2:#F7ECE8; --carte:#FCF8FA;
+    --encre:#46394F; --encre-douce:#7A6E82;
+    --corail:#E1806F; --corail-clair:#F0AFA1; --miel:#E4B266;
+    --display:'Fraunces', Georgia, serif;
+    --body:'Nunito Sans', system-ui, sans-serif;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:var(--body);color:var(--encre);
+    background:
+      radial-gradient(120% 90% at 15% 0%, var(--brume-2) 0%, transparent 55%),
+      radial-gradient(120% 90% at 90% 100%, #EFE7F0 0%, transparent 50%),
+      var(--brume);
+    min-height:100dvh;padding:34px 18px 60px;line-height:1.65;
+  }
+  .page{max-width:520px;margin:0 auto;}
+  .eyebrow{font-weight:700;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--corail);margin:0 0 10px;text-align:center;}
+  h1{font-family:var(--display);font-weight:500;font-size:clamp(1.8rem,7vw,2.4rem);text-align:center;margin:0 0 10px;}
+  .sous{text-align:center;color:var(--encre-douce);font-size:.98rem;margin:0 auto 34px;max-width:440px;}
+  .env{
+    background:var(--carte);border:1px solid rgba(70,57,79,.08);border-radius:18px;
+    padding:20px 22px;margin-bottom:16px;cursor:pointer;
+    box-shadow:0 16px 40px -30px rgba(70,57,79,.6);
+    transition:transform .2s var(--ease);
+  }
+  .env:hover{transform:translateY(-2px);}
+  .env .quand{font-family:var(--display);font-style:italic;font-size:1.12rem;color:var(--corail);}
+  .env .etat{font-size:.86rem;color:var(--encre-douce);margin-top:4px;}
+  .env .contenu{
+    display:none;margin-top:16px;border-top:1px dashed rgba(70,57,79,.16);
+    padding-top:16px;font-size:1.02rem;white-space:pre-line;
+  }
+  .env.ouverte{cursor:default;}
+  .env.ouverte .contenu{display:block;animation:doux .8s ease both;}
+  @keyframes doux{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .note{text-align:center;font-size:.88rem;color:var(--encre-douce);margin-top:26px;}
+  .liens{margin-top:30px;text-align:center;font-size:.92rem;color:var(--encre-douce);}
+  .liens a{color:var(--corail);text-decoration:none;font-weight:600;}
+  .artisan{text-align:center;font-size:.8rem;color:var(--encre-douce);opacity:.75;margin-top:22px;font-style:italic;}
+</style>
+</head>
+<body>
+<!-- Ces lettres espèrent ne jamais servir. Mais elles seront toujours là. -->
+
+<div class="page">
+  <p class="eyebrow">à n'ouvrir que si besoin</p>
+  <h1>Au cas où</h1>
+  <p class="sous">Quatre enveloppes, écrites à l'avance, pour les moments où je ne suis pas là au bon moment. Tu n'es pas obligée de les ouvrir. Elles ne périment jamais. Elles se rechargent à volonté.</p>
+
+  <div class="env" data-cle="doute">
+    <div class="quand">Ouvre-moi si tu doutes de nous</div>
+    <div class="etat">enveloppe scellée · toucher pour ouvrir</div>
+    <div class="contenu">Alors, écoute-moi bien.
+
+Sept ans. On s'est trouvés sur une appli où tout disparaît, et on a construit la seule chose qui n'a pas disparu. Tu m'as dit toi-même que personne n'aurait parié sur nous, avec nos personnalités aux antipodes. C'est vrai. Et pourtant on est là, et chaque année on est plus solides que la précédente.
+
+Le doute, c'est normal. C'est même bon signe : on ne doute que de ce qui compte. Mais ne doute jamais de ceci : je te choisis. Pas par défaut, pas par habitude. Je te choisis le matin, le soir, les bons jours et les mauvais. Je t'ai choisie le 1er janvier 2020 et je n'ai jamais changé d'avis une seule seconde depuis.
+
+Maintenant respire, et viens me parler. Même à 3h du matin. Surtout à 3h du matin, c'est notre spécialité.</div>
+  </div>
+
+  <div class="env" data-cle="dispute">
+    <div class="quand">Ouvre-moi si on s'est disputés</div>
+    <div class="etat">enveloppe scellée · toucher pour ouvrir</div>
+    <div class="contenu">Bon. On s'est disputés. Je ne sais pas pourquoi, moi non plus je ne m'en souviendrai probablement plus dans un mois.
+
+Ce que je sais, c'est qu'en ce moment précis, pendant que tu lis ça, je suis probablement en train de tourner en rond en me repassant la conversation et en cherchant comment revenir vers toi sans perdre la face. Je suis prévisible, tu me connais.
+
+Alors laisse-moi te dire ce que j'ai du mal à dire au milieu d'une dispute : même fâché, je t'aime. Même quand j'ai raison (rarement, d'après toi), je préfère nous à ma raison. Une dispute, c'est nous deux contre un problème. Ce n'est jamais toi contre moi.
+
+Je viens m'excuser dans pas longtemps. Si c'est toi qui dois t'excuser, cette lettre te fournit une excellente occasion de faire le premier pas sans le dire. Je ne le saurai jamais. Enfin si, maintenant je le saurai. Viens quand même.</div>
+  </div>
+
+  <div class="env" data-cle="insomnie">
+    <div class="quand">Ouvre-moi si tu n'arrives pas à dormir</div>
+    <div class="etat">enveloppe scellée · toucher pour ouvrir</div>
+    <div class="contenu">Encore réveillée ? Évidemment. Tu n'as jamais su te coucher, c'est une de tes signatures.
+
+Alors puisque tu es là : pense à un truc doux. Pense à Malte, à la lumière sur l'eau. Pense à Barcelone, aux soirées qui ne finissaient pas. Pense au 15 juillet, à cette nuit où ne pas dormir était la meilleure décision de nos vies.
+
+Les pensées qui tournent en rond à cette heure-ci mentent presque toujours. Elles sont plus grandes la nuit et minuscules le matin. Ne les crois pas. Crois plutôt ceci : quelqu'un t'aime, là, maintenant, pendant que tu lis. Il dort peut-être, mais même endormi, il t'aime. C'est un système très bien conçu, je le sais, c'est moi l'ingénieur.
+
+Ferme le téléphone. Ferme les yeux. Je suis là demain. Comme tous les jours depuis sept ans.</div>
+  </div>
+
+  <div class="env" data-cle="manque">
+    <div class="quand">Ouvre-moi si je te manque</div>
+    <div class="etat">enveloppe scellée · toucher pour ouvrir</div>
+    <div class="contenu">Toi aussi tu me manques. Là, maintenant, à l'instant où tu lis. Ce n'est pas de la magie, c'est des statistiques : tu me manques tellement souvent que cette phrase est vraie à peu près à n'importe quel moment.
+
+Tu sais ce qui est fou ? On a passé des années à se manquer avant même de se rencontrer en vrai. On est diplômés en distance, toi et moi. Champions du monde. Et on a gagné à chaque fois : chaque manque s'est toujours terminé par des retrouvailles.
+
+Celui-là aussi se terminera comme ça.
+
+En attendant : envoie-moi un message, même juste un mot. Ou va sur la page de notre nuit et fais un vœu sur une étoile filante. Ou appuie trois fois sur le cœur de ta page, il y a un secret. Je sème des morceaux de moi partout sur ce site précisément pour les moments comme celui-là.</div>
+  </div>
+
+  <p class="note">Ces lettres ne s'usent pas. Tu peux les rouvrir dans un an, dans dix ans : elles seront toujours vraies.</p>
+  <p class="liens">retour : <a href="/dadoucherie">ta page</a> · <a href="/histoire">notre histoire</a></p>
+  <p class="artisan" id="artisan"></p>
+</div>
+
+<script>
+(function(){
+  var DB_URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var DB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  document.querySelectorAll('.env').forEach(function(env){
+    env.addEventListener('click', function(){
+      if(env.classList.contains('ouverte')) return;
+      env.classList.add('ouverte');
+      env.querySelector('.etat').textContent = 'ouverte · elle reste à toi pour toujours';
+      fetch(DB_URL + '/rest/v1/dadoucherie_journal', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':DB_KEY,'Authorization':'Bearer '+DB_KEY,'Prefer':'return=minimal'},
+        body:JSON.stringify({type:'urgence', periode:env.dataset.cle})
+      }).catch(function(){});
+    });
+  });
+  var artisans = [
+    "fait main, pour toi, depuis 2020 — aujourd'hui encore.",
+    "écrites un soir de calme, pour tes soirs de tempête.",
+    "aucune de ces lettres n'a de date de péremption.",
+    "construit un soir où tu me manquais.",
+    "relues douze fois. pensé à toi les douze fois.",
+    "le stock d'amour est illimité, on renouvelle gratuitement.",
+    "version " + (new Date().getFullYear()-2019) + ".0 de nous. mises à jour illimitées."
+  ];
+  document.getElementById('artisan').textContent = artisans[new Date().getDay()];
+})();
+</script>
+</body>
+</html>

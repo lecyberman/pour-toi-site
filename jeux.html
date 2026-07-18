@@ -143,6 +143,13 @@
     <div id="duelZone"></div>
   </div>
 
+  <!-- LA LETTRE INFINIE -->
+  <div class="carte">
+    <h2>La lettre infinie</h2>
+    <p class="desc">Une lettre qu'on écrit à deux, une phrase à la fois, chacun son tour. Dans dix ans, ce sera notre livre.</p>
+    <div id="liZone"></div>
+  </div>
+
   <!-- LA QUESTION DU DIMANCHE -->
   <div class="carte">
     <h2>La question du dimanche</h2>
@@ -383,6 +390,54 @@
     });
   }
   chargerQds();
+
+  /* ============ LA LETTRE INFINIE ============ */
+  function chargerLettreInfinie(){
+    var z = document.getElementById('liZone');
+    dbLire('lettre_infinie','order=created_at.asc').then(function(rows){
+      z.innerHTML = '';
+      if(!rows) rows = [];
+      var texteDiv = document.createElement('div');
+      texteDiv.style.cssText = 'background:#FBF6F1;border-radius:14px;padding:16px 18px;margin-bottom:12px;font-family:var(--display);font-size:1.05rem;line-height:1.8;';
+      rows.forEach(function(r){
+        var s = document.createElement('span');
+        s.textContent = r.texte + ' ';
+        s.style.color = (r.auteur === 'elle') ? '#B05A7A' : '#46394F';
+        texteDiv.appendChild(s);
+      });
+      z.appendChild(texteDiv);
+      var legende = document.createElement('p');
+      legende.className = 'desc';
+      legende.innerHTML = '<span style="color:#46394F;">■</span> Mathieu · <span style="color:#B05A7A;">■</span> elle · ' + rows.length + ' phrase' + (rows.length>1?'s':'') + ' pour l\'instant';
+      z.appendChild(legende);
+      var dernierAuteur = rows.length ? rows[rows.length-1].auteur : null;
+      if(dernierAuteur === joueur){
+        var attente = document.createElement('p');
+        attente.className = 'desc';
+        attente.textContent = 'La dernière phrase est de toi. C\'est à l\'autre d\'écrire la suite : chacun son tour, c\'est la règle.';
+        z.appendChild(attente);
+        return;
+      }
+      var ta = document.createElement('textarea');
+      ta.placeholder = 'La phrase suivante (une seule, choisis-la bien)…';
+      ta.style.minHeight = '58px';
+      var b = document.createElement('button');
+      b.className = 'btn';
+      b.textContent = 'Ajouter ma phrase';
+      b.addEventListener('click', function(){
+        var t = ta.value.trim();
+        if(!t) return;
+        b.disabled = true;
+        dbInserer('lettre_infinie',{auteur:joueur, texte:t}).then(chargerLettreInfinie);
+      });
+      z.appendChild(ta); z.appendChild(b);
+    });
+  }
+  chargerLettreInfinie();
+  // recharger quand on change de joueur
+  quiJoue.querySelectorAll('button').forEach(function(b){
+    b.addEventListener('click', function(){ setTimeout(chargerLettreInfinie, 50); });
+  });
 
   /* ============ PIÈCE D'OR (3/3 possibles ici) ============ */
   var piece = document.getElementById('piece');
