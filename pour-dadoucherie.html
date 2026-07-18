@@ -956,6 +956,38 @@
     a.hidden = false;
   });
 
+  // Idée 4 : les mois-anniversaires (le 1er et le 15 de chaque mois)
+  (function(){
+    var d = new Date();
+    var ligne = null;
+    if(d.getDate() === 1 && !(d.getMonth() === 0)){
+      var mLyon = (d.getFullYear()-2020)*12 + d.getMonth();
+      ligne = "🌙 On est le 1er : ça fait " + mLyon + " mois pile que je t'ai vue pour la première fois à Lyon. Oui, je compte. Évidemment que je compte.";
+    } else if(d.getDate() === 15 && !(d.getMonth() === 6)){
+      var mNuit = (d.getFullYear()-2023)*12 + d.getMonth() - 6;
+      if(mNuit > 0) ligne = "🌙 On est le 15 : ça fait " + mNuit + " mois pile depuis notre nuit. Je lève mon café (ou ma tisane, selon l'heure) à nous.";
+    }
+    if(ligne){
+      var p = document.createElement('p');
+      p.className = 'soft';
+      p.textContent = ligne;
+      document.getElementById('greetBody').appendChild(p);
+    }
+  })();
+
+  // Idée 22 : « emmène-moi quelque part » — une porte au hasard
+  (function(){
+    var actions0 = document.querySelector('[data-step="0"] .actions');
+    var b = document.createElement('button');
+    b.className = 'btn btn-ghost';
+    b.textContent = 'emmène-moi quelque part 🎲';
+    b.addEventListener('click', function(){
+      var portes = ['/nuit','/ocean','/jardin','/feu','/histoire','/jeux'];
+      location.href = portes[Math.floor(Math.random()*portes.length)];
+    });
+    actions0.appendChild(b);
+  })();
+
   // Les saisons : le décor suit le calendrier tout seul
   (function(){
     var mois = new Date().getMonth();
@@ -1023,6 +1055,91 @@
     } else {
       chercher(45.75, 4.85);
     }
+  })();
+
+  // Idée 58 : la chanson du moment
+  dbLireDadou('chansons','order=created_at.desc&limit=1').then(function(rows){
+    if(!rows || !rows.length) return;
+    var c = rows[0];
+    var p = document.createElement('p');
+    p.className = 'soft';
+    p.textContent = '🎵 En ce moment, cette chanson me fait penser à toi : « ' + c.titre + ' ».' + (c.note ? ' ' + c.note : '');
+    document.getElementById('greetBody').appendChild(p);
+  });
+
+  // Idée 9 : le prochain rendez-vous heureux, compté en dodos
+  dbLireDadou('compteurs','date_cible=gte.' + new Date().toISOString().slice(0,10) + '&order=date_cible.asc&limit=1').then(function(rows){
+    if(!rows || !rows.length) return;
+    var c = rows[0];
+    var dodos = Math.ceil((new Date(c.date_cible+'T00:00:00') - Date.now()) / 86400000);
+    var p = document.createElement('p');
+    p.className = 'soft';
+    p.textContent = '⏳ Prochain rendez-vous heureux : ' + c.label + ', dans ' + dodos + ' dodo' + (dodos>1?'s':'') + '.';
+    document.getElementById('greetBody').appendChild(p);
+  });
+
+  // Idée 6 : il y a un an jour pour jour (s'activera tout seul avec les années)
+  (function(){
+    var d = new Date();
+    var ilYaUnAn = (d.getFullYear()-1) + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    dbLireDadou('dadoucherie_mots','created_at=gte.' + ilYaUnAn + 'T00:00:00&created_at=lt.' + ilYaUnAn + 'T23:59:59&limit=1').then(function(rows){
+      if(!rows || !rows.length) return;
+      var extrait = rows[0].message.slice(0, 120) + (rows[0].message.length > 120 ? '…' : '');
+      var p = document.createElement('p');
+      p.className = 'soft';
+      p.textContent = '🕰️ Il y a un an jour pour jour, tu m\'écrivais ici : « ' + extrait + ' ». Le temps passe, pas nous.';
+      document.getElementById('greetBody').appendChild(p);
+    });
+  })();
+
+  // Décembre : la porte du calendrier de l'avent apparaît toute seule
+  if(new Date().getMonth() === 11){
+    var portesEl = document.querySelector('.portes');
+    if(portesEl){
+      var a = document.createElement('a');
+      a.href = '/avent';
+      a.textContent = ' · le calendrier de l\'avent 🎄';
+      portesEl.appendChild(a);
+    }
+  }
+
+  // Idée 63 : elle peut sceller une lettre à retardement pour Mathieu
+  (function(){
+    var rep = document.getElementById('repondre');
+    var lien = document.createElement('p');
+    lien.className = 'soft';
+    lien.innerHTML = 'Ou alors… <a href="#" id="capsuleLien" style="color:var(--corail);font-weight:600;">scelle une lettre à retardement pour Mathieu 🕰️</a> : il ne pourra l\'ouvrir qu\'à la date que tu choisis.';
+    rep.appendChild(lien);
+    var form = document.createElement('div');
+    form.hidden = true;
+    form.innerHTML = '<textarea id="capsuleTexte" placeholder="Ta lettre pour lui, il ne la verra pas avant la date choisie…" style="width:100%;border:1px solid rgba(70,57,79,.16);border-radius:14px;padding:14px 16px;font-family:inherit;font-size:1rem;resize:vertical;min-height:100px;margin:8px 0;line-height:1.55;"></textarea>' +
+      '<input id="capsuleDate" type="date" style="width:100%;border:1px solid rgba(70,57,79,.16);border-radius:14px;padding:12px 16px;font-family:inherit;font-size:1rem;margin-bottom:10px;" />';
+    var bt = document.createElement('button');
+    bt.className = 'btn btn-primary';
+    bt.textContent = 'Je scelle 🔒';
+    form.appendChild(bt);
+    var merci = document.createElement('p');
+    merci.className = 'soft';
+    merci.hidden = true;
+    merci.textContent = 'Scellée. Il va devenir fou d\'impatience, c\'est exactement le but. 🤍';
+    rep.appendChild(form);
+    rep.appendChild(merci);
+    document.getElementById('capsuleLien').addEventListener('click', function(e){
+      e.preventDefault();
+      form.hidden = false;
+      lien.hidden = true;
+    });
+    bt.addEventListener('click', function(){
+      var t = document.getElementById('capsuleTexte').value.trim();
+      var dte = document.getElementById('capsuleDate').value;
+      if(!t || !dte) return;
+      bt.disabled = true;
+      dbInserer('lettres_pour_mathieu', {texte:t, date_ouverture:dte}).then(function(){
+        form.hidden = true;
+        merci.hidden = false;
+        pluie(['🔒','💌','✨'], 16, 15);
+      });
+    });
   })();
 
   // Lettres à retardement : enveloppes scellées et lettres ouvertes

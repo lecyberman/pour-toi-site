@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Le calendrier de l'avent de nous</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --display:'Fraunces', Georgia, serif;
+    --body:'Nunito Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:var(--body);color:#F3EDE4;
+    background:
+      radial-gradient(120% 80% at 80% 0%, #2E3A55 0%, transparent 55%),
+      radial-gradient(100% 70% at 15% 100%, #23304A 0%, transparent 60%),
+      #1C2740;
+    min-height:100dvh;padding:34px 18px 60px;line-height:1.6;overflow-x:hidden;
+  }
+  .page{max-width:560px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{font-weight:700;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:#E8B45C;margin:0 0 10px;text-align:center;}
+  h1{font-family:var(--display);font-weight:500;font-size:clamp(1.8rem,7vw,2.4rem);text-align:center;margin:0 0 10px;}
+  .sous{text-align:center;color:#B9C2D8;font-size:.96rem;margin:0 auto 30px;max-width:430px;}
+  .grille{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .case{
+    aspect-ratio:1;border-radius:14px;border:1px solid rgba(232,180,92,.25);
+    background:rgba(255,255,255,.05);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-size:1.3rem;color:#E8B45C;cursor:pointer;
+    transition:transform .2s ease, background .2s;
+  }
+  .case:hover{transform:translateY(-2px);background:rgba(232,180,92,.14);}
+  .case.verrouillee{opacity:.35;cursor:default;}
+  .case.verrouillee:hover{transform:none;background:rgba(255,255,255,.05);}
+  .case.lue{background:rgba(232,180,92,.2);}
+  .lecture{
+    margin-top:22px;background:rgba(252,248,250,.07);
+    border:1px solid rgba(232,180,92,.3);border-radius:16px;
+    padding:20px 22px;display:none;
+  }
+  .lecture.visible{display:block;animation:doux .6s ease both;}
+  @keyframes doux{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .lecture .jour{font-family:var(--display);font-style:italic;color:#E8B45C;margin-bottom:8px;}
+  .lecture .txt{font-size:1.02rem;}
+  .hors-saison{
+    text-align:center;background:rgba(252,248,250,.07);border-radius:16px;
+    padding:34px 24px;border:1px solid rgba(232,180,92,.25);
+  }
+  .hors-saison p{margin-bottom:10px;}
+  .liens{margin-top:30px;text-align:center;font-size:.92rem;color:#B9C2D8;}
+  .liens a{color:#E8B45C;text-decoration:none;font-weight:600;}
+  .flocons{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden;}
+  .flocons span{position:absolute;top:-5vh;animation:tomber linear forwards;}
+  @keyframes tomber{
+    0%{transform:translateY(0) translateX(0);}
+    50%{transform:translateY(55vh) translateX(3vw);}
+    100%{transform:translateY(110vh) translateX(-2vw);}
+  }
+  @media (prefers-reduced-motion:reduce){ .flocons{display:none;} }
+</style>
+</head>
+<body>
+<!-- 24 petites portes. Une par jour. La patience fait partie du cadeau. -->
+
+<div class="flocons" id="flocons" aria-hidden="true"></div>
+
+<div class="page">
+  <p class="eyebrow">décembre, un jour à la fois</p>
+  <h1>Le calendrier<br>de l'avent de nous</h1>
+  <p class="sous">Une petite porte par jour, du 1er au 24 décembre. Impossible d'ouvrir en avance : la page connaît la date, et elle est intraitable.</p>
+  <div id="contenu"></div>
+  <p class="liens">retour : <a href="/dadoucherie">ta page</a></p>
+</div>
+
+<script>
+(function(){
+  var messages = [
+    "1er décembre. Le mois le plus doux commence. Mon cadeau du jour : je pense à toi depuis ce matin, et il n'est même pas encore midi.",
+    "Jour 2. Fait vérifié : tu es plus belle en décembre. C'est la lumière d'hiver, ou c'est toi. C'est toi.",
+    "Jour 3. Merci d'exister un 3 décembre. Et tous les autres jours aussi, mais aujourd'hui on est le 3.",
+    "Jour 4. Rappel : sous les pulls d'hiver, il y a toujours la même personne dont je suis tombé amoureux. Très pratique, les pulls n'y changent rien.",
+    "Jour 5. Si tu as froid aujourd'hui, considère ce message comme une écharpe. Je fais ce que je peux à distance.",
+    "Jour 6. Saint-Nicolas. Tu as été sage cette année ? Peu importe, mes cadeaux ne sont pas conditionnés. Amour inconditionnel, c'est le terme technique.",
+    "Jour 7. Une semaine de décembre déjà. Chaque jour qui passe est un jour de moins avant nos fêtes. Je compte, évidemment que je compte.",
+    "Jour 8. Aujourd'hui, mission : trouve une jolie lumière de Noël et pense à nous. C'est tout. C'est déjà beaucoup.",
+    "Jour 9. Tu sais ce qui brille plus qu'une guirlande ? Bon, tu connais la réponse. Mais je le redis : tes yeux quand tu ris.",
+    "Jour 10. Dix. Comme le nombre de fois par jour minimum où tu traverses ma tête. Estimation très basse.",
+    "Jour 11. S'il neige aujourd'hui, c'est pour toi. Si il ne neige pas, c'est que le ciel garde la surprise.",
+    "Jour 12. Mi-chemin avant le réveillon. Mon vœu de moitié de parcours : tous les décembres avec toi, pour toujours.",
+    "Jour 13. Sainte-Lucie, la fête de la lumière. Tu tombes bien, c'est exactement ton métier dans ma vie.",
+    "Jour 14. Aujourd'hui je t'autorise officiellement à écouter des chansons de Noël en boucle. Comme si tu attendais mon autorisation.",
+    "Jour 15. Le 15 ! Notre chiffre. Un 15 juillet on s'est tout dit. Ce 15 décembre, je te redis juste l'essentiel : je t'aime.",
+    "Jour 16. Le chocolat chaud, c'est meilleur à deux. Note pour bientôt. Considère ça comme une invitation officielle.",
+    "Jour 17. Plus qu'une semaine avant le réveillon. Mon cadeau est prêt. Enfin, presque. Enfin, j'y travaille. Ne lis pas cette ligne.",
+    "Jour 18. Fun fact : les couples qui s'écrivent des calendriers de l'avent sont statistiquement plus heureux. Source : moi, à l'instant.",
+    "Jour 19. Si décembre était une personne, il serait jaloux de nous. On brille plus que lui.",
+    "Jour 20. Compte à rebours final. Mon programme des fêtes tient en un mot : toi.",
+    "Jour 21. Le jour le plus court de l'année. Parfait : plus de nuit, et la nuit c'est notre spécialité depuis un certain 15 juillet.",
+    "Jour 22. Avant-avant-veille. Je m'entraîne à faire semblant d'être surpris pour mes cadeaux. Toi aussi, entraîne-toi, je te connais.",
+    "Jour 23. Demain c'est le réveillon. Merci pour cette année. Toute cette année. Chaque jour de cette année.",
+    "Jour 24. Joyeux réveillon, ma dadouchérie. De tous les cadeaux sous tous les sapins du monde, c'est encore toi que je choisis. Joyeux Noël, mon amour. 🎄"
+  ];
+
+  var contenu = document.getElementById('contenu');
+  var maintenant = new Date();
+  var mois = maintenant.getMonth();
+  var jour = maintenant.getDate();
+
+  if(mois !== 11){
+    var hs = document.createElement('div');
+    hs.className = 'hors-saison';
+    var joursAvant = Math.ceil((new Date(maintenant.getMonth() > 10 ? maintenant.getFullYear()+1 : maintenant.getFullYear(), 11, 1) - maintenant)/86400000);
+    hs.innerHTML = '<p style="font-size:2rem;">🎄</p>' +
+      '<p>Le calendrier dort encore. Il se réveillera tout seul le 1er décembre, dans ' + joursAvant + ' jours.</p>' +
+      '<p style="color:#B9C2D8;font-size:.92rem;">Reviens cet hiver. Ça fera partie du plaisir.</p>';
+    contenu.appendChild(hs);
+    return;
+  }
+
+  var grille = document.createElement('div');
+  grille.className = 'grille';
+  var lecture = document.createElement('div');
+  lecture.className = 'lecture';
+  lecture.innerHTML = '<div class="jour"></div><div class="txt"></div>';
+
+  var lues = {};
+  try{ lues = JSON.parse(localStorage.getItem('avent_lues') || '{}'); }catch(e){}
+
+  for(var i=1;i<=24;i++){
+    (function(n){
+      var c = document.createElement('div');
+      c.className = 'case' + (n > jour ? ' verrouillee' : '') + (lues[n] ? ' lue' : '');
+      c.textContent = n;
+      c.addEventListener('click', function(){
+        if(n > jour){ return; }
+        lecture.querySelector('.jour').textContent = '🎁 ' + n + ' décembre';
+        lecture.querySelector('.txt').textContent = messages[n-1];
+        lecture.classList.add('visible');
+        c.classList.add('lue');
+        lues[n] = 1;
+        try{ localStorage.setItem('avent_lues', JSON.stringify(lues)); }catch(e){}
+      });
+      grille.appendChild(c);
+    })(i);
+  }
+  contenu.appendChild(grille);
+  contenu.appendChild(lecture);
+
+  // flocons
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(!reduce){
+    var fl = document.getElementById('flocons');
+    setInterval(function(){
+      if(fl.childElementCount > 24) return;
+      var s = document.createElement('span');
+      s.textContent = '❄️';
+      s.style.left = Math.random()*100 + 'vw';
+      s.style.fontSize = (8 + Math.random()*10) + 'px';
+      s.style.opacity = .4 + Math.random()*.4;
+      s.style.animationDuration = (9 + Math.random()*8) + 's';
+      fl.appendChild(s);
+      s.addEventListener('animationend', function(){ s.remove(); });
+    }, 900);
+  }
+})();
+</script>
+</body>
+</html>

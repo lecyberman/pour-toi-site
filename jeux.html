@@ -150,6 +150,13 @@
     <div id="liZone"></div>
   </div>
 
+  <!-- LE POT DE GRATITUDE -->
+  <div class="carte">
+    <h2>Le pot de gratitude 🫙</h2>
+    <p class="desc">On y dépose des « merci pour… ». Le pot ne se vide jamais. Les jours gris, on vient piocher dedans.</p>
+    <div id="gratZone"></div>
+  </div>
+
   <!-- LA QUESTION DU DIMANCHE -->
   <div class="carte">
     <h2>La question du dimanche</h2>
@@ -390,6 +397,42 @@
     });
   }
   chargerQds();
+
+  /* ============ LE POT DE GRATITUDE ============ */
+  function chargerGratitudes(){
+    var z = document.getElementById('gratZone');
+    dbLire('gratitudes','order=created_at.desc').then(function(rows){
+      z.innerHTML = '';
+      rows = rows || [];
+      var compteur = document.createElement('p');
+      compteur.className = 'desc';
+      compteur.textContent = rows.length ? ('Le pot contient ' + rows.length + ' merci' + (rows.length>1?'s':'') + '. Il déborde ? Parfait, c\'est le but.') : 'Le pot est vide. Quelqu\'un doit commencer. Pas de pression. (Un peu de pression.)';
+      z.appendChild(compteur);
+      rows.slice(0,6).forEach(function(g){
+        var d = document.createElement('div');
+        d.className = 'qds-reponse';
+        d.innerHTML = '<div class="a">' + (g.auteur==='elle'?'Elle':'Mathieu') + '</div>';
+        var t = document.createElement('div');
+        t.textContent = 'Merci pour ' + g.texte;
+        d.appendChild(t);
+        z.appendChild(d);
+      });
+      var ta = document.createElement('textarea');
+      ta.placeholder = 'Merci pour… (complète la phrase)';
+      ta.style.minHeight = '52px';
+      var b = document.createElement('button');
+      b.className = 'btn';
+      b.textContent = 'Je le mets dans le pot';
+      b.addEventListener('click', function(){
+        var t = ta.value.trim();
+        if(!t) return;
+        b.disabled = true;
+        dbInserer('gratitudes',{auteur:joueur, texte:t}).then(chargerGratitudes);
+      });
+      z.appendChild(ta); z.appendChild(b);
+    });
+  }
+  chargerGratitudes();
 
   /* ============ LA LETTRE INFINIE ============ */
   function chargerLettreInfinie(){

@@ -121,6 +121,31 @@
     </div>
 
     <div class="carte">
+      <h2>Ses lettres scellées pour toi 🔒</h2>
+      <p class="note" style="margin-bottom:10px;">Elle peut te sceller des lettres à retardement depuis sa page. Les voici. Pas de triche possible, même pour toi.</p>
+      <div id="lpmZone"><p class="vide">Je regarde…</p></div>
+    </div>
+
+    <div class="carte">
+      <h2>La chanson du moment 🎵</h2>
+      <p class="note" style="margin-bottom:10px;">« En ce moment, cette chanson me fait penser à toi. » Elle s'affiche sur sa page. L'historique devient votre radio du passé.</p>
+      <input type="text" id="chTitre" placeholder="Titre et artiste" />
+      <input type="text" id="chNote" placeholder="Pourquoi cette chanson, en une phrase (optionnel)" />
+      <button class="btn" id="chBtn">C'est celle-là en ce moment</button>
+      <p class="ok" id="chOk">Enregistrée. Elle la verra sur sa page. 🎵</p>
+      <div id="chListe" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="carte">
+      <h2>Les comptes à rebours ⏳</h2>
+      <p class="note" style="margin-bottom:10px;">Vos prochains rendez-vous heureux. Le plus proche s'affiche sur sa page, compté en dodos.</p>
+      <input type="text" id="cptLabel" placeholder="L'événement (ex : notre week-end à Rome)" />
+      <input type="text" id="cptDate" placeholder="La date (AAAA-MM-JJ)" inputmode="numeric" />
+      <button class="btn" id="cptBtn">Ajouter</button>
+      <div id="cptListe" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="carte">
       <h2>Le livre de l'année 📖</h2>
       <p class="note" style="margin-bottom:12px;">Tout ce que vous écrivez sur le site, compilé en album. Chaque 1er janvier, imprime-le : le numérique passe, le papier reste.</p>
       <button class="btn" onclick="location.href='/livre'">Ouvrir le livre de nous</button>
@@ -173,6 +198,9 @@
 
   function charger(){
     chargerLettres();
+    chargerLpm();
+    chargerChansons();
+    chargerCompteurs();
     // Ses mots + accusé de lecture
     dbLire('dadoucherie_mots','order=created_at.desc').then(function(rows){
       var z = document.getElementById('motsZone');
@@ -273,6 +301,85 @@
       ok.style.display='block';
       setTimeout(function(){ok.style.display='none';},4000);
       chargerLettres();
+    });
+  });
+
+  // Ses lettres scellées pour Mathieu
+  function chargerLpm(){
+    dbLire('lettres_pour_mathieu','order=date_ouverture.asc').then(function(rows){
+      var z = document.getElementById('lpmZone');
+      z.innerHTML = '';
+      if(!rows || !rows.length){
+        z.innerHTML = '<p class="vide">Aucune pour l\'instant. Elle ne sait peut-être pas encore qu\'elle peut : la fonction est au bas de sa page.</p>';
+        return;
+      }
+      rows.forEach(function(l){
+        var d = document.createElement('div'); d.className='mot';
+        var ouverte = new Date(l.date_ouverture + 'T00:00:00') <= new Date();
+        if(!ouverte){
+          var dodos = Math.ceil((new Date(l.date_ouverture+'T00:00:00') - Date.now())/86400000);
+          d.innerHTML = '<div class="texte" style="font-weight:700;">✉️ Une lettre d\'elle, scellée</div>' +
+            '<div class="meta">ouverture dans ' + dodos + ' dodo' + (dodos>1?'s':'') + ', le ' + dateFr(l.date_ouverture+'T00:00:00').split(' à ')[0] + '. Patience. Elle a le droit de te faire attendre aussi.</div>';
+        } else {
+          d.innerHTML = '<div class="texte"></div><div class="meta">déverrouillée le ' + dateFr(l.date_ouverture+'T00:00:00').split(' à ')[0] + (l.lue_le ? ' · lue ✓' : '') + '</div>';
+          d.querySelector('.texte').textContent = l.texte;
+          if(!l.lue_le){
+            dbPatch('lettres_pour_mathieu','id=eq.'+l.id,{lue_le:new Date().toISOString()});
+          }
+        }
+        z.appendChild(d);
+      });
+    });
+  }
+
+  // Chanson du moment
+  function chargerChansons(){
+    dbLire('chansons','order=created_at.desc&limit=5').then(function(rows){
+      var z = document.getElementById('chListe');
+      z.innerHTML = '';
+      (rows||[]).forEach(function(c,i){
+        var d = document.createElement('div'); d.className='mot';
+        d.innerHTML = '<div class="texte">🎵 ' + '</div><div class="meta">' + dateFr(c.created_at) + (i===0?' · en ce moment sur sa page':'') + '</div>';
+        d.querySelector('.texte').textContent = '🎵 ' + c.titre + (c.note ? ' — ' + c.note : '');
+        z.appendChild(d);
+      });
+    });
+  }
+  document.getElementById('chBtn').addEventListener('click', function(){
+    var t = document.getElementById('chTitre').value.trim();
+    if(!t) return;
+    dbInserer('chansons',{titre:t, note:document.getElementById('chNote').value.trim() || null}).then(function(){
+      document.getElementById('chTitre').value='';
+      document.getElementById('chNote').value='';
+      var ok=document.getElementById('chOk');
+      ok.style.display='block';
+      setTimeout(function(){ok.style.display='none';},4000);
+      chargerChansons();
+    });
+  });
+
+  // Comptes à rebours
+  function chargerCompteurs(){
+    dbLire('compteurs','order=date_cible.asc').then(function(rows){
+      var z = document.getElementById('cptListe');
+      z.innerHTML = '';
+      (rows||[]).forEach(function(c){
+        var dodos = Math.ceil((new Date(c.date_cible+'T00:00:00') - Date.now())/86400000);
+        var d = document.createElement('div'); d.className='mot';
+        d.innerHTML = '<div class="texte"></div><div class="meta">' + (dodos>=0 ? 'dans '+dodos+' dodo'+(dodos>1?'s':'') : 'passé, à transformer en souvenir') + '</div>';
+        d.querySelector('.texte').textContent = '⏳ ' + c.label + ' · ' + c.date_cible;
+        z.appendChild(d);
+      });
+    });
+  }
+  document.getElementById('cptBtn').addEventListener('click', function(){
+    var l = document.getElementById('cptLabel').value.trim();
+    var dte = document.getElementById('cptDate').value.trim();
+    if(!l || !/^\d{4}-\d{2}-\d{2}$/.test(dte)) return;
+    dbInserer('compteurs',{label:l, date_cible:dte}).then(function(){
+      document.getElementById('cptLabel').value='';
+      document.getElementById('cptDate').value='';
+      chargerCompteurs();
     });
   });
 
