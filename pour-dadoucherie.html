@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Pour toi, dadouchérie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brume:#EFE9F3;
+    --brume-2:#F7ECE8;
+    --carte:#FCF8FA;
+    --encre:#46394F;
+    --encre-douce:#7A6E82;
+    --dehors:#7A6E82;
+    --corail:#E1806F;
+    --corail-clair:#F0AFA1;
+    --miel:#E4B266;
+    --fil:var(--corail);
+    --display:'Fraunces', Georgia, serif;
+    --body:'Nunito Sans', system-ui, sans-serif;
+    --r:22px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--body);
+    color:var(--encre);
+    background:
+      radial-gradient(120% 90% at 15% 0%, var(--brume-2) 0%, transparent 55%),
+      radial-gradient(120% 90% at 90% 100%, #EFE7F0 0%, transparent 50%),
+      var(--brume);
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding:18px 18px 40px;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    transition:background 1.2s ease;
+  }
+
+  /* ============ AMBIANCES SELON L'HEURE ============ */
+  body.t-aube{
+    --brume:#F6EAE4; --brume-2:#FBE3D6; --corail:#DE8A63; --corail-clair:#F2BC9C;
+    --miel:#E8B45C; --dehors:#8A7268;
+    background:
+      radial-gradient(130% 80% at 50% 110%, #FBD9BC 0%, transparent 60%),
+      radial-gradient(110% 90% at 80% 0%, #EFDDE8 0%, transparent 55%),
+      linear-gradient(180deg,#EEE3EE 0%, #F8E6D6 100%);
+  }
+  body.t-matin{
+    --brume:#EDF2E7; --brume-2:#F6EEE3; --corail:#D9836F; --corail-clair:#EFB3A3;
+    --miel:#DFB35F; --dehors:#77806B;
+    background:
+      radial-gradient(120% 90% at 15% 0%, #F7F0DF 0%, transparent 55%),
+      radial-gradient(120% 90% at 90% 100%, #E3EEDD 0%, transparent 50%),
+      #EDF2E7;
+  }
+  body.t-apresmidi{
+    --brume:#F3EBE0; --brume-2:#FAE8D8; --corail:#E1806F; --corail-clair:#F0AFA1;
+    --miel:#E4A94F; --dehors:#8A7A68;
+    background:
+      radial-gradient(120% 90% at 20% 0%, #FBEAD3 0%, transparent 55%),
+      radial-gradient(120% 90% at 85% 100%, #F4DFD3 0%, transparent 50%),
+      #F3EBE0;
+  }
+  body.t-soir{
+    --brume:#EFE3EC; --brume-2:#F6DEDD; --corail:#D9707E; --corail-clair:#EFA9B0;
+    --miel:#E0A15E; --dehors:#7E687C;
+    background:
+      radial-gradient(130% 80% at 50% 115%, #F4C9B8 0%, transparent 55%),
+      radial-gradient(110% 90% at 85% 0%, #D9CBE4 0%, transparent 55%),
+      linear-gradient(180deg,#E4D5E8 0%, #F2DCD8 100%);
+  }
+  body.t-nuit{
+    --brume:#2B2743; --brume-2:#3A3157; --corail:#E79BAB; --corail-clair:#B98CA8;
+    --miel:#E5C273; --dehors:#B9AECB;
+    --carte:#FBF7FA;
+    background:
+      radial-gradient(120% 80% at 80% 0%, #443A6B 0%, transparent 55%),
+      radial-gradient(100% 70% at 15% 100%, #33294E 0%, transparent 60%),
+      #262239;
+  }
+
+  /* ============ CIEL FÉÉRIQUE (papillons, pétales, étoiles) ============ */
+  .ciel{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden;}
+  .ciel .flotte{
+    position:absolute;top:-6vh;
+    animation:derive linear forwards;
+    will-change:transform;
+    filter:drop-shadow(0 2px 6px rgba(70,57,79,.12));
+  }
+  @keyframes derive{
+    0%{transform:translateY(0) translateX(0) rotate(0deg);}
+    25%{transform:translateY(28vh) translateX(3.5vw) rotate(12deg);}
+    50%{transform:translateY(56vh) translateX(-3vw) rotate(-8deg);}
+    75%{transform:translateY(84vh) translateX(3vw) rotate(10deg);}
+    100%{transform:translateY(115vh) translateX(-2vw) rotate(-6deg);}
+  }
+  .ciel .vole{
+    position:absolute;left:-8vw;
+    animation:traverse linear forwards;
+    will-change:transform;
+  }
+  .ciel .vole .aile{display:inline-block;animation:battement 0.55s ease-in-out infinite alternate;}
+  @keyframes traverse{
+    0%{transform:translateX(0) translateY(0);}
+    20%{transform:translateX(24vw) translateY(-6vh);}
+    40%{transform:translateX(46vw) translateY(3vh);}
+    60%{transform:translateX(68vw) translateY(-5vh);}
+    80%{transform:translateX(90vw) translateY(2vh);}
+    100%{transform:translateX(118vw) translateY(-3vh);}
+  }
+  @keyframes battement{
+    from{transform:scaleX(1) rotate(-4deg);}
+    to{transform:scaleX(.72) rotate(6deg);}
+  }
+  .ciel .scintille{
+    position:absolute;
+    animation:scintiller ease-in-out forwards;
+  }
+  @keyframes scintiller{
+    0%{opacity:0;transform:scale(.4);}
+    30%{opacity:.95;transform:scale(1.05);}
+    70%{opacity:.8;transform:scale(.95);}
+    100%{opacity:0;transform:scale(.5);}
+  }
+
+  /* --- Fil de progression --- */
+  .rail{
+    width:100%;
+    max-width:520px;
+    margin:14px auto 30px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0;
+    position:relative;
+    height:26px;
+    z-index:2;
+  }
+  .rail .track{
+    position:absolute;
+    left:8%;right:8%;top:50%;
+    height:2px;
+    background:linear-gradient(90deg,var(--corail-clair),var(--corail-clair));
+    opacity:.45;
+    transform:translateY(-50%);
+    border-radius:2px;
+  }
+  .rail .thread{
+    position:absolute;
+    left:8%;top:50%;
+    height:2px;
+    width:0%;
+    background:var(--corail);
+    transform:translateY(-50%);
+    border-radius:2px;
+    transition:width .6s var(--ease);
+  }
+  .dot{
+    width:11px;height:11px;border-radius:50%;
+    background:var(--carte);
+    border:2px solid var(--corail-clair);
+    position:relative;z-index:2;
+    margin:0 5%;
+    transition:transform .4s var(--ease), background .4s var(--ease), border-color .4s var(--ease);
+  }
+  .dot.done{background:var(--corail);border-color:var(--corail);}
+  .dot.current{transform:scale(1.5);border-color:var(--corail);box-shadow:0 0 0 5px rgba(225,128,111,.14);}
+
+  /* --- Scène / cartes --- */
+  .stage{
+    width:100%;
+    max-width:520px;
+    position:relative;
+    flex:1;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    z-index:2;
+  }
+  .step{
+    display:none;
+    width:100%;
+    background:var(--carte);
+    border:1px solid rgba(70,57,79,.07);
+    border-radius:var(--r);
+    padding:34px 26px 30px;
+    box-shadow:0 18px 50px -30px rgba(40,32,50,.55), 0 2px 0 rgba(255,255,255,.7) inset;
+    animation:rise .55s var(--ease) both;
+  }
+  .step.is-active{display:block;}
+  @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+
+  .eyebrow{
+    font-family:var(--body);
+    font-weight:700;
+    font-size:.72rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--corail);
+    margin:0 0 14px;
+  }
+  h1,h2{
+    font-family:var(--display);
+    font-weight:500;
+    line-height:1.15;
+    color:var(--encre);
+    margin:0 0 16px;
+    letter-spacing:-.01em;
+  }
+  h1{font-size:clamp(1.7rem,7vw,2.35rem);}
+  h2{font-size:clamp(1.45rem,6vw,2rem);}
+  p{margin:0 0 15px;font-size:1.06rem;color:var(--encre);}
+  p.soft{color:var(--encre-douce);font-size:.97rem;}
+  .big-heart{color:var(--corail);font-style:italic;}
+
+  /* --- Boutons --- */
+  .actions{margin-top:26px;display:flex;flex-direction:column;gap:12px;}
+  .btn{
+    font-family:var(--body);
+    font-weight:700;
+    font-size:1.02rem;
+    border:none;
+    border-radius:100px;
+    padding:15px 26px;
+    cursor:pointer;
+    transition:transform .18s var(--ease), box-shadow .25s var(--ease), background .25s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn-primary{
+    background:var(--corail);
+    color:#fff;
+    box-shadow:0 12px 26px -12px rgba(225,128,111,.8);
+  }
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-primary:active{transform:translateY(0);}
+  .btn-gold{
+    background:linear-gradient(135deg,#E8C15C,#D9A13E);
+    color:#4A3714;
+    box-shadow:0 12px 26px -12px rgba(217,161,62,.85);
+  }
+  .btn-gold:hover{transform:translateY(-2px);}
+  .btn:focus-visible{outline:3px solid var(--miel);outline-offset:3px;}
+  a:focus-visible{outline:3px solid var(--miel);outline-offset:3px;}
+
+  .backrow{margin-top:6px;text-align:center;}
+  .back{
+    background:none;border:none;cursor:pointer;
+    color:var(--encre-douce);font-family:var(--body);font-size:.9rem;
+    padding:8px 12px;border-radius:100px;
+  }
+  .back:hover{color:var(--corail);}
+  .back:focus-visible{outline:3px solid var(--miel);outline-offset:2px;}
+
+  /* --- Terminal doux (étape geek) --- */
+  .term{
+    background:#efe6ee;
+    border:1px solid rgba(70,57,79,.1);
+    border-radius:16px;
+    padding:18px 18px 16px;
+    margin:6px 0 18px;
+    font-family:'Nunito Sans',ui-monospace,monospace;
+    font-size:.93rem;
+    color:var(--encre);
+    line-height:1.75;
+  }
+  .term .prompt{color:var(--corail);font-weight:700;}
+  .term .ok{color:#6a8f5f;font-weight:700;}
+  .term .arrow{color:var(--encre-douce);}
+
+  /* --- Timeline (étape nous) --- */
+  .tl{list-style:none;margin:6px 0 4px;padding:0;position:relative;}
+  .tl:before{
+    content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;
+    background:var(--corail-clair);border-radius:2px;
+  }
+  .tl li{position:relative;padding:0 0 22px 32px;}
+  .tl li:last-child{padding-bottom:0;}
+  .tl li:before{
+    content:"";position:absolute;left:2px;top:4px;width:14px;height:14px;border-radius:50%;
+    background:var(--corail);border:3px solid var(--carte);
+  }
+  .tl .when{font-family:var(--display);font-style:italic;color:var(--corail);font-size:1.02rem;}
+  .tl .what{color:var(--encre);}
+
+  /* --- Compteur d'amour (étape billets) --- */
+  .compteur{
+    background:linear-gradient(135deg,#FBF3DF,#F6E7C4);
+    border:1px solid rgba(180,140,60,.25);
+    border-radius:16px;
+    padding:18px;
+    margin:6px 0 18px;
+    text-align:center;
+  }
+  .compteur .label{
+    font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    color:#9A7B3A;margin-bottom:6px;
+  }
+  .compteur .valeur{
+    font-family:var(--display);font-size:1.5rem;color:#6B5320;font-weight:600;
+    overflow-wrap:anywhere;
+  }
+
+  /* --- Jour spécial (1er janvier, 15 juillet) --- */
+  .special{
+    background:linear-gradient(135deg,#FDEEF3,#F4E2F0);
+    border:1px solid rgba(217,112,126,.28);
+    border-radius:14px;
+    padding:13px 16px;
+    font-size:.99rem;
+    margin:0 0 15px;
+  }
+
+  /* --- Réponse (elle m'écrit) --- */
+  .repondre{margin-top:26px;text-align:left;}
+  .repondre textarea{
+    width:100%;
+    border:1px solid rgba(70,57,79,.16);
+    border-radius:14px;
+    padding:14px 16px;
+    font-family:var(--body);
+    font-size:1rem;
+    color:var(--encre);
+    background:#fff;
+    resize:vertical;
+    min-height:120px;
+    margin-bottom:10px;
+    line-height:1.55;
+  }
+  .repondre textarea:focus{outline:3px solid var(--miel);outline-offset:1px;}
+
+  /* --- Son --- */
+  .sound{
+    position:fixed;top:16px;right:16px;z-index:20;
+    background:var(--carte);
+    border:1px solid rgba(70,57,79,.12);
+    border-radius:100px;
+    padding:9px 15px;
+    font-family:var(--body);font-weight:600;font-size:.85rem;
+    color:var(--encre-douce);cursor:pointer;
+    box-shadow:0 8px 20px -12px rgba(70,57,79,.5);
+    display:flex;align-items:center;gap:7px;
+  }
+  .sound:hover{color:var(--corail);}
+  .sound:focus-visible{outline:3px solid var(--miel);outline-offset:2px;}
+
+  /* --- Cœur final SVG --- */
+  .finalwrap{text-align:center;}
+  .heartsvg{width:96px;height:96px;margin:4px auto 8px;display:block;}
+  .heartsvg path{
+    fill:none;stroke:var(--corail);stroke-width:5;
+    stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:400;stroke-dashoffset:400;
+  }
+  .heartsvg.draw path{animation:sew 1.6s var(--ease) forwards;}
+  @keyframes sew{to{stroke-dashoffset:0;}}
+  .signoff{
+    font-family:var(--display);font-style:italic;font-size:1.25rem;color:var(--corail);
+    margin-top:10px;opacity:0;transition:opacity .6s ease .3s;
+  }
+  .signoff.show{opacity:1;}
+
+  /* --- Confettis (cœurs, billets) --- */
+  .confetti{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden;}
+  .confetti span{
+    position:absolute;top:-40px;font-size:20px;
+    animation:fall linear forwards;
+    opacity:.95;
+  }
+  @keyframes fall{
+    to{transform:translateY(108dvh) rotate(50deg);opacity:0;}
+  }
+
+  @media (min-width:560px){
+    .step{padding:44px 40px 36px;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important;}
+    .heartsvg path{stroke-dashoffset:0;}
+    .signoff{opacity:1;}
+    .step{display:none;}
+    .step.is-active{display:block;}
+    .ciel{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- Pour ajouter une musique douce : dépose un fichier "musique.mp3" à côté de ce fichier. Le bouton en haut à droite la lancera. Sans fichier, le bouton reste discret et sans effet. -->
+<audio id="audio" loop preload="none">
+  <source src="musique.mp3" type="audio/mpeg" />
+</audio>
+<button class="sound" id="soundBtn" aria-pressed="false">🔇 musique</button>
+
+<!-- Le ciel : papillons, pétales, étoiles… selon l'heure -->
+<div class="ciel" id="ciel" aria-hidden="true"></div>
+
+<nav class="rail" aria-hidden="true">
+  <div class="track"></div>
+  <div class="thread" id="thread"></div>
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+</nav>
+
+<main class="stage" aria-live="polite">
+
+  <!-- 0 : Bonjour automatique -->
+  <section class="step is-active" data-step="0" tabindex="-1">
+    <p class="eyebrow" id="greetEyebrow">pour toi</p>
+    <h1 id="greetTitle">Coucou,<br>dadouchérie</h1>
+    <p class="special" id="jourSpecial" hidden></p>
+    <div id="greetBody"></div>
+    <p class="soft" id="visites" hidden></p>
+    <p class="soft">Petit secret : ce site vit à la même heure que toi. Ouvre-le un matin, il sera doux et fleuri. Ouvre-le un soir, il rougit. Ouvre-le en pleine nuit, il allume les étoiles. Comme moi, en fait : je change d'humeur, mais je t'aime à toutes les heures.</p>
+    <div class="actions">
+      <button class="btn btn-primary" data-go="1">Je commence</button>
+    </div>
+  </section>
+
+  <!-- 1 : Tendre -->
+  <section class="step" data-step="1" tabindex="-1">
+    <p class="eyebrow">simplement</p>
+    <h2>Ce que je veux te dire</h2>
+    <p>Je t'aime. Voilà, c'est dit, et je pourrais m'arrêter là. Mais tu me connais, et surtout je te connais : tu aimes les longs messages, ceux qu'on lit deux fois, ceux qu'on garde. Alors installe-toi.</p>
+    <p>Je t'aime, et pas seulement les jours faciles. Je t'aime les jours en désordre, les jours à cent à l'heure, les jours où tout va de travers et où on se comprend quand même d'un regard. Je t'aime quand tu ris tellement fort que tu essaies de te cacher derrière ta main (raté, d'ailleurs, ça marche jamais). Je t'aime quand tu me racontes ta journée dans le désordre le plus total et que je dois reconstituer l'histoire comme un puzzle. Je t'aime même quand tu as raison alors que j'étais sûr d'avoir raison, ce qui, statistiquement, arrive bien trop souvent.</p>
+    <p>Sept ans que tu es dans ma vie. Sept ans, tu te rends compte ? Il y a des gens qui ne gardent pas un téléphone aussi longtemps. Et moi, chaque matin, je te choisis encore. Pas par habitude, par évidence. Toi, exactement comme tu es. C'est <em class="big-heart">ça</em> que je choisis.</p>
+    <div class="actions">
+      <button class="btn btn-primary" data-go="2">Continuer</button>
+    </div>
+    <div class="backrow"><button class="back" data-go="0">← revenir</button></div>
+  </section>
+
+  <!-- 2 : Geek -->
+  <section class="step" data-step="2" tabindex="-1">
+    <p class="eyebrow">côté ingénieur</p>
+    <h2>Bulletin technique<br>de mon cœur</h2>
+    <div class="term" role="img" aria-label="Un petit rapport d'état amoureux, écrit comme un terminal">
+      <div><span class="prompt">$</span> status --coeur</div>
+      <div><span class="ok">●</span> connexion d'origine : Snapchat, il y a 7 ans</div>
+      <div><span class="arrow">&nbsp;&nbsp;&nbsp;→ meilleur ajout de toute ma vie, et de loin</span></div>
+      <div><span class="ok">●</span> en service officiel depuis le 01/01/2020, zéro panne majeure</div>
+      <div><span class="ok">●</span> uptime : <span id="uptime">beaucoup de</span> jours depuis Lyon, et ça tourne toujours</div>
+      <div><span class="ok">●</span> batterie : rechargée à chaque fois que tu ris</div>
+      <div><span class="ok">●</span> mise à jour installée : « je t'aime » v.∞</div>
+      <div><span class="ok">●</span> bug connu : je pense à toi même quand je bosse</div>
+      <div><span class="arrow">&nbsp;&nbsp;&nbsp;→ correctif prévu : aucun. on garde.</span></div>
+      <div><span class="ok">●</span> solde du compte affectif : illimité</div>
+      <div><span class="arrow">&nbsp;&nbsp;&nbsp;→ pour l'autre compte, on y travaille 💪</span></div>
+    </div>
+    <p class="soft">Oui, je suis ingénieur. Non, je ne sais pas le dire autrement. Mais crois-moi, chaque ligne est vérifiée, testée, et validée en production depuis des années.</p>
+    <div class="actions">
+      <button class="btn btn-primary" data-go="3">Continuer</button>
+    </div>
+    <div class="backrow"><button class="back" data-go="1">← revenir</button></div>
+  </section>
+
+  <!-- 3 : Nous -->
+  <section class="step" data-step="3" tabindex="-1">
+    <p class="eyebrow">nous</p>
+    <h2>Notre histoire,<br>en vrai</h2>
+    <ul class="tl">
+      <li>
+        <span class="when">il y a 7 ans · Snapchat</span><br>
+        <span class="what">Tout commence par un ajout sur Snap. Franchement, qui aurait parié qu'une appli où les messages disparaissent en 10 secondes me donnerait la personne la plus permanente de ma vie ?</span>
+      </li>
+      <li>
+        <span class="when">1er janvier 2020 · Lyon</span><br>
+        <span class="what">La première fois que je te vois en vrai. Premier jour de l'année, première fois de nous. Et là, sans effet spécial, sans prévenir : j'ai su. Le monde entier prenait de bonnes résolutions, moi j'en ai pris une seule, et je la tiens encore.</span>
+      </li>
+      <li>
+        <span class="when">15 juillet 2023 · notre nuit</span><br>
+        <span class="what">La deuxième fois qu'on se voit. On a passé la nuit ensemble à parler, à tout se dire : nos sentiments, nos peurs, nos envies. Le soleil s'est levé et on parlait encore. C'est cette nuit-là que « toi et moi » est devenu « nous ».</span>
+      </li>
+      <li>
+        <span class="when">Monaco · Malte · Barcelone</span><br>
+        <span class="what">Nos échappées. Trois villes, mille souvenirs, et toujours la même conclusion : peu importe la destination, ma plus belle vue c'est toi en face de moi.</span>
+      </li>
+      <li>
+        <span class="when">aujourd'hui</span><br>
+        <span class="what">Et je te choisis encore. Ça fait exactement <span id="joursLyon">…</span> jours que je t'ai vue pour la première fois, et je compte bien au moins doubler ce chiffre. Puis le redoubler. Tu es prévenue.</span>
+      </li>
+    </ul>
+    <div class="actions">
+      <button class="btn btn-primary" data-go="4">Continuer</button>
+    </div>
+    <div class="backrow"><button class="back" data-go="2">← revenir</button></div>
+  </section>
+
+  <!-- 4 : Billets -->
+  <section class="step" data-step="4" tabindex="-1">
+    <p class="eyebrow">soyons honnêtes</p>
+    <h2>La partie que<br>tu attendais</h2>
+    <p>Bon. On se connaît depuis 7 ans, alors je vais pas te mentir : je sais très bien que les fleurs, les papillons et les jolis mots, ça te fait fondre… mais qu'il y a une autre chose qui fait briller tes yeux presque autant que moi. Presque.</p>
+    <p>Alors j'ai fait ce que tout homme amoureux et un minimum lucide aurait fait : j'ai mis de l'argent dans ce site. Pas beaucoup, on se calme. Mais appuie sur le bouton doré et regarde ce que ça donne.</p>
+    <div class="compteur">
+      <div class="label">Ta valeur estimée à mes yeux</div>
+      <div class="valeur" id="valeur">calcul en cours…</div>
+    </div>
+    <p class="soft" id="pluies" hidden></p>
+    <div class="actions">
+      <button class="btn btn-gold" id="moneyBtn">Fais pleuvoir 💸</button>
+      <button class="btn btn-primary" data-go="5">Continuer</button>
+    </div>
+    <div class="backrow"><button class="back" data-go="3">← revenir</button></div>
+  </section>
+
+  <!-- 5 : Fin -->
+  <section class="step" data-step="5" tabindex="-1">
+    <p class="eyebrow">une dernière chose</p>
+    <h2>Et j'arrête<br>de t'embêter</h2>
+    <p>Merci d'être toi. Merci pour Lyon, pour Monaco, pour Malte, pour Barcelone, pour cette nuit de juillet où on s'est tout dit. Merci pour les sept ans qui viennent de passer, et pardon d'avance pour les soixante-dix qui arrivent : tu vas devoir me supporter encore longtemps, c'est écrit noir sur blanc ici, ça fait foi.</p>
+    <p>Merci de me laisser t'aimer à ma façon, avec des sites web, des mots un peu maladroits, des blagues d'ingénieur, et beaucoup de patience de ta part.</p>
+    <p>Je t'aime, dadouchérie. Aujourd'hui, et encore demain. Et le jour d'après aussi, mais je vais pas tous les lister, le site deviendrait trop long même pour toi.</p>
+    <div class="finalwrap">
+      <svg class="heartsvg" id="heart" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 82 C50 82 12 58 12 34 C12 20 24 14 34 18 C42 21 50 32 50 32 C50 32 58 21 66 18 C76 14 88 20 88 34 C88 58 50 82 50 82 Z"/>
+      </svg>
+      <button class="btn btn-primary" id="loveBtn">Appuie ici 🤍</button>
+      <p class="signoff" id="signoff">Ton Mathieu</p>
+      <p class="soft" id="coeurCompte" hidden></p>
+    </div>
+    <div class="repondre" id="repondre">
+      <p class="soft">Et si tu veux me répondre, c'est juste ici. Prends toute la place qu'il te faut : tu sais très bien que j'aime tes pavés autant que tu aimes les miens. Ce que tu écris arrive directement chez moi, et nulle part ailleurs.</p>
+      <textarea id="motTexte" placeholder="Écris-moi ce que tu veux, mon amour…"></textarea>
+      <button class="btn btn-primary" id="motBtn">Je t'envoie ça 💌</button>
+      <p class="soft" id="motMerci" hidden>C'est parti. Je vais le lire, le relire, puis le relire encore. Merci mon amour.</p>
+    </div>
+    <div class="backrow"><button class="back" id="restart">recommencer depuis le début</button></div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* ============ 1. AMBIANCE & BONJOUR SELON L'HEURE ============ */
+  var h = new Date().getHours();
+  var periode = (h >= 5 && h < 8) ? 'aube'
+              : (h >= 8 && h < 12) ? 'matin'
+              : (h >= 12 && h < 18) ? 'apresmidi'
+              : (h >= 18 && h < 23) ? 'soir'
+              : 'nuit';
+  document.body.classList.add('t-' + periode);
+
+  var salutations = {
+    aube: {
+      eyebrow: "l'aube se lève",
+      titre: "Coucou toi,<br>déjà réveillée ?",
+      paras: [
+        "Il est tôt. Le ciel hésite encore entre la nuit et le jour, tout est calme, et toi tu es déjà là, sur ce site, probablement encore dans le lit avec les cheveux dans tous les sens. Et tu sais quoi ? Même comme ça, surtout comme ça, tu es la plus belle chose que cette journée verra passer, et elle ne fait que commencer.",
+        "J'aime cette heure-là. Le monde n'a pas encore mis son masque, tout est doux, tout est possible. Un peu comme nous au tout début, sur Snap, quand chaque notification me faisait sourire bêtement devant mon écran. Sept ans plus tard, devine quoi : ça n'a pas changé.",
+        "Prends ton temps ce matin. Respire. Et souviens-toi en buvant ton premier verre d'eau ou ton café que quelque part, quelqu'un a pensé à toi avant même que le soleil se lève complètement. Ce quelqu'un, c'est moi. Comme d'habitude."
+      ]
+    },
+    matin: {
+      eyebrow: "bonjour bonjour",
+      titre: "Bonjour,<br>ma dadouchérie",
+      paras: [
+        "Bonjour toi. Oui, toi. La personne qui illumine mes journées depuis maintenant sept ans et qui, si tout va bien, vient d'ouvrir ce site avec un petit sourire en coin. Ne nie pas, je te vois d'ici.",
+        "J'espère que tu as bien dormi, que tu as rêvé de choses douces : de nous à Barcelone, de nous à Malte, ou soyons fous, de nous à Monaco avec beaucoup trop d'argent. J'espère surtout que ta journée sera à ta hauteur : belle, lumineuse, et un peu extraordinaire. Comme toi.",
+        "Regarde autour de toi sur cette page : il y a des fleurs, des papillons, de la lumière. J'ai essayé de mettre un matin de film dans une page web, parce que c'est ce que tu mérites tous les jours. Allez, avance, j'ai des choses à te dire."
+      ]
+    },
+    apresmidi: {
+      eyebrow: "en pleine journée",
+      titre: "Coucou,<br>ma dadouchérie",
+      paras: [
+        "Coucou toi. Il est l'après-midi, tu es sûrement en train de courir partout ou de faire semblant de travailler. Dans les deux cas, merci de faire une pause ici, avec moi. C'est officiellement le meilleur moment de ta journée. Je dis ça en toute objectivité, évidemment.",
+        "Tu sais ce que je fais, moi, l'après-midi ? Je bosse, et à un moment, sans prévenir, tu débarques dans ma tête. Un souvenir de Lyon, ton rire, un truc que tu m'as dit il y a trois ans et qui me revient d'un coup. C'est le bug le plus agréable que je connaisse, et crois-moi, en tant qu'ingénieur, j'en ai vu des bugs.",
+        "Alors voilà : ce site, c'est ma façon de débarquer dans TA tête en pleine journée. Chacun son tour. Installe-toi deux minutes, le soleil est haut, les papillons volent, et moi je t'aime."
+      ]
+    },
+    soir: {
+      eyebrow: "le soir tombe",
+      titre: "Bonsoir,<br>ma dadouchérie",
+      paras: [
+        "Bonsoir toi. Le ciel devient rose et doré. Regarde, même la page a rougi. Elle fait ça tous les soirs, je l'ai programmée comme ça, parce que c'est exactement l'effet que tu me fais depuis le 1er janvier 2020, à Lyon, la première fois que je t'ai vue en vrai.",
+        "J'espère que ta journée a été douce. Et si elle ne l'a pas été, viens, pose tout ici. C'est l'heure où le monde ralentit, où la lumière pardonne tout, où les plus belles conversations commencent. On en sait quelque chose, non ? Une certaine nuit de juillet 2023, on a laissé le soir devenir le matin sans s'en rendre compte, juste en se parlant. Je rejouerais cette nuit-là mille fois.",
+        "Alors ce soir, offre-toi cinq minutes. Il y a des pétales qui tombent, des mots que j'ai choisis un par un, et au bout, un cœur qui t'attend. Il est à toi depuis longtemps de toute façon."
+      ]
+    },
+    nuit: {
+      eyebrow: "sous les étoiles",
+      titre: "Toujours debout,<br>dadouchérie ?",
+      paras: [
+        "Il est tard, toi. Très tard. Le monde dort, les étoiles sont sorties (regarde, j'en ai mis partout sur la page, juste pour toi) et évidemment, tu es encore réveillée. Je ne suis même pas surpris. Tu n'as jamais su te coucher tôt, et entre nous, c'est une de nos plus belles qualités communes.",
+        "Les nuits, c'est notre spécialité. C'est en pleine nuit qu'on s'est tout dit, un 15 juillet, il y a des années. On a parlé de nos sentiments, de nos peurs, de tout, jusqu'à ce que le soleil se lève. Depuis, chaque fois qu'il est tard et que je ne dors pas, je pense à cette nuit-là. Et donc à toi. Donc en fait je pense à toi tout le temps, la démonstration est faite.",
+        "Alors puisque tu es là, à cette heure impossible : lis ce que j'ai à te dire, souris, et après, promis, tu vas dormir. Les étoiles veilleront sur toi. Et moi aussi, comme toujours, même de loin."
+      ]
+    }
+  };
+
+  var g = salutations[periode];
+  document.getElementById('greetEyebrow').textContent = g.eyebrow;
+  document.getElementById('greetTitle').innerHTML = g.titre;
+  var body = document.getElementById('greetBody');
+  g.paras.forEach(function(t){
+    var p = document.createElement('p');
+    p.textContent = t;
+    body.appendChild(p);
+  });
+
+  /* ============ 2. LE CIEL FÉÉRIQUE ============ */
+  var ciel = document.getElementById('ciel');
+  var decors = {
+    aube:      { tombe:['🌸','🌷','✨','💮'], vole:['🦋'], brille:['✨'] },
+    matin:     { tombe:['🌸','🌼','🌷','💮'], vole:['🦋','🦋','🐝'], brille:['✨'] },
+    apresmidi: { tombe:['🌺','🌸','🌻'], vole:['🦋','🦋'], brille:['✨'] },
+    soir:      { tombe:['🌸','🌹','💮','✨'], vole:['🦋'], brille:['✨','💫'] },
+    nuit:      { tombe:['💫','✨'], vole:['🦋'], brille:['⭐','✨','🌟'] }
+  };
+
+  function elemFlotte(){
+    var d = decors[periode];
+    var s = document.createElement('span');
+    s.className = 'flotte';
+    s.textContent = d.tombe[Math.floor(Math.random()*d.tombe.length)];
+    s.style.left = Math.random()*100 + 'vw';
+    s.style.fontSize = (13 + Math.random()*14) + 'px';
+    s.style.opacity = (0.55 + Math.random()*0.4);
+    s.style.animationDuration = (11 + Math.random()*10) + 's';
+    ciel.appendChild(s);
+    s.addEventListener('animationend', function(){ s.remove(); });
+  }
+
+  function elemVole(){
+    var d = decors[periode];
+    var s = document.createElement('span');
+    s.className = 'vole';
+    var a = document.createElement('span');
+    a.className = 'aile';
+    a.textContent = d.vole[Math.floor(Math.random()*d.vole.length)];
+    s.appendChild(a);
+    s.style.top = (5 + Math.random()*70) + 'vh';
+    s.style.fontSize = (16 + Math.random()*12) + 'px';
+    s.style.animationDuration = (13 + Math.random()*12) + 's';
+    ciel.appendChild(s);
+    s.addEventListener('animationend', function(){ s.remove(); });
+  }
+
+  function elemBrille(){
+    var d = decors[periode];
+    var s = document.createElement('span');
+    s.className = 'scintille';
+    s.textContent = d.brille[Math.floor(Math.random()*d.brille.length)];
+    s.style.left = Math.random()*100 + 'vw';
+    s.style.top = Math.random()*90 + 'vh';
+    s.style.fontSize = (9 + Math.random()*12) + 'px';
+    s.style.animationDuration = (2.5 + Math.random()*3) + 's';
+    ciel.appendChild(s);
+    s.addEventListener('animationend', function(){ s.remove(); });
+  }
+
+  if(!reduce){
+    for(var i=0;i<6;i++){ setTimeout(elemBrille, i*300); }
+    elemVole();
+    setInterval(function(){
+      if(ciel.childElementCount > 30) return; // on reste léger
+      elemFlotte();
+      if(Math.random() < 0.5) elemBrille();
+      if(Math.random() < 0.16) elemVole();
+    }, 1100);
+  }
+
+  /* ============ 3. NAVIGATION ============ */
+  var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+  var dots  = Array.prototype.slice.call(document.querySelectorAll('.dot'));
+  var thread = document.getElementById('thread');
+  var total = steps.length;
+  var current = 0;
+
+  function render(){
+    steps.forEach(function(s){
+      var active = (+s.dataset.step === current);
+      s.classList.toggle('is-active', active);
+    });
+    dots.forEach(function(d,i){
+      d.classList.toggle('done', i < current);
+      d.classList.toggle('current', i === current);
+    });
+    var pct = total > 1 ? (current/(total-1))*84 : 0;
+    thread.style.width = pct + '%';
+    var active = steps[current];
+    if(active){ active.focus({preventScroll:false}); }
+    window.scrollTo({top:0, behavior:'smooth'});
+    if(current === total-1){ drawHeart(); }
+    if(current === 4){ lancerCompteur(); }
+  }
+
+  function go(n){
+    n = Math.max(0, Math.min(total-1, n));
+    current = n;
+    render();
+  }
+
+  document.querySelectorAll('[data-go]').forEach(function(btn){
+    btn.addEventListener('click', function(){ go(+btn.dataset.go); });
+  });
+
+  /* ============ 4. COMPTEUR & PLUIE DE BILLETS ============ */
+  var valeurEl = document.getElementById('valeur');
+  var compteurLance = false;
+  function lancerCompteur(){
+    if(compteurLance) return;
+    compteurLance = true;
+    var etapes = [
+      "calcul en cours…",
+      "1 000 000 €…",
+      "999 000 000 €…",
+      "99 999 999 999 €…",
+      "ERREUR : nombre trop grand 😌",
+      "∞ € (et encore, c'est sous-estimé)"
+    ];
+    var i = 0;
+    var t = setInterval(function(){
+      valeurEl.textContent = etapes[i];
+      i++;
+      if(i >= etapes.length){ clearInterval(t); }
+    }, 800);
+  }
+
+  function pluie(chars, nombre, taille){
+    if(reduce) return;
+    var layer = document.createElement('div');
+    layer.className = 'confetti';
+    for(var i=0;i<nombre;i++){
+      var s = document.createElement('span');
+      s.textContent = chars[Math.floor(Math.random()*chars.length)];
+      s.style.left = Math.random()*100 + 'vw';
+      s.style.fontSize = (taille + Math.random()*taille*0.9) + 'px';
+      s.style.animationDuration = (2.6 + Math.random()*2.6) + 's';
+      s.style.animationDelay = (Math.random()*0.8) + 's';
+      layer.appendChild(s);
+    }
+    document.body.appendChild(layer);
+    setTimeout(function(){ layer.remove(); }, 7000);
+  }
+
+  document.getElementById('moneyBtn').addEventListener('click', function(){
+    pluie(['💶','💵','💰','🪙','💎','🤑','💸'], 34, 18);
+  });
+
+  /* ============ 5. CŒUR FINAL ============ */
+  var heart = document.getElementById('heart');
+  var heartDrawn = false;
+  function drawHeart(){
+    if(heartDrawn) return;
+    heartDrawn = true;
+    heart.classList.remove('draw');
+    void heart.offsetWidth;
+    heart.classList.add('draw');
+  }
+
+  var loveBtn = document.getElementById('loveBtn');
+  var signoff = document.getElementById('signoff');
+  loveBtn.addEventListener('click', function(){
+    signoff.classList.add('show');
+    pluie(['🤍','💗','🩷','✨','🦋','🌸'], 26, 16);
+  });
+
+  document.getElementById('restart').addEventListener('click', function(){
+    heartDrawn = false;
+    compteurLance = false;
+    valeurEl.textContent = "calcul en cours…";
+    signoff.classList.remove('show');
+    go(0);
+  });
+
+  /* ============ 6. MÉMOIRE (compteurs de jours, dates spéciales, base de données) ============ */
+
+  // Jours depuis Lyon (01/01/2020)
+  var joursLyon = Math.floor((Date.now() - new Date(2020,0,1).getTime()) / 86400000);
+  document.getElementById('uptime').textContent = joursLyon;
+  document.getElementById('joursLyon').textContent = joursLyon;
+
+  // Dates spéciales : la page le sait toute seule
+  var auj = new Date();
+  var jourSpecial = document.getElementById('jourSpecial');
+  if(auj.getMonth() === 0 && auj.getDate() === 1){
+    jourSpecial.textContent = "Au fait… bonne année. Et surtout : joyeux anniversaire de nous. Un 1er janvier exactement comme aujourd'hui, à Lyon, je te voyais pour la toute première fois. Je n'ai jamais retrouvé une meilleure façon de commencer une année, et pourtant j'ai eu " + (auj.getFullYear() - 2020) + " essais depuis. 🥂";
+    jourSpecial.hidden = false;
+  } else if(auj.getMonth() === 6 && auj.getDate() === 15){
+    jourSpecial.textContent = "Au fait… on est le 15 juillet. Notre nuit. Celle où on a parlé jusqu'au lever du soleil et où tout a vraiment commencé. Bon anniversaire à nous, mon amour. 🌙";
+    jourSpecial.hidden = false;
+  }
+
+  // Petite mémoire partagée (Supabase). Si pas d'internet, la page vit très bien sans.
+  var DB_URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var DB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+
+  function dbInserer(table, data){
+    return fetch(DB_URL + '/rest/v1/' + table, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':DB_KEY,
+        'Authorization':'Bearer ' + DB_KEY,
+        'Prefer':'return=minimal'
+      },
+      body:JSON.stringify(data)
+    }).catch(function(){});
+  }
+
+  function dbCompter(table, filtre){
+    return fetch(DB_URL + '/rest/v1/' + table + '?select=id' + (filtre ? '&' + filtre : ''), {
+      method:'HEAD',
+      headers:{'apikey':DB_KEY,'Authorization':'Bearer ' + DB_KEY,'Prefer':'count=exact'}
+    }).then(function(r){
+      var cr = r.headers.get('content-range');
+      return cr ? parseInt(cr.split('/')[1], 10) : null;
+    }).catch(function(){ return null; });
+  }
+
+  // Visite : on la note, puis on lui dit combien de fois elle est venue
+  dbInserer('dadoucherie_journal', {type:'visite', periode:periode}).then(function(){
+    return dbCompter('dadoucherie_journal', 'type=eq.visite');
+  }).then(function(n){
+    if(!n || n < 2) return;
+    var v = document.getElementById('visites');
+    v.textContent = "Au fait : c'est la " + n + "e fois que cette page s'ouvre. À chaque fois, quelque part, mon cœur reçoit une petite notification. Et à chaque fois, il est content.";
+    v.hidden = false;
+  });
+
+  // Pluie de billets : on compte, forcément
+  document.getElementById('moneyBtn').addEventListener('click', function(){
+    dbInserer('dadoucherie_journal', {type:'billets', periode:periode}).then(function(){
+      return dbCompter('dadoucherie_journal', 'type=eq.billets');
+    }).then(function(n){
+      if(!n) return;
+      var p = document.getElementById('pluies');
+      p.textContent = n + (n === 1 ? "re" : "e") + " pluie de billets déclenchée sur cette page. À ce rythme, on n'a plus le choix : on va devoir devenir riches pour de vrai.";
+      p.hidden = false;
+    });
+  });
+
+  // Le cœur : chaque appui est gardé en mémoire
+  document.getElementById('loveBtn').addEventListener('click', function(){
+    dbInserer('dadoucherie_journal', {type:'coeur', periode:periode}).then(function(){
+      return dbCompter('dadoucherie_journal', 'type=eq.coeur');
+    }).then(function(n){
+      if(!n) return;
+      var c = document.getElementById('coeurCompte');
+      c.textContent = "Tu as appuyé " + n + " fois sur mon cœur en tout. Il tient le coup, ne t'inquiète pas. Il a l'habitude, avec toi.";
+      c.hidden = false;
+    });
+  });
+
+  // Elle me répond : ça arrive directement chez moi
+  var motBtn = document.getElementById('motBtn');
+  var motTexte = document.getElementById('motTexte');
+  motBtn.addEventListener('click', function(){
+    var txt = motTexte.value.trim();
+    if(!txt) return;
+    motBtn.disabled = true;
+    motBtn.textContent = "Envoi…";
+    dbInserer('dadoucherie_mots', {message:txt}).then(function(){
+      motTexte.value = '';
+      motTexte.hidden = true;
+      motBtn.hidden = true;
+      document.getElementById('motMerci').hidden = false;
+      pluie(['💌','🤍','🦋','✨'], 20, 15);
+    });
+  });
+
+  /* ============ 7. SON (optionnel, off par défaut) ============ */
+  var audio = document.getElementById('audio');
+  var soundBtn = document.getElementById('soundBtn');
+  var on = false;
+  soundBtn.addEventListener('click', function(){
+    on = !on;
+    soundBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if(on){
+      audio.play().then(function(){
+        soundBtn.textContent = '🔊 musique';
+      }).catch(function(){
+        on = false;
+        soundBtn.setAttribute('aria-pressed','false');
+        soundBtn.textContent = '🔇 musique';
+      });
+    } else {
+      audio.pause();
+      soundBtn.textContent = '🔇 musique';
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
