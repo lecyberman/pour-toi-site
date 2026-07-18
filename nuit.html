@@ -123,7 +123,7 @@
     <div class="voile">
       <div class="heure">3 h · le monde dort, pas nous</div>
       <p class="grand">On a parlé de nos peurs,<br>de nos envies, de tout.</p>
-      <p class="petit">À cette heure-là, il n'y a plus de masque, plus de pudeur, plus de calcul. Il ne restait que nous deux et la vérité. Si tu vois une étoile filer, tu sais quoi faire. Moi, mon vœu, je l'ai fait cette nuit-là — et il s'est réalisé.</p>
+      <p class="petit">À cette heure-là, il n'y a plus de masque, plus de pudeur, plus de calcul. Il ne restait que nous deux et la vérité. Si tu vois une étoile filer, tu sais quoi faire. Moi, mon vœu, je l'ai fait cette nuit-là. Et il s'est réalisé.</p>
     </div>
   </section>
 
@@ -408,7 +408,7 @@
 
   // l'indice disparaît dès qu'on descend
   window.addEventListener('scroll', function(){
-    document.getElementById('indice').style.opacity = window.scrollY > H*0.3 ? 0 : '';
+    document.getElementById('indice').style.display = window.scrollY > H*0.3 ? 'none' : '';
   }, {passive:true});
 
   window.addEventListener('resize', resize);
