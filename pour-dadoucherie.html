@@ -446,6 +446,7 @@
     <p class="eyebrow" id="greetEyebrow">pour toi</p>
     <h1 id="greetTitle">Coucou,<br>dadouchérie</h1>
     <p class="special" id="jourSpecial" hidden></p>
+    <p class="special" id="motDuJour" hidden></p>
     <div id="greetBody"></div>
     <p class="soft" id="visites" hidden></p>
     <p class="soft">Petit secret : ce site vit à la même heure que toi. Ouvre-le un matin, il sera doux et fleuri. Ouvre-le un soir, il rougit. Ouvre-le en pleine nuit, il allume les étoiles. Comme moi, en fait : je change d'humeur, mais je t'aime à toutes les heures.</p>
@@ -559,6 +560,7 @@
     </div>
     <div class="repondre" id="repondre">
       <p class="soft">Et si tu veux me répondre, c'est juste ici. Prends toute la place qu'il te faut : tu sais très bien que j'aime tes pavés autant que tu aimes les miens. Ce que tu écris arrive directement chez moi, et nulle part ailleurs.</p>
+      <p class="soft" id="accuse" hidden></p>
       <textarea id="motTexte" placeholder="Écris-moi ce que tu veux, mon amour…"></textarea>
       <button class="btn btn-primary" id="motBtn">Je t'envoie ça 💌</button>
       <p class="soft" id="motMerci" hidden>C'est parti. Je vais le lire, le relire, puis le relire encore. Merci mon amour.</p>
@@ -902,6 +904,38 @@
       return cr ? parseInt(cr.split('/')[1], 10) : null;
     }).catch(function(){ return null; });
   }
+
+  function dbLireDadou(table, filtre){
+    return fetch(DB_URL + '/rest/v1/' + table + '?' + filtre, {
+      headers:{'apikey':DB_KEY,'Authorization':'Bearer ' + DB_KEY}
+    }).then(function(r){ return r.json(); }).catch(function(){ return []; });
+  }
+
+  // Le mot épinglé par Mathieu (s'il y en a un de moins de 3 jours)
+  dbLireDadou('mot_du_jour','order=created_at.desc&limit=1').then(function(rows){
+    if(!rows || !rows.length) return;
+    var age = Date.now() - new Date(rows[0].created_at).getTime();
+    if(age > 3*86400000) return;
+    var m = document.getElementById('motDuJour');
+    m.textContent = '📌 Mathieu a épinglé ça pour toi : « ' + rows[0].texte + ' »';
+    m.hidden = false;
+  });
+
+  // Accusé de lecture amoureux : elle voit que son mot a été lu
+  dbLireDadou('dadoucherie_mots','order=created_at.desc&limit=1').then(function(rows){
+    if(!rows || !rows.length) return;
+    var a = document.getElementById('accuse');
+    if(rows[0].lu_le){
+      var d = new Date(rows[0].lu_le);
+      a.textContent = 'Ton dernier mot a été lu par Mathieu 🤍 (le ' +
+        d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'}) + ' à ' +
+        d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) +
+        '). Connaissant l\'individu, il l\'a relu plusieurs fois.';
+    } else {
+      a.textContent = 'Ton dernier mot est bien arrivé. Il attend Mathieu dans sa boîte 🤍';
+    }
+    a.hidden = false;
+  });
 
   // Visite : on la note, puis on lui dit combien de fois elle est venue
   dbInserer('dadoucherie_journal', {type:'visite', periode:periode}).then(function(){

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Le courrier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brume:#EFE9F3; --brume-2:#F7ECE8; --carte:#FCF8FA;
+    --encre:#46394F; --encre-douce:#7A6E82;
+    --corail:#E1806F; --corail-clair:#F0AFA1; --miel:#E4B266;
+    --display:'Fraunces', Georgia, serif;
+    --body:'Nunito Sans', system-ui, sans-serif;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--body); color:var(--encre);
+    background:
+      radial-gradient(120% 90% at 15% 0%, var(--brume-2) 0%, transparent 55%),
+      radial-gradient(120% 90% at 90% 100%, #EFE7F0 0%, transparent 50%),
+      var(--brume);
+    min-height:100dvh; padding:30px 18px 60px;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:560px;margin:0 auto;}
+  .eyebrow{font-weight:700;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--corail);margin:0 0 10px;text-align:center;}
+  h1{font-family:var(--display);font-weight:500;font-size:clamp(1.8rem,7vw,2.4rem);text-align:center;margin:0 0 8px;}
+  .sous{text-align:center;color:var(--encre-douce);margin:0 0 28px;font-size:.95rem;}
+  .carte{
+    background:var(--carte);border:1px solid rgba(70,57,79,.07);border-radius:20px;
+    padding:24px;margin:0 0 22px;
+    box-shadow:0 18px 46px -32px rgba(70,57,79,.55);
+  }
+  h2{font-family:var(--display);font-weight:500;font-size:1.3rem;margin:0 0 12px;}
+  .mot{
+    background:#FBF2F0;border-radius:14px;padding:16px 18px;margin:0 0 14px;
+  }
+  .mot .texte{font-size:1rem;white-space:pre-wrap;}
+  .mot .meta{font-size:.8rem;color:var(--encre-douce);margin-top:10px;}
+  .mot .meta .lu{color:#6a8f5f;font-weight:600;}
+  .vide{color:var(--encre-douce);font-style:italic;font-size:.95rem;}
+  input[type="password"], textarea, input[type="text"]{
+    width:100%;border:1px solid rgba(70,57,79,.16);border-radius:13px;
+    padding:12px 14px;font-family:var(--body);font-size:1rem;color:var(--encre);
+    background:#fff;margin-bottom:10px;
+  }
+  textarea{resize:vertical;min-height:70px;line-height:1.5;}
+  input:focus, textarea:focus{outline:3px solid var(--miel);outline-offset:1px;}
+  .btn{
+    font-family:var(--body);font-weight:700;font-size:.98rem;border:none;border-radius:100px;
+    padding:12px 22px;cursor:pointer;background:var(--corail);color:#fff;
+    box-shadow:0 10px 22px -12px rgba(225,128,111,.8);transition:transform .18s var(--ease);
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .stats{display:flex;flex-wrap:wrap;gap:10px;}
+  .stat{
+    flex:1;min-width:100px;background:#F4EEF3;border-radius:14px;padding:12px;text-align:center;
+  }
+  .stat .n{font-family:var(--display);font-size:1.4rem;color:var(--corail);font-weight:600;}
+  .stat .l{font-size:.75rem;color:var(--encre-douce);margin-top:2px;}
+  .ok{color:#6a8f5f;font-size:.9rem;margin-top:8px;display:none;}
+  #contenu{display:none;}
+  .note{font-size:.85rem;color:var(--encre-douce);}
+</style>
+</head>
+<body>
+<div class="page">
+  <p class="eyebrow">réservé au facteur en chef</p>
+  <h1>Le courrier</h1>
+  <p class="sous">Tout ce qu'elle dépose sur le site arrive ici.</p>
+
+  <!-- Porte d'entrée -->
+  <div class="carte" id="porte">
+    <h2>Code d'accès</h2>
+    <input type="password" id="code" placeholder="Le code…" inputmode="numeric" />
+    <button class="btn" id="entrer">Entrer</button>
+    <p class="note" style="margin-top:10px;">Indice pour toi seul : l'année où tout est devenu officiel, à Lyon.</p>
+  </div>
+
+  <div id="contenu">
+
+    <div class="carte">
+      <h2>Ses mots 💌</h2>
+      <div id="motsZone"><p class="vide">Je regarde la boîte aux lettres…</p></div>
+      <p class="note">Ouvrir cette page marque ses mots comme lus : elle verra « lu par Mathieu » sur sa page. C'est voulu — c'est l'accusé de lecture amoureux.</p>
+    </div>
+
+    <div class="carte">
+      <h2>Épingler le mot du jour 📌</h2>
+      <p class="note" style="margin-bottom:10px;">Ce que tu écris ici devient la première chose qu'elle voit en ouvrant sa page.</p>
+      <textarea id="mdjTexte" placeholder="Une phrase pour elle, là, maintenant…"></textarea>
+      <button class="btn" id="mdjBtn">Épingler</button>
+      <p class="ok" id="mdjOk">Épinglé. Elle le verra à sa prochaine visite. 🤍</p>
+    </div>
+
+    <div class="carte">
+      <h2>Le tableau de bord</h2>
+      <div class="stats" id="stats"></div>
+    </div>
+
+    <div class="carte">
+      <h2>Ses réponses ailleurs</h2>
+      <div id="autresZone"><p class="vide">Chargement…</p></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var DB_URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var DB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  function hdrs(extra){
+    var h = {'apikey':DB_KEY,'Authorization':'Bearer '+DB_KEY,'Content-Type':'application/json'};
+    for(var k in (extra||{})) h[k]=extra[k];
+    return h;
+  }
+  function dbLire(t,f){return fetch(DB_URL+'/rest/v1/'+t+'?'+(f||''),{headers:hdrs()}).then(function(r){return r.json();}).catch(function(){return [];});}
+  function dbInserer(t,d){return fetch(DB_URL+'/rest/v1/'+t,{method:'POST',headers:hdrs({'Prefer':'return=minimal'}),body:JSON.stringify(d)}).catch(function(){});}
+  function dbPatch(t,f,d){return fetch(DB_URL+'/rest/v1/'+t+'?'+f,{method:'PATCH',headers:hdrs({'Prefer':'return=minimal'}),body:JSON.stringify(d)}).catch(function(){});}
+  function dbCompter(t,f){
+    return fetch(DB_URL+'/rest/v1/'+t+'?select=id'+(f?'&'+f:''),{method:'HEAD',headers:hdrs({'Prefer':'count=exact'})})
+      .then(function(r){var c=r.headers.get('content-range');return c?parseInt(c.split('/')[1],10):0;})
+      .catch(function(){return 0;});
+  }
+  function dateFr(iso){
+    var d = new Date(iso);
+    return d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) + ' à ' +
+           d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  }
+
+  // Porte : le code est l'année de Lyon
+  var CODE = '2020';
+  var porte = document.getElementById('porte');
+  var contenu = document.getElementById('contenu');
+  function ouvrir(){
+    porte.style.display='none';
+    contenu.style.display='block';
+    try{ localStorage.setItem('courrier_ok','1'); }catch(e){}
+    charger();
+  }
+  document.getElementById('entrer').addEventListener('click', function(){
+    if(document.getElementById('code').value.trim() === CODE) ouvrir();
+    else document.getElementById('code').value = '';
+  });
+  document.getElementById('code').addEventListener('keydown', function(e){
+    if(e.key==='Enter') document.getElementById('entrer').click();
+  });
+  try{ if(localStorage.getItem('courrier_ok')==='1') ouvrir(); }catch(e){}
+
+  function charger(){
+    // Ses mots + accusé de lecture
+    dbLire('dadoucherie_mots','order=created_at.desc').then(function(rows){
+      var z = document.getElementById('motsZone');
+      z.innerHTML = '';
+      if(!rows || !rows.length){
+        z.innerHTML = '<p class="vide">Rien pour l\'instant. Elle n\'a pas encore écrit — patience, ça viendra.</p>';
+        return;
+      }
+      rows.forEach(function(m){
+        var d = document.createElement('div'); d.className='mot';
+        var t = document.createElement('div'); t.className='texte'; t.textContent = m.message;
+        var meta = document.createElement('div'); meta.className='meta';
+        meta.innerHTML = 'reçu le ' + dateFr(m.created_at) +
+          (m.lu_le ? ' · <span class="lu">lu ✓</span>' : '');
+        d.appendChild(t); d.appendChild(meta); z.appendChild(d);
+      });
+      // Marquer les non-lus comme lus
+      dbPatch('dadoucherie_mots','lu_le=is.null',{lu_le:new Date().toISOString()});
+    });
+
+    // Tableau de bord
+    Promise.all([
+      dbCompter('dadoucherie_journal','type=eq.visite'),
+      dbCompter('dadoucherie_journal','type=eq.coeur'),
+      dbCompter('dadoucherie_journal','type=eq.billets'),
+      dbLire('tresor','select=piece')
+    ]).then(function(r){
+      var pieces = {}; (r[3]||[]).forEach(function(x){pieces[x.piece]=1;});
+      var s = document.getElementById('stats');
+      var data = [
+        {n:r[0], l:'visites de sa page'},
+        {n:r[1], l:'appuis sur ton cœur'},
+        {n:r[2], l:'pluies de billets'},
+        {n:Object.keys(pieces).length + '/3', l:'pièces d\'or trouvées'}
+      ];
+      s.innerHTML = '';
+      data.forEach(function(x){
+        var d = document.createElement('div'); d.className='stat';
+        d.innerHTML = '<div class="n">'+x.n+'</div><div class="l">'+x.l+'</div>';
+        s.appendChild(d);
+      });
+    });
+
+    // Ses réponses ailleurs (histoire + question du dimanche)
+    Promise.all([
+      dbLire('histoire_versions','order=created_at.desc&limit=5'),
+      dbLire('qds','auteur=eq.elle&order=created_at.desc&limit=3')
+    ]).then(function(r){
+      var z = document.getElementById('autresZone');
+      z.innerHTML = '';
+      var rien = true;
+      (r[0]||[]).forEach(function(v){
+        rien = false;
+        var d = document.createElement('div'); d.className='mot';
+        d.innerHTML = '<div class="texte"></div><div class="meta">sa version du chapitre « '+v.etape+' » · '+dateFr(v.created_at)+'</div>';
+        d.querySelector('.texte').textContent = v.texte;
+        z.appendChild(d);
+      });
+      (r[1]||[]).forEach(function(v){
+        rien = false;
+        var d = document.createElement('div'); d.className='mot';
+        d.innerHTML = '<div class="texte"></div><div class="meta">sa réponse du dimanche ('+v.semaine+') · '+dateFr(v.created_at)+'</div>';
+        d.querySelector('.texte').textContent = v.texte;
+        z.appendChild(d);
+      });
+      if(rien) z.innerHTML = '<p class="vide">Rien encore dans la frise ni au jeu du dimanche.</p>';
+    });
+  }
+
+  // Mot du jour
+  document.getElementById('mdjBtn').addEventListener('click', function(){
+    var t = document.getElementById('mdjTexte').value.trim();
+    if(!t) return;
+    dbInserer('mot_du_jour',{texte:t}).then(function(){
+      document.getElementById('mdjTexte').value='';
+      var ok = document.getElementById('mdjOk');
+      ok.style.display='block';
+      setTimeout(function(){ok.style.display='none';},4000);
+    });
+  });
+})();
+</script>
+</body>
+</html>
