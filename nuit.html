@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>La nuit du 15 juillet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --display:'Fraunces', Georgia, serif;
+    --body:'Nunito Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:var(--body);
+    background:#0B1026;
+    color:#EDE9F3;
+    overflow-x:hidden;
+  }
+  #ciel{
+    position:fixed;inset:0;width:100vw;height:100vh;display:block;
+    z-index:1;
+  }
+  .defilement{position:relative;z-index:2;height:520vh;pointer-events:none;}
+  .moment{
+    position:absolute;left:0;right:0;
+    display:flex;align-items:center;justify-content:center;
+    padding:0 22px;
+    pointer-events:none;
+  }
+  .moment .voile{
+    max-width:520px;text-align:center;
+    opacity:0;transform:translateY(26px);
+    transition:opacity 1.4s ease, transform 1.4s ease;
+  }
+  .moment.vu .voile{opacity:1;transform:none;}
+  .heure{
+    font-size:.78rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+    color:#B9AECB;margin-bottom:14px;
+  }
+  .moment p.grand{
+    font-family:var(--display);font-weight:400;
+    font-size:clamp(1.4rem,5.2vw,2rem);line-height:1.4;
+    text-shadow:0 2px 30px rgba(0,0,0,.6);
+  }
+  .moment p.petit{
+    margin-top:16px;font-size:1rem;color:#CFC7DD;line-height:1.7;
+    text-shadow:0 2px 20px rgba(0,0,0,.6);
+  }
+  .m1{top:16vh;height:60vh;}
+  .m2{top:110vh;height:60vh;}
+  .m3{top:210vh;height:60vh;}
+  .m4{top:310vh;height:60vh;}
+  .m5{top:430vh;height:70vh;}
+  .m5 .heure{color:#8A6A55;}
+  .m5 p.grand{color:#3D2E33;text-shadow:0 2px 30px rgba(255,240,220,.5);}
+  .m5 p.petit{color:#5E4A47;text-shadow:none;}
+  .m5 a{
+    pointer-events:auto;display:inline-block;margin-top:26px;
+    font-weight:700;font-size:.95rem;color:#7A4A3E;text-decoration:none;
+    border:1.5px solid rgba(122,74,62,.5);border-radius:100px;padding:12px 26px;
+    transition:background .3s, color .3s;
+  }
+  .m5 a:hover{background:rgba(122,74,62,.9);color:#FFF4E8;}
+
+  .indice{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+    z-index:3;font-size:.8rem;color:#B9AECB;opacity:.8;
+    animation:respire 3s ease-in-out infinite;
+    pointer-events:none;text-align:center;
+  }
+  @keyframes respire{0%,100%{opacity:.75;transform:translateX(-50%) translateY(0);}50%{opacity:.35;transform:translateX(-50%) translateY(6px);}}
+
+  /* Bulle mémoire des étoiles */
+  .memoire{
+    position:fixed;z-index:4;max-width:280px;
+    background:rgba(15,18,40,.92);
+    border:1px solid rgba(185,174,203,.35);
+    border-radius:14px;padding:14px 16px;
+    backdrop-filter:blur(6px);
+    opacity:0;pointer-events:none;transition:opacity .5s ease;
+  }
+  .memoire.visible{opacity:1;}
+  .memoire .nom{
+    font-family:var(--display);font-style:italic;font-size:1.05rem;
+    color:#F0C9A8;margin-bottom:6px;
+  }
+  .memoire .txt{font-size:.9rem;line-height:1.55;color:#DDD5E8;}
+
+  @media (prefers-reduced-motion:reduce){
+    .moment .voile{transition:none;opacity:1;transform:none;}
+  }
+</style>
+</head>
+<body>
+<!-- Cette page rejoue notre nuit. Le code aussi a veillé jusqu'à l'aube. -->
+
+<canvas id="ciel"></canvas>
+
+<div class="defilement" id="defilement">
+
+  <section class="moment m1">
+    <div class="voile">
+      <div class="heure">15 juillet 2023 · 23 h</div>
+      <p class="grand">Il est tard.<br>On devrait dormir.<br>On ne dort pas.</p>
+      <p class="petit">C'est la deuxième fois qu'on se voit en vrai. Dehors, la nuit est posée sur tout, et nous, on commence à peine à parler. Descends doucement — cette page dure toute la nuit, comme nous.</p>
+    </div>
+  </section>
+
+  <section class="moment m2">
+    <div class="voile">
+      <div class="heure">1 h · les mots qui comptent</div>
+      <p class="grand">Chaque chose qu'on osait se dire<br>allumait quelque chose là-haut.</p>
+      <p class="petit">Regarde notre constellation, juste au-dessus. Chaque étoile est un chapitre de nous — touche-les, elles se souviennent. Cette nuit-là, on les a allumées une par une.</p>
+    </div>
+  </section>
+
+  <section class="moment m3">
+    <div class="voile">
+      <div class="heure">3 h · le monde dort, pas nous</div>
+      <p class="grand">On a parlé de nos peurs,<br>de nos envies, de tout.</p>
+      <p class="petit">À cette heure-là, il n'y a plus de masque, plus de pudeur, plus de calcul. Il ne restait que nous deux et la vérité. Si tu vois une étoile filer, tu sais quoi faire. Moi, mon vœu, je l'ai fait cette nuit-là — et il s'est réalisé.</p>
+    </div>
+  </section>
+
+  <section class="moment m4">
+    <div class="voile">
+      <div class="heure">5 h · le ciel hésite</div>
+      <p class="grand">On aurait pu s'arrêter là.<br>On a continué.</p>
+      <p class="petit">Le noir devient bleu, le bleu devient pâle. On le voyait par la fenêtre et on faisait comme si de rien n'était, parce qu'aucun de nous deux ne voulait que ça se termine. Continue de descendre. Le jour arrive.</p>
+    </div>
+  </section>
+
+  <section class="moment m5">
+    <div class="voile">
+      <div class="heure">6 h 12 · le soleil se lève</div>
+      <p class="grand">Le soleil s'est levé,<br>et on parlait encore.</p>
+      <p class="petit">C'est cette nuit-là que « toi et moi » est devenu « nous ». Trois ans plus tard, je n'ai toujours pas fini de te parler. Alors je te construis des ciels, en attendant la prochaine nuit blanche.</p>
+      <a href="/histoire">revenir à notre histoire ✨</a>
+    </div>
+  </section>
+
+</div>
+
+<div class="indice" id="indice">descends dans la nuit ↓</div>
+<div class="memoire" id="memoire"><div class="nom"></div><div class="txt"></div></div>
+
+<script>
+(function(){
+  var canvas = document.getElementById('ciel');
+  var ctx = canvas.getContext('2d');
+  var W, H, DPR;
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    peindreVoieLactee();
+  }
+
+  /* ---------- Étoiles ---------- */
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+  var etoiles = [];
+  for(var i=0;i<340;i++){
+    etoiles.push({
+      x: Math.random(), y: Math.random()*0.92,
+      r: rnd(0.4,1.5), tw: rnd(0,Math.PI*2), v: rnd(0.4,1.4),
+      couche: Math.random()<0.3 ? 2 : 1
+    });
+  }
+
+  /* ---------- Constellation "nous" ---------- */
+  var C = [
+    {x:.30,y:.30,nom:"L'ajout Snap",      txt:"Il y a 7 ans, une notification. La première étoile — on ne savait pas encore qu'on dessinait une constellation."},
+    {x:.40,y:.22,nom:"Lyon",              txt:"1er janvier 2020. La première fois que je te vois en vrai. J'ai su. Cette étoile-là brille plus fort que les autres."},
+    {x:.52,y:.28,nom:"Cette nuit",        txt:"15 juillet 2023. La nuit que tu es en train de revivre, exactement. C'est elle, le centre de tout."},
+    {x:.62,y:.20,nom:"Monaco · Malte · Barcelone", txt:"Trois villes, mille souvenirs. Nos échappées ont leur propre lumière."},
+    {x:.72,y:.27,nom:"Le oui",            txt:"Juillet 2026. Je n'en dis pas plus, même aux étoiles. Elles ont vu, de toute façon."},
+    {x:.80,y:.19,nom:"La suite",          txt:"Cette étoile n'a pas encore de nom. C'est la place de tout ce qui nous reste à vivre. On la nommera ensemble."}
+  ];
+
+  /* ---------- Voie lactée (pré-rendue) ---------- */
+  var vl = document.createElement('canvas');
+  function peindreVoieLactee(){
+    vl.width = W; vl.height = H;
+    var c = vl.getContext('2d');
+    c.clearRect(0,0,W,H);
+    var n = 900;
+    for(var i=0;i<n;i++){
+      var t = i/n;
+      var bx = t*W*1.3 - W*0.15;
+      var by = H*0.55 - t*H*0.42 + Math.sin(t*9)*H*0.03;
+      var x = bx + rnd(-W*0.09, W*0.09);
+      var y = by + rnd(-H*0.075, H*0.075);
+      var r = rnd(0.3,1.1);
+      var a = rnd(0.03,0.16);
+      c.beginPath();
+      c.arc(x,y,r,0,Math.PI*2);
+      c.fillStyle = 'rgba(' + (200+Math.floor(rnd(0,55))) + ',' + (195+Math.floor(rnd(0,40))) + ',255,' + a + ')';
+      c.fill();
+    }
+  }
+
+  /* ---------- Couleurs du ciel selon la progression ---------- */
+  function lerp(a,b,t){ return a+(b-a)*t; }
+  function lerpC(c1,c2,t){ return [lerp(c1[0],c2[0],t), lerp(c1[1],c2[1],t), lerp(c1[2],c2[2],t)]; }
+  function css(c){ return 'rgb(' + Math.round(c[0]) + ',' + Math.round(c[1]) + ',' + Math.round(c[2]) + ')'; }
+  // [haut, milieu, bas] par phase
+  var phases = [
+    {p:0.00, h:[7,9,28],    m:[13,16,42],   b:[20,24,56]},
+    {p:0.55, h:[7,9,28],    m:[13,16,42],   b:[20,24,56]},
+    {p:0.72, h:[16,18,48],  m:[38,32,74],   b:[74,56,92]},
+    {p:0.86, h:[44,38,84],  m:[122,80,110], b:[214,140,110]},
+    {p:1.00, h:[126,126,178],m:[232,166,120],b:[255,214,150]}
+  ];
+  function cielCouleurs(p){
+    for(var i=0;i<phases.length-1;i++){
+      if(p>=phases[i].p && p<=phases[i+1].p){
+        var t=(p-phases[i].p)/(phases[i+1].p-phases[i].p);
+        return { h:lerpC(phases[i].h,phases[i+1].h,t), m:lerpC(phases[i].m,phases[i+1].m,t), b:lerpC(phases[i].b,phases[i+1].b,t) };
+      }
+    }
+    var d=phases[phases.length-1];
+    return {h:d.h,m:d.m,b:d.b};
+  }
+
+  /* ---------- Étoile filante ---------- */
+  var filante = null;
+  function lancerFilante(){
+    filante = { x:rnd(0.15,0.75)*W, y:rnd(0.08,0.3)*H, vx:rnd(6,10), vy:rnd(2.4,4), vie:1 };
+  }
+  setInterval(function(){
+    if(reduce) return;
+    if(progression>0.15 && progression<0.8 && !filante && Math.random()<0.5) lancerFilante();
+  }, 7000);
+
+  /* ---------- Souris / parallaxe ---------- */
+  var mx=0.5, my=0.5;
+  window.addEventListener('mousemove', function(e){ mx=e.clientX/W; my=e.clientY/H; });
+
+  /* ---------- Progression du scroll ---------- */
+  var progression = 0;
+  function majProgression(){
+    var max = document.getElementById('defilement').offsetHeight - H;
+    progression = Math.min(1, Math.max(0, window.scrollY / max));
+  }
+  window.addEventListener('scroll', majProgression, {passive:true});
+
+  /* ---------- Rendu ---------- */
+  var t0 = performance.now();
+  function dessiner(now){
+    var t = (now - t0)/1000;
+    var p = progression;
+    var c = cielCouleurs(p);
+
+    // ciel
+    var g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0, css(c.h));
+    g.addColorStop(0.55, css(c.m));
+    g.addColorStop(1, css(c.b));
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+
+    var nuit = p<0.72 ? 1 : Math.max(0, 1-(p-0.72)/0.2); // les étoiles s'éteignent à l'aube
+
+    // voie lactée (plus visible au cœur de la nuit)
+    var vlAlpha = nuit * (p<0.3 ? 0.5+p : Math.max(0.4, 1.1-p));
+    if(vlAlpha>0.02){
+      ctx.globalAlpha = Math.min(0.85, vlAlpha);
+      ctx.drawImage(vl, (mx-0.5)*-8, (my-0.5)*-5);
+      ctx.globalAlpha = 1;
+    }
+
+    // étoiles
+    if(nuit>0.02){
+      for(var i=0;i<etoiles.length;i++){
+        var s = etoiles[i];
+        var scint = reduce ? 1 : (0.6 + 0.4*Math.sin(t*s.v + s.tw));
+        var px = s.x*W + (mx-0.5)*-14*s.couche;
+        var py = s.y*H + (my-0.5)*-9*s.couche;
+        ctx.beginPath();
+        ctx.arc(px, py, s.r, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(235,235,255,' + (scint*nuit*0.9).toFixed(3) + ')';
+        ctx.fill();
+      }
+    }
+
+    // constellation : se dessine entre p=0.18 et p=0.42
+    var lp = Math.min(1, Math.max(0, (p-0.18)/0.24));
+    if(lp>0 && nuit>0.02){
+      ctx.save();
+      // lignes
+      ctx.strokeStyle = 'rgba(240,201,168,' + (0.55*nuit*Math.min(1,lp*1.2)).toFixed(3) + ')';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      var totalSeg = C.length-1;
+      var segVisibles = lp*totalSeg;
+      for(var i=0;i<totalSeg;i++){
+        var a1 = C[i], a2 = C[i+1];
+        var x1=a1.x*W, y1=a1.y*H, x2=a2.x*W, y2=a2.y*H;
+        if(i < Math.floor(segVisibles)){
+          ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+        } else if(i === Math.floor(segVisibles)){
+          var f = segVisibles - i;
+          ctx.moveTo(x1,y1); ctx.lineTo(x1+(x2-x1)*f, y1+(y2-y1)*f);
+        }
+      }
+      ctx.stroke();
+      // étoiles nommées
+      for(var i=0;i<C.length;i++){
+        var e = C[i];
+        var vis = Math.min(1, Math.max(0, lp*C.length - i));
+        if(vis<=0) continue;
+        var puls = reduce ? 1 : (0.75 + 0.25*Math.sin(t*1.6 + i));
+        var x=e.x*W, y=e.y*H;
+        var halo = ctx.createRadialGradient(x,y,0,x,y,14);
+        halo.addColorStop(0,'rgba(240,201,168,' + (0.8*vis*nuit).toFixed(3) + ')');
+        halo.addColorStop(1,'rgba(240,201,168,0)');
+        ctx.fillStyle = halo;
+        ctx.beginPath(); ctx.arc(x,y,14,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x,y,2.4*puls,0,Math.PI*2);
+        ctx.fillStyle = 'rgba(255,235,215,' + (vis*nuit).toFixed(3) + ')';
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // étoile filante
+    if(filante){
+      ctx.save();
+      var f = filante;
+      var grad = ctx.createLinearGradient(f.x, f.y, f.x - f.vx*9, f.y - f.vy*9);
+      grad.addColorStop(0, 'rgba(255,255,255,' + (0.9*f.vie*nuit).toFixed(3) + ')');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(f.x, f.y);
+      ctx.lineTo(f.x - f.vx*9, f.y - f.vy*9);
+      ctx.stroke();
+      ctx.restore();
+      f.x += f.vx; f.y += f.vy; f.vie -= 0.016;
+      if(f.vie<=0 || f.x>W+80) filante = null;
+    }
+
+    // le soleil se lève (p > 0.82)
+    if(p>0.82){
+      var sp = (p-0.82)/0.18;
+      var sx = W*0.5, sy = H*1.05 - sp*H*0.33;
+      var rayon = Math.max(W,H)*0.5;
+      var soleil = ctx.createRadialGradient(sx,sy,0,sx,sy,rayon);
+      soleil.addColorStop(0,'rgba(255,236,190,' + (0.95*sp).toFixed(3) + ')');
+      soleil.addColorStop(0.12,'rgba(255,214,150,' + (0.6*sp).toFixed(3) + ')');
+      soleil.addColorStop(1,'rgba(255,214,150,0)');
+      ctx.fillStyle = soleil;
+      ctx.fillRect(0,0,W,H);
+      ctx.beginPath();
+      ctx.arc(sx, sy, 34, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,248,225,' + (0.95*sp).toFixed(3) + ')';
+      ctx.fill();
+    }
+
+    requestAnimationFrame(dessiner);
+  }
+
+  /* ---------- Interaction constellation ---------- */
+  var memoire = document.getElementById('memoire');
+  var memTimer = null;
+  function toucherCiel(cx, cy){
+    for(var i=0;i<C.length;i++){
+      var e = C[i];
+      var dx = cx - e.x*W, dy = cy - e.y*H;
+      if(dx*dx+dy*dy < 28*28){
+        memoire.querySelector('.nom').textContent = e.nom;
+        memoire.querySelector('.txt').textContent = e.txt;
+        var left = Math.min(W-300, Math.max(12, e.x*W - 140));
+        var top  = e.y*H + 22;
+        memoire.style.left = left + 'px';
+        memoire.style.top = top + 'px';
+        memoire.classList.add('visible');
+        clearTimeout(memTimer);
+        memTimer = setTimeout(function(){ memoire.classList.remove('visible'); }, 6500);
+        return true;
+      }
+    }
+    memoire.classList.remove('visible');
+    return false;
+  }
+  window.addEventListener('click', function(e){ toucherCiel(e.clientX, e.clientY); });
+
+  /* ---------- Apparition des textes ---------- */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting) en.target.classList.add('vu');
+    });
+  }, {threshold:0.35});
+  document.querySelectorAll('.moment').forEach(function(m){ io.observe(m); });
+
+  // l'indice disparaît dès qu'on descend
+  window.addEventListener('scroll', function(){
+    document.getElementById('indice').style.opacity = window.scrollY > H*0.3 ? 0 : '';
+  }, {passive:true});
+
+  window.addEventListener('resize', resize);
+  resize();
+  majProgression();
+  if(reduce){
+    // version calme : une seule image du ciel, textes visibles
+    document.querySelectorAll('.moment').forEach(function(m){ m.classList.add('vu'); });
+    progression = 0.3;
+    dessiner(performance.now());
+  } else {
+    requestAnimationFrame(dessiner);
+  }
+})();
+</script>
+</body>
+</html>
