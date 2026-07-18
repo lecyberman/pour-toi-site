@@ -51,6 +51,9 @@
     <button onclick="naviguer('creations')"  data-page="creations"  aria-label="Ses créations">✦ Créations</button>
     <button onclick="naviguer('dramas')"     data-page="dramas"     aria-label="Nos dramas">✦ Dramas</button>
     <button onclick="naviguer('humeurs')"    data-page="humeurs"    aria-label="Ce soir je me sens">✦ Humeurs</button>
+    <button onclick="location.href='/dadoucherie'" aria-label="Pour toi">💌 Pour toi</button>
+    <button onclick="location.href='/histoire'"    aria-label="Notre histoire">✨ Histoire</button>
+    <button onclick="location.href='/jeux'"        aria-label="Nos jeux">🎲 Jeux</button>
     <button onclick="naviguer('accueil')"    class="btn-retour"     aria-label="Retour accueil">⌂</button>
   </nav>
 
@@ -639,5 +642,19 @@
 
   <script src="supabase.js"></script>
   <script src="script.js"></script>
+  <script>
+  // Passage discret du facteur : trois appuis rapides sur ⌂ ouvrent le courrier.
+  (function(){
+    var clics = [];
+    document.addEventListener('click', function(e){
+      var b = e.target.closest('.btn-retour');
+      if(!b) return;
+      var t = Date.now();
+      clics = clics.filter(function(x){ return t - x < 1600; });
+      clics.push(t);
+      if(clics.length >= 3){ location.href = '/courrier'; }
+    });
+  })();
+  </script>
 </body>
 </html>
