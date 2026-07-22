@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Toi, vue par moi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brume:#EFE9F3; --brume-2:#F7ECE8; --carte:#FCF8FA;
+    --encre:#46394F; --encre-douce:#7A6E82;
+    --corail:#E1806F; --miel:#E4B266;
+    --display:'Fraunces', Georgia, serif;
+    --body:'Nunito Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:var(--body);color:var(--encre);
+    background:
+      radial-gradient(120% 90% at 15% 0%, var(--brume-2) 0%, transparent 55%),
+      radial-gradient(120% 90% at 90% 100%, #EFE7F0 0%, transparent 50%),
+      var(--brume);
+    min-height:100dvh;padding:30px 14px 60px;line-height:1.6;text-align:center;
+  }
+  .eyebrow{font-weight:700;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--corail);margin:0 0 10px;}
+  h1{font-family:var(--display);font-weight:500;font-size:clamp(1.8rem,7vw,2.4rem);margin:0 0 8px;}
+  .sous{color:var(--encre-douce);font-size:.96rem;max-width:440px;margin:0 auto 10px;}
+  #coeur{display:block;margin:0 auto;max-width:100%;cursor:pointer;}
+  .phrase{
+    max-width:480px;margin:6px auto 0;min-height:64px;
+    font-family:var(--display);font-style:italic;font-size:1.08rem;color:var(--corail);
+    opacity:0;transition:opacity .5s ease;padding:0 10px;
+  }
+  .phrase.visible{opacity:1;}
+  .aide{font-size:.85rem;color:var(--encre-douce);margin-top:4px;}
+  .liens{margin-top:26px;font-size:.92rem;color:var(--encre-douce);}
+  .liens a{color:var(--corail);text-decoration:none;font-weight:600;}
+</style>
+</head>
+<body>
+<!-- Ce cœur est fait de mots. Comme nous, au début. -->
+
+<p class="eyebrow">fait de mots</p>
+<h1>Toi, vue par moi</h1>
+<p class="sous">Tous les mots que j'utilise quand je parle de toi, rassemblés au seul endroit logique. Touche un mot : il te dira d'où il vient.</p>
+
+<canvas id="coeur"></canvas>
+<p class="phrase" id="phrase"></p>
+<p class="aide" id="aide">touche un mot 🤍</p>
+
+<p class="liens"><a href="/">⌂ accueil</a> · retour : <a href="/dadoucherie">ta page</a> · <a href="/histoire">notre histoire</a></p>
+
+<script>
+(function(){
+  var mots = [
+    {t:'dadouchérie', p:26, ph:"Le mot le plus important de ce dictionnaire. Le tien."},
+    {t:'je t\'aime', p:22, ph:"Dit, écrit, codé, chuchoté. Décliné sur ce site en à peu près toutes les technologies existantes."},
+    {t:'lumière', p:15, ph:"« Tu illumines mes journées depuis sept ans. » C'est ton métier dans ma vie, je l'ai écrit noir sur blanc."},
+    {t:'ton rire', p:16, ph:"« Tu ris tellement fort que tu essaies de te cacher derrière ta main. Raté, d'ailleurs, ça marche jamais. »"},
+    {t:'évidence', p:14, ph:"« Je te choisis chaque matin. Pas par habitude, par évidence. »"},
+    {t:'antipodes', p:13, ph:"Nos personnalités, d'après toi. Les aimants aussi, mon amour."},
+    {t:'permanente', p:12, ph:"« Une appli où tout disparaît m'a donné la personne la plus permanente de ma vie. »"},
+    {t:'profonde', p:12, ph:"« Tu es la seule personne que je connais qui devient plus profonde avec le temps. »"},
+    {t:'courage', p:11, ph:"Celui que je ne t'avais jamais vu et que tu sors sans prévenir."},
+    {t:'douceur', p:13, ph:"Celle que tu caches sous ton caractère. Je sais où elle habite."},
+    {t:'tes yeux', p:13, ph:"« Monaco, quand tu as vu les yachts. Tes yeux. Je m'en souviens de tes yeux. »"},
+    {t:'insomniaque', p:10, ph:"« Tu n'as jamais su te coucher tôt, et entre nous, c'est une de nos plus belles qualités communes. »"},
+    {t:'Lyon', p:12, ph:"1er janvier 2020. Là où j'ai su."},
+    {t:'15 juillet', p:12, ph:"Notre nuit. Celle qui a sa propre page sur ce site."},
+    {t:'Snap', p:10, ph:"Le meilleur ajout de toute ma vie, et de loin."},
+    {t:'Malte', p:10, ph:"La lumière sur l'eau. Toi qui prends la même photo quinze fois. Moi qui te regarde toi."},
+    {t:'Barcelone', p:10, ph:"Les soirées qui ne voulaient pas finir."},
+    {t:'Monaco', p:10, ph:"Les billets, les yachts, tes étoiles dans les yeux. Je note tout."},
+    {t:'billets', p:11, ph:"« Ce qui fait briller tes yeux presque autant que moi. Presque. » 💸"},
+    {t:'pavés', p:10, ph:"« Tu aimes les longs messages, ceux qu'on lit deux fois, ceux qu'on garde. » Toi-même tu as dit merci pour les pavés."},
+    {t:'puzzle', p:9, ph:"« Tu me racontes ta journée dans le désordre le plus total et je reconstitue l'histoire comme un puzzle. »"},
+    {t:'ma plus belle vue', p:11, ph:"« Peu importe la destination, ma plus belle vue c'est toi en face de moi. »"},
+    {t:'2 390 jours', p:10, ph:"Et ça continue de compter tout seul, quelque part sur ce site, à la seconde près."},
+    {t:'jackpot', p:11, ph:"Le mot de passe de ta récompense, quand tu auras trouvé les trois pièces d'or."},
+    {t:'têtue', p:9, ph:"Le quiz dira qui l'est le plus. L'arbitre tranchera. Je connais déjà le verdict."},
+    {t:'vraie', p:10, ph:"« Même si je ne sais pas l'exprimer, j'essaie » : tu l'exprimes mieux que tout le monde, justement."},
+    {t:'patiente', p:9, ph:"« Merci de me laisser t'aimer à ma façon, avec beaucoup de patience de ta part. »"},
+    {t:'nous', p:16, ph:"Le mot devenu réalité une nuit de juillet 2023."},
+    {t:'demain', p:10, ph:"« Je t'aime aujourd'hui, et encore demain. Et le jour d'après aussi. »"},
+    {t:'💍', p:14, ph:"Juillet 2026. Je n'en dis pas plus, même ici. Tu sais."},
+    {t:'étoiles', p:9, ph:"Celles de notre nuit, celles de ta page, celle qui n'a pas encore de nom."},
+    {t:'papillons', p:9, ph:"Ceux de ton écran, et les autres, les vrais, ceux d'avant un rendez-vous avec toi."},
+    {t:'chez moi', p:10, ph:"Ce n'est pas une adresse. C'est là où tu es."},
+    {t:'fière', p:9, ph:"Ce que je veux que tu sois en nous regardant. Ce que je suis en te regardant."},
+    {t:'l\'infini', p:10, ph:"« Combien de temps je compte te garder ? L'infini, et on renégociera à la fin. »"}
+  ];
+
+  var canvas = document.getElementById('coeur');
+  var ctx = canvas.getContext('2d');
+  var W, H, DPR;
+  var places = [];
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var t0 = performance.now();
+
+  function dansCoeur(x, y){
+    // x,y normalisés autour du centre, coeur paramétrique
+    var X = x*1.28, Y = -y*1.28 + 0.12;
+    var a = X*X + Y*Y - 1;
+    return a*a*a - X*X*Y*Y*Y <= 0;
+  }
+
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio||1, 2);
+    W = Math.min(620, window.innerWidth - 16);
+    H = Math.round(W * 0.94);
+    canvas.width = W*DPR; canvas.height = H*DPR;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    placer();
+  }
+
+  function graine(n){ var x=Math.sin(n*127.1+311.7)*43758.5453; return x-Math.floor(x); }
+
+  function placer(){
+    places = [];
+    var echelle = W/620;
+    mots.forEach(function(m, i){
+      var taille = m.p * 1.35 * echelle;
+      ctx.font = (i<2 ? 'italic ' : '') + '500 ' + taille + 'px Fraunces, Georgia, serif';
+      var larg = ctx.measureText(m.t).width;
+      var haut = taille;
+      var ok = false, essai = 0, x=0, y=0;
+      while(!ok && essai < 900){
+        essai++;
+        var g1 = graine(i*997 + essai*13);
+        var g2 = graine(i*613 + essai*29 + 7);
+        x = (g1*2-1) * 0.94;
+        y = (g2*2-1) * 0.94;
+        // les mots importants vers le centre
+        if(i < 4){ x *= 0.45; y *= 0.4; }
+        var cx = W/2 + x*W/2, cy = H/2 + y*H/2;
+        // tout le rectangle du mot doit être dans le coeur
+        var coins = [[-larg/2,-haut/2],[larg/2,-haut/2],[-larg/2,haut/2],[larg/2,haut/2],[0,0]];
+        var dedans = coins.every(function(c){
+          return dansCoeur((cx+c[0]-W/2)/(W/2), (cy+c[1]-H/2)/(H/2));
+        });
+        if(!dedans) continue;
+        // pas de chevauchement
+        var libre = places.every(function(p){
+          return Math.abs(cx-p.x) > (larg+p.l)/2 + 6 || Math.abs(cy-p.y) > (haut+p.h)/2 + 4;
+        });
+        if(libre){
+          ok = true;
+          places.push({x:cx, y:cy, l:larg, h:haut, m:m, taille:taille, i:i, delai:i*0.12});
+        }
+      }
+    });
+  }
+
+  var couleurs = ['#E1806F','#B05A7A','#C98A50','#7A6E82','#946F8C'];
+  function dessiner(now){
+    var t = (now-t0)/1000;
+    ctx.clearRect(0,0,W,H);
+    // silhouette du coeur, très discrète
+    ctx.save();
+    ctx.globalAlpha = 0.06;
+    ctx.fillStyle = '#E1806F';
+    var pas = 6;
+    for(var px=0; px<W; px+=pas){
+      for(var py=0; py<H; py+=pas){
+        if(dansCoeur((px-W/2)/(W/2), (py-H/2)/(H/2))){
+          ctx.fillRect(px,py,pas,pas);
+        }
+      }
+    }
+    ctx.restore();
+    places.forEach(function(p){
+      var app = reduce ? 1 : Math.min(1, Math.max(0, (t - p.delai)/0.8));
+      if(app <= 0) return;
+      var puls = (p.i < 2 && !reduce) ? (1 + 0.02*Math.sin(t*2 + p.i)) : 1;
+      ctx.save();
+      ctx.globalAlpha = app;
+      ctx.translate(p.x, p.y);
+      ctx.scale(puls, puls);
+      ctx.font = (p.i<2 ? 'italic ' : '') + '500 ' + p.taille + 'px Fraunces, Georgia, serif';
+      ctx.fillStyle = p.i===0 ? '#D9576B' : couleurs[p.i % couleurs.length];
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(p.m.t, 0, 0);
+      ctx.restore();
+    });
+    requestAnimationFrame(dessiner);
+  }
+
+  var phraseEl = document.getElementById('phrase');
+  var aideEl = document.getElementById('aide');
+  canvas.addEventListener('click', function(e){
+    var r = canvas.getBoundingClientRect();
+    var cx = e.clientX - r.left, cy = e.clientY - r.top;
+    var trouve = null, dmin = 1e9;
+    places.forEach(function(p){
+      if(Math.abs(cx-p.x) < p.l/2+10 && Math.abs(cy-p.y) < p.h/2+8){
+        var d = (cx-p.x)*(cx-p.x)+(cy-p.y)*(cy-p.y);
+        if(d < dmin){ dmin = d; trouve = p; }
+      }
+    });
+    if(trouve){
+      phraseEl.textContent = trouve.m.ph;
+      phraseEl.classList.add('visible');
+      aideEl.style.display = 'none';
+    }
+  });
+
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(dessiner);
+})();
+</script>
+</body>
+</html>
