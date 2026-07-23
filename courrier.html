@@ -86,6 +86,20 @@
   <div id="contenu">
 
     <div class="carte">
+      <h2>Le bonjour & la bonne nuit du jour ☀️🌙</h2>
+      <p class="note" style="margin-bottom:12px;">Écris ici ton message du jour. Le matin, elle verra ton bonjour ; le soir, ta bonne nuit. Si tu ne mets rien, le site affiche une belle lettre de ta bibliothèque à ta place — mais rien ne vaut ta plume à toi, aujourd'hui, rien que pour ce jour.</p>
+      <p style="font-weight:700;color:var(--corail);font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">☀️ Le bonjour d'aujourd'hui</p>
+      <textarea id="bjTexte" placeholder="Ton bonjour romantique du jour, aussi long que tu veux…" style="min-height:120px;"></textarea>
+      <button class="btn" id="bjBtn">Publier le bonjour</button>
+      <p class="ok" id="bjOk">Publié. Elle le lira en ouvrant sa page ce matin. ☀️</p>
+      <p style="font-weight:700;color:var(--corail);font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 6px;">🌙 La bonne nuit d'aujourd'hui</p>
+      <textarea id="bnTexte" placeholder="Ta bonne nuit romantique du jour…" style="min-height:120px;"></textarea>
+      <button class="btn" id="bnBtn">Publier la bonne nuit</button>
+      <p class="ok" id="bnOk">Publié. Elle la lira ce soir. 🌙</p>
+      <div id="bjEtat" class="note" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="carte">
       <h2>Ses mots 💌</h2>
       <div id="motsZone"><p class="vide">Je regarde la boîte aux lettres…</p></div>
       <p class="note">Ouvrir cette page marque ses mots comme lus : elle verra « lu par Mathieu » sur sa page. C'est voulu — c'est l'accusé de lecture amoureux.</p>
@@ -196,7 +210,43 @@
   });
   try{ if(localStorage.getItem('courrier_ok')==='1') ouvrir(); }catch(e){}
 
+  // Le bonjour & la bonne nuit du jour
+  function auj(){ return new Date().toISOString().slice(0,10); }
+  function chargerMessagesJour(){
+    dbLire('messages_jour', 'pour_date=eq.' + auj() + '&order=created_at.desc').then(function(rows){
+      rows = rows || [];
+      var bj = rows.find(function(r){ return r.type === 'bonjour'; });
+      var bn = rows.find(function(r){ return r.type === 'bonne_nuit'; });
+      var etat = document.getElementById('bjEtat');
+      var parts = [];
+      parts.push(bj ? '☀️ Bonjour du jour : publié' + (bj.lu_le ? ' · lu ✓' : ' · pas encore lu') : '☀️ Bonjour du jour : pas encore écrit (le site mettra une lettre de la bibliothèque)');
+      parts.push(bn ? '🌙 Bonne nuit : publiée' + (bn.lu_le ? ' · lue ✓' : ' · pas encore lue') : '🌙 Bonne nuit : pas encore écrite');
+      etat.innerHTML = parts.join('<br>');
+      if(bj) document.getElementById('bjTexte').value = bj.texte;
+      if(bn) document.getElementById('bnTexte').value = bn.texte;
+    });
+  }
+  document.getElementById('bjBtn').addEventListener('click', function(){
+    var t = document.getElementById('bjTexte').value.trim();
+    if(!t) return;
+    dbInserer('messages_jour', {type:'bonjour', texte:t, pour_date:auj()}).then(function(){
+      var ok = document.getElementById('bjOk'); ok.style.display='block';
+      setTimeout(function(){ok.style.display='none';}, 4000);
+      chargerMessagesJour();
+    });
+  });
+  document.getElementById('bnBtn').addEventListener('click', function(){
+    var t = document.getElementById('bnTexte').value.trim();
+    if(!t) return;
+    dbInserer('messages_jour', {type:'bonne_nuit', texte:t, pour_date:auj()}).then(function(){
+      var ok = document.getElementById('bnOk'); ok.style.display='block';
+      setTimeout(function(){ok.style.display='none';}, 4000);
+      chargerMessagesJour();
+    });
+  });
+
   function charger(){
+    chargerMessagesJour();
     chargerLettres();
     chargerLpm();
     chargerChansons();

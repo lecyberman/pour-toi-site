@@ -390,6 +390,29 @@
     font-style:italic;margin-top:12px;text-align:left;
   }
 
+  /* --- La lettre du jour (bonjour / bonne nuit) --- */
+  .lettre-jour{
+    background:linear-gradient(160deg, rgba(252,248,250,.9), rgba(247,236,232,.85));
+    border:1px solid rgba(225,128,111,.22);
+    border-radius:18px;
+    padding:22px 22px 20px;
+    margin:4px 0 18px;
+    box-shadow:0 16px 40px -30px rgba(70,57,79,.55);
+  }
+  .lettre-jour .lj-tete{
+    font-weight:700;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--corail);margin-bottom:12px;display:flex;align-items:center;gap:8px;
+  }
+  .lettre-jour .lj-texte{
+    font-size:1.06rem;line-height:1.75;white-space:pre-line;
+  }
+  .lettre-jour .lj-sign{
+    margin-top:14px;font-family:var(--display);font-style:italic;color:var(--corail);font-size:1.02rem;
+  }
+  body.t-nuit .lettre-jour{
+    background:linear-gradient(160deg, rgba(251,247,250,.95), rgba(245,238,246,.9));
+  }
+
   /* --- Bouton voix (idée 11) --- */
   .voix{
     display:inline-flex;align-items:center;gap:8px;
@@ -502,6 +525,11 @@
     <h1 id="greetTitle">Coucou,<br>dadouchérie</h1>
     <p class="special" id="jourSpecial" hidden></p>
     <p class="special" id="motDuJour" hidden></p>
+    <div class="lettre-jour" id="lettreJour" hidden>
+      <div class="lj-tete" id="ljTete"></div>
+      <div class="lj-texte" id="ljTexte"></div>
+      <div class="lj-sign">Ton Mathieu</div>
+    </div>
     <div id="greetBody"></div>
     <button class="voix" data-audio="/bonjour.mp3"><span class="onde"><i></i><i></i><i></i><i></i></span> écoute mon bonjour</button>
     <p class="soft" id="visites" hidden></p>
@@ -635,6 +663,7 @@
 <button class="piece" id="piece" aria-label="une pièce dorée">🪙</button>
 <div class="tresor-msg" id="tresorMsg"></div>
 
+<script src="/bonjours.js"></script>
 <script>
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -969,6 +998,50 @@
       headers:{'apikey':DB_KEY,'Authorization':'Bearer ' + DB_KEY}
     }).then(function(r){ return r.json(); }).catch(function(){ return []; });
   }
+
+  /* ============ LA LETTRE DU JOUR (bonjour le matin, bonne nuit le soir) ============ */
+  (function(){
+    var estNuit = (periode === 'soir' || periode === 'nuit');
+    var type = estNuit ? 'bonne_nuit' : 'bonjour';
+    var lettreJour = document.getElementById('lettreJour');
+    var ljTete = document.getElementById('ljTete');
+    var ljTexte = document.getElementById('ljTexte');
+
+    // jour de l'année, pour faire tourner la bibliothèque
+    var d = new Date();
+    var debutAnnee = new Date(d.getFullYear(), 0, 0);
+    var jourAnnee = Math.floor((d - debutAnnee) / 86400000);
+
+    var biblio = estNuit ? (window.BONNES_NUITS || []) : (window.BONJOURS || []);
+    var texteBiblio = biblio.length ? biblio[jourAnnee % biblio.length] : '';
+    var teteMatin = ['☀️ ton bonjour du jour', '☀️ ton bonjour du jour', '🌸 ton bonjour du jour'];
+    var teteNuit  = ['🌙 ta bonne nuit', '🌙 ta bonne nuit', '✨ ta bonne nuit'];
+
+    function afficher(texte, deLui){
+      ljTete.textContent = estNuit ? teteNuit[0] : teteMatin[0];
+      if(deLui){ ljTete.textContent += ' · écrit pour toi aujourd\'hui'; }
+      ljTexte.textContent = texte;
+      lettreJour.hidden = false;
+    }
+
+    // 1) message personnalisé de Mathieu pour aujourd'hui ? sinon 2) bibliothèque
+    var auj = d.toISOString().slice(0,10);
+    dbLireDadou('messages_jour', 'type=eq.' + type + '&pour_date=eq.' + auj + '&order=created_at.desc&limit=1').then(function(rows){
+      if(rows && rows.length){
+        afficher(rows[0].message ? rows[0].message : rows[0].texte, true);
+        // accusé de lecture : elle a lu le message du jour
+        if(!rows[0].lu_le){
+          fetch(DB_URL + '/rest/v1/messages_jour?id=eq.' + rows[0].id, {
+            method:'PATCH',
+            headers:{'Content-Type':'application/json','apikey':DB_KEY,'Authorization':'Bearer '+DB_KEY,'Prefer':'return=minimal'},
+            body:JSON.stringify({lu_le:new Date().toISOString()})
+          }).catch(function(){});
+        }
+      } else if(texteBiblio){
+        afficher(texteBiblio, false);
+      }
+    });
+  })();
 
   // Le mot épinglé par Mathieu (s'il y en a un de moins de 3 jours)
   dbLireDadou('mot_du_jour','order=created_at.desc&limit=1').then(function(rows){
