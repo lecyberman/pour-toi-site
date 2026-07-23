@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>La carte de nos rêves</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --display:'Fraunces', Georgia, serif;
+    --body:'Nunito Sans', system-ui, sans-serif;
+    --or:#E8B45C; --corail:#E1806F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:var(--body);color:#EAF0F6;
+    background:
+      radial-gradient(120% 80% at 80% 0%, #1E3050 0%, transparent 55%),
+      radial-gradient(100% 70% at 15% 100%, #172742 0%, transparent 60%),
+      #0F1B30;
+    min-height:100dvh;padding:28px 14px 60px;overflow-x:hidden;
+  }
+  .tete{text-align:center;max-width:560px;margin:0 auto 20px;}
+  .eyebrow{font-weight:700;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--or);margin:0 0 10px;}
+  h1{font-family:var(--display);font-weight:500;font-size:clamp(1.8rem,7vw,2.5rem);margin:0 0 8px;}
+  .sous{color:#A9B6CC;font-size:.96rem;line-height:1.6;}
+  .carte-wrap{max-width:900px;margin:0 auto;position:relative;}
+  svg{width:100%;height:auto;display:block;}
+  .terre{fill:#24374F;stroke:#33496A;stroke-width:.4;}
+  .point{cursor:pointer;}
+  .point circle.halo{fill:var(--or);opacity:.18;}
+  .point circle.coeur{fill:#FFF4E0;stroke:var(--or);stroke-width:1.4;}
+  .point:hover circle.coeur{fill:var(--or);}
+  .pin-label{fill:#EAF0F6;font-size:8px;font-family:var(--body);font-weight:600;pointer-events:none;text-anchor:middle;opacity:.85;}
+  .detail{
+    max-width:560px;margin:22px auto 0;background:rgba(20,32,54,.75);
+    border:1px solid rgba(232,180,92,.3);border-radius:18px;padding:22px 24px;
+    backdrop-filter:blur(6px);opacity:0;transform:translateY(10px);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .detail.visible{opacity:1;transform:none;}
+  .detail .lieu{font-family:var(--display);font-size:1.5rem;color:var(--or);margin-bottom:4px;}
+  .detail .quoi{font-size:.82rem;color:#A9B6CC;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;}
+  .detail .txt{font-size:1.02rem;line-height:1.65;}
+  .compteur-rev{text-align:center;margin-top:18px;color:#A9B6CC;font-size:.9rem;}
+  .liens{margin-top:30px;text-align:center;font-size:.92rem;color:#A9B6CC;}
+  .liens a{color:var(--or);text-decoration:none;font-weight:600;}
+  .etoilefond{position:fixed;inset:0;pointer-events:none;z-index:0;}
+  .etoilefond span{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.5;animation:scint 3s ease-in-out infinite;}
+  @keyframes scint{0%,100%{opacity:.2;}50%{opacity:.7;}}
+  .carte-wrap, .tete, .detail, .liens{position:relative;z-index:2;}
+</style>
+</head>
+<body>
+<!-- Dix rêves posés sur le monde. On les décrochera un par un. -->
+<div class="etoilefond" id="etoilefond" aria-hidden="true"></div>
+
+<div class="tete">
+  <p class="eyebrow">là où on ira</p>
+  <h1>La carte de nos rêves</h1>
+  <p class="sous">Chaque étoile dorée est un endroit qu'on s'est promis. Touche-les. Le jour où on en décroche un, il rejoindra nos souvenirs — et la carte s'allègera d'un rêve, parce qu'il sera devenu réel.</p>
+</div>
+
+<div class="carte-wrap">
+  <svg id="mapsvg" viewBox="0 0 1000 500" role="img" aria-label="Carte du monde de nos destinations de rêve">
+    <rect x="0" y="0" width="1000" height="500" fill="none"/>
+    <g id="continents"></g>
+    <g id="pins"></g>
+  </svg>
+</div>
+
+<div class="detail" id="detail">
+  <div class="lieu" id="dLieu"></div>
+  <div class="quoi" id="dQuoi"></div>
+  <div class="txt" id="dTxt"></div>
+</div>
+
+<p class="compteur-rev" id="compteur"></p>
+<p class="liens"><a href="/">⌂ accueil</a> · <a href="/dadoucherie">ta page</a> · <a href="/histoire">notre histoire</a> · <a href="/voyages" onclick="return true;">nos voyages déjà faits</a></p>
+
+<script>
+(function(){
+  // fond d'étoiles
+  var ef = document.getElementById('etoilefond');
+  for(var i=0;i<70;i++){
+    var s=document.createElement('span');
+    s.style.left=Math.random()*100+'vw';
+    s.style.top=Math.random()*100+'vh';
+    s.style.animationDelay=(Math.random()*3)+'s';
+    s.style.transform='scale('+(0.5+Math.random()*1.5)+')';
+    ef.appendChild(s);
+  }
+
+  // Silhouette très simplifiée des continents (équirectangulaire, décoratif)
+  var continents = [
+    // Amérique du Nord
+    "M120,90 L200,80 L250,110 L240,160 L200,210 L170,200 L150,150 L120,130 Z",
+    // Amérique du Sud
+    "M240,250 L290,240 L300,300 L280,370 L250,400 L235,340 L245,290 Z",
+    // Europe
+    "M470,95 L540,85 L560,120 L530,150 L490,150 L465,125 Z",
+    // Afrique
+    "M480,180 L560,170 L580,230 L560,310 L510,340 L485,290 L475,220 Z",
+    // Asie
+    "M580,80 L780,70 L860,110 L840,180 L760,200 L660,180 L600,150 L575,110 Z",
+    // Asie du Sud-Est / Inde
+    "M640,200 L720,195 L760,230 L730,270 L680,255 L650,225 Z",
+    // Australie
+    "M800,320 L870,310 L890,350 L860,385 L810,375 L795,345 Z"
+  ];
+  var gc = document.getElementById('continents');
+  continents.forEach(function(d){
+    var p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',d); p.setAttribute('class','terre');
+    gc.appendChild(p);
+  });
+
+  // lon/lat -> x/y (projection équirectangulaire sur 1000x500)
+  function proj(lon, lat){
+    return { x: (lon+180)/360*1000, y: (90-lat)/180*500 };
+  }
+
+  var reves = [
+    {nom:'Polynésie française', lon:-149.4, lat:-17.5, quoi:'lagons & bungalows sur l\'eau',
+     txt:"Le rêve turquoise. Un lagon si clair qu'on verra le fond, un bungalow sur pilotis, et rien d'autre à faire que d'être là, ensemble. Le genre d'endroit qu'on regarde en photo en se disant « un jour ». Ce jour, on le mettra dans le calendrier."},
+    {nom:'Chine', lon:104, lat:35, quoi:'la Grande Muraille & les lanternes',
+     txt:"Marcher sur quelque chose qu'on voit depuis l'espace, main dans la main. Se perdre dans une mégapole illuminée. Manger des choses qu'on ne sait pas nommer et adorer ça. La Chine, c'est le dépaysement total, et j'ai envie de le vivre avec toi."},
+    {nom:'Corée du Sud', lon:127.8, lat:36.5, quoi:'Séoul, la nuit qui ne dort jamais',
+     txt:"Séoul illuminée, les palais anciens à côté des néons, la street food à minuit. Un pays qui ne dort jamais — donc parfait pour deux insomniaques comme nous. On y traînera jusqu'à l'aube, notre spécialité."},
+    {nom:'Croisière transatlantique', lon:-40, lat:38, quoi:'traverser un océan, à deux',
+     txt:"Ton rêve à toi : traverser l'Atlantique en bateau. Plusieurs jours entre deux continents, juste de l'eau à l'horizon, et nous au milieu. Rappelle-toi la lettre de la mer : ce qu'il y a tout au fond, c'est toi. Là, on sera dessus, ensemble, pendant des jours."},
+    {nom:'Carnaval de Rio', lon:-43.2, lat:-22.9, quoi:'la plus grande fête du monde',
+     txt:"Le carnaval de Rio. Les couleurs, la musique qui fait vibrer le sol, la foule en joie. Toi qui aimes danser, moi qui te regarderai danser. La fête la plus intense de la planète, à cocher ensemble."},
+    {nom:'Festival Yi Peng, Thaïlande', lon:98.98, lat:18.79, quoi:'mille lanternes dans le ciel',
+     txt:"Chiang Mai, le festival Yi Peng. Des milliers de lanternes qui montent dans la nuit en même temps. On en tiendra une chacun, on fera un vœu, et on la lâchera. Je te préviens tout de suite : mon vœu sera déjà exaucé, parce que tu seras à côté de moi."},
+    {nom:'Champs de tulipes, Pays-Bas', lon:4.6, lat:52.27, quoi:'des fleurs à perte de vue',
+     txt:"Les champs de tulipes de Keukenhof au printemps. Des kilomètres de fleurs, toutes les couleurs qui existent, alignées sous un ciel doux. Toi qui aimes les fleurs et les jolis décors de film : celui-là est réel, et il t'attend."},
+    {nom:'Jérusalem', lon:35.2, lat:31.78, quoi:'trois mille ans d\'histoire',
+     txt:"Marcher dans une ville où chaque pierre a vu passer des millénaires. Jérusalem, ses ruelles, sa lumière particulière, son poids d'histoire. Un voyage qui n'est pas seulement beau : il fait réfléchir. On en reviendra un peu différents, tous les deux."},
+    {nom:'Tanzanie', lon:34.9, lat:-6.4, quoi:'safari & Kilimandjaro',
+     txt:"L'Afrique, la vraie, immense. Un safari où on retient notre souffle devant les lions, le Kilimandjaro qui domine tout, des couchers de soleil comme on n'en verra nulle part ailleurs. La nature à son état le plus spectaculaire, partagée avec toi."},
+    {nom:'Japon', lon:138, lat:36.5, quoi:'cerisiers, temples & néons',
+     txt:"Le Japon, notre grand classique du rêve. Les cerisiers au printemps (les pétales qui tombent, comme sur ta page), les temples silencieux, Tokyo en folie, un bol de ramen à deux un soir de pluie. Le pays où la douceur et l'intensité cohabitent — comme nous."},
+    {nom:'Égypte', lon:30, lat:26.8, quoi:'les pyramides & le Nil',
+     txt:"Se tenir devant les pyramides, ces trucs qu'on apprend à l'école et qu'on n'ose pas croire réels. Naviguer sur le Nil au coucher du soleil. Toucher du doigt cinq mille ans d'histoire. Un rêve d'enfant qu'on réalisera en adultes, main dans la main."}
+  ];
+
+  var gp = document.getElementById('pins');
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  reves.forEach(function(r, i){
+    var p = proj(r.lon, r.lat);
+    var g = document.createElementNS(SVGNS,'g');
+    g.setAttribute('class','point');
+    g.setAttribute('transform','translate('+p.x+','+p.y+')');
+    var halo = document.createElementNS(SVGNS,'circle');
+    halo.setAttribute('class','halo'); halo.setAttribute('r','11');
+    var an = document.createElementNS(SVGNS,'animate');
+    an.setAttribute('attributeName','r'); an.setAttribute('values','7;13;7');
+    an.setAttribute('dur',(2.4+i*0.15)+'s'); an.setAttribute('repeatCount','indefinite');
+    halo.appendChild(an);
+    var c = document.createElementNS(SVGNS,'circle');
+    c.setAttribute('class','coeur'); c.setAttribute('r','3.4');
+    var label = document.createElementNS(SVGNS,'text');
+    label.setAttribute('class','pin-label'); label.setAttribute('y','-14');
+    label.textContent = r.nom.split(',')[0].split(' ')[0];
+    g.appendChild(halo); g.appendChild(c); g.appendChild(label);
+    g.addEventListener('click', function(){ afficher(r); });
+    gp.appendChild(g);
+  });
+
+  var detail = document.getElementById('detail');
+  function afficher(r){
+    document.getElementById('dLieu').textContent = r.nom;
+    document.getElementById('dQuoi').textContent = r.quoi;
+    document.getElementById('dTxt').textContent = r.txt;
+    detail.classList.add('visible');
+    detail.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  document.getElementById('compteur').textContent = reves.length + ' rêves sur la carte. Zéro cliché : ce sont les tiens, les vrais. On les décrochera un par un.';
+
+  // premier rêve montré au hasard, pour donner envie
+  setTimeout(function(){ afficher(reves[Math.floor(Math.random()*reves.length)]); }, 900);
+})();
+</script>
+</body>
+</html>
