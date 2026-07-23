@@ -87,7 +87,7 @@
 
     <div class="carte">
       <h2>Le bonjour & la bonne nuit du jour ☀️🌙</h2>
-      <p class="note" style="margin-bottom:12px;">Écris ici ton message du jour. Le matin, elle verra ton bonjour ; le soir, ta bonne nuit. Si tu ne mets rien, le site affiche une belle lettre de ta bibliothèque à ta place — mais rien ne vaut ta plume à toi, aujourd'hui, rien que pour ce jour.</p>
+      <p class="note" style="margin-bottom:12px;">Écris ici ton message du jour. Le matin, elle verra ton bonjour ; le soir, ta bonne nuit. Si tu ne mets rien, le site affiche une belle lettre de ta bibliothèque à ta place, mais rien ne vaut ta plume à toi, aujourd'hui, rien que pour ce jour.</p>
       <p style="font-weight:700;color:var(--corail);font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">☀️ Le bonjour d'aujourd'hui</p>
       <textarea id="bjTexte" placeholder="Ton bonjour romantique du jour, aussi long que tu veux…" style="min-height:120px;"></textarea>
       <button class="btn" id="bjBtn">Publier le bonjour</button>
@@ -102,7 +102,7 @@
     <div class="carte">
       <h2>Ses mots 💌</h2>
       <div id="motsZone"><p class="vide">Je regarde la boîte aux lettres…</p></div>
-      <p class="note">Ouvrir cette page marque ses mots comme lus : elle verra « lu par Mathieu » sur sa page. C'est voulu — c'est l'accusé de lecture amoureux.</p>
+      <p class="note">Ouvrir cette page marque ses mots comme lus : elle verra « lu par Mathieu » sur sa page. C'est voulu, c'est l'accusé de lecture amoureux.</p>
     </div>
 
     <div class="carte">
@@ -256,7 +256,7 @@
       var z = document.getElementById('motsZone');
       z.innerHTML = '';
       if(!rows || !rows.length){
-        z.innerHTML = '<p class="vide">Rien pour l\'instant. Elle n\'a pas encore écrit — patience, ça viendra.</p>';
+        z.innerHTML = '<p class="vide">Rien pour l\'instant. Elle n\'a pas encore écrit, patience, ça viendra.</p>';
         return;
       }
       rows.forEach(function(m){
@@ -390,7 +390,7 @@
       (rows||[]).forEach(function(c,i){
         var d = document.createElement('div'); d.className='mot';
         d.innerHTML = '<div class="texte">🎵 ' + '</div><div class="meta">' + dateFr(c.created_at) + (i===0?' · en ce moment sur sa page':'') + '</div>';
-        d.querySelector('.texte').textContent = '🎵 ' + c.titre + (c.note ? ' — ' + c.note : '');
+        d.querySelector('.texte').textContent = '🎵 ' + c.titre + (c.note ? ', ' + c.note : '');
         z.appendChild(d);
       });
     });

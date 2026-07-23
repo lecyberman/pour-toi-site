@@ -274,7 +274,7 @@
     if(qi >= quiz.length){ montrerScore(); return; }
     var item = quiz[qi];
     var q = document.createElement('p'); q.className='q';
-    q.textContent = (qi+1) + '/' + quiz.length + ' — ' + item.q;
+    q.textContent = (qi+1) + '/' + quiz.length + ', ' + item.q;
     quizZone.appendChild(q);
     var opts = document.createElement('div'); opts.className='opts';
     item.opts.forEach(function(o, idx){
@@ -335,7 +335,7 @@
             el.textContent = '🤍'; // la maison paie toujours
             if(i === 2){
               setTimeout(function(){
-                verdict.textContent = '🎉 JACKPOT : 🤍🤍🤍 — tu m\'as gagné, moi. Le plus gros lot de la maison, et il est déjà à toi.';
+                verdict.textContent = '🎉 JACKPOT : 🤍🤍🤍, tu m\'as gagné, moi. Le plus gros lot de la maison, et il est déjà à toi.';
                 pluie(['🤍','💰','🪙','✨','💗'], 40, 18);
                 enCours = false;
               }, 300);
@@ -356,7 +356,7 @@
     try{ score = JSON.parse(localStorage.getItem('pfc_score') || '{"toi":0,"site":0}'); }
     catch(e){ score = {toi:0, site:0}; }
     function majScore(){
-      scoreEl.textContent = 'Score : toi ' + score.toi + ' — le site ' + score.site + '. Le perdant fait la vaisselle. C\'est la règle, je l\'ai écrite.';
+      scoreEl.textContent = 'Score : toi ' + score.toi + ', le site ' + score.site + '. Le perdant fait la vaisselle. C\'est la règle, je l\'ai écrite.';
     }
     majScore();
     document.querySelectorAll('[data-pfc]').forEach(function(b){
@@ -364,7 +364,7 @@
         var choixToi = b.dataset.pfc;
         var opts = ['pierre','feuille','ciseaux'];
         var choixSite = opts[Math.floor(Math.random()*3)];
-        var txt = 'Toi ' + emoji[choixToi] + ' contre ' + emoji[choixSite] + ' — ';
+        var txt = 'Toi ' + emoji[choixToi] + ' contre ' + emoji[choixSite] + ', ';
         if(choixToi === choixSite){
           txt += 'égalité. On rejoue, personne n\'échappe à la vaisselle comme ça.';
         } else if(bat[choixToi] === choixSite){
@@ -676,7 +676,7 @@
 
   /* Signature + onglet */
   var artisans = [
-    "fait main, pour toi, depuis 2020 — aujourd'hui encore.",
+    "fait main, pour toi, depuis 2020, aujourd'hui encore.",
     "les jeux sont truqués : tu gagnes mon cœur à tous les coups.",
     "site garanti sans tricheur (sauf peut-être Mathieu au quiz).",
     "construit un soir où tu me manquais.",
