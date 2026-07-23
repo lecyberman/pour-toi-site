@@ -476,11 +476,9 @@
 
 <!-- Si tu lis ce code source, c'est que tu as fait Ctrl+U par curiosité. Alors sache-le : je t'aime aussi en HTML. Signé : l'ingénieur qui t'aime. -->
 
-<!-- Pour ajouter une musique douce : dépose un fichier "musique.mp3" à côté de ce fichier. Le bouton en haut à droite la lancera. Sans fichier, le bouton reste discret et sans effet. -->
-<audio id="audio" loop preload="none">
-  <source src="musique.mp3" type="audio/mpeg" />
-</audio>
-<button class="sound" id="soundBtn" aria-pressed="false">🔇 musique</button>
+<!-- Ambiance sonore originale, une par moment de la journée. La source est choisie par le script selon l'heure. -->
+<audio id="audio" loop preload="none"></audio>
+<button class="sound" id="soundBtn" aria-pressed="false">🔇 ambiance</button>
 
 <!-- Le ciel : papillons, pétales, étoiles… selon l'heure -->
 <div class="ciel" id="ciel" aria-hidden="true"></div>
@@ -1406,24 +1404,30 @@
     });
   })();
 
-  /* ============ 7. SON (optionnel, off par défaut) ============ */
+  /* ============ 7. AMBIANCE SONORE (une par moment de la journée) ============ */
   var audio = document.getElementById('audio');
   var soundBtn = document.getElementById('soundBtn');
+  audio.src = '/musique-' + periode + '.mp3';   // l'ambiance suit l'heure, comme le reste
+  audio.volume = 0.55;
+  var nomsAmbiance = {
+    aube:'ambiance de l\'aube', matin:'ambiance du matin', apresmidi:'ambiance du jour',
+    soir:'ambiance du soir', nuit:'ambiance de la nuit'
+  };
   var on = false;
   soundBtn.addEventListener('click', function(){
     on = !on;
     soundBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
     if(on){
       audio.play().then(function(){
-        soundBtn.textContent = '🔊 musique';
+        soundBtn.textContent = '🔊 ' + nomsAmbiance[periode];
       }).catch(function(){
         on = false;
         soundBtn.setAttribute('aria-pressed','false');
-        soundBtn.textContent = '🔇 musique';
+        soundBtn.textContent = '🔇 ambiance';
       });
     } else {
       audio.pause();
-      soundBtn.textContent = '🔇 musique';
+      soundBtn.textContent = '🔇 ambiance';
     }
   });
 
