@@ -46,6 +46,15 @@
   .env.ouverte{cursor:default;}
   .env.ouverte .contenu{display:block;animation:doux .8s ease both;}
   @keyframes doux{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .voix{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--corail);color:#fff;border:none;border-radius:100px;
+    padding:11px 20px;font-family:var(--body);font-weight:700;font-size:.95rem;
+    cursor:pointer;margin:14px 0 0;
+    box-shadow:0 10px 22px -12px rgba(225,128,111,.8);transition:transform .18s;
+  }
+  .voix:hover{transform:translateY(-2px);}
+  .voix.joue{background:var(--miel);color:#4A3714;}
   .note{text-align:center;font-size:.88rem;color:var(--encre-douce);margin-top:26px;}
   .liens{margin-top:30px;text-align:center;font-size:.92rem;color:var(--encre-douce);}
   .liens a{color:var(--corail);text-decoration:none;font-weight:600;}
@@ -59,6 +68,9 @@
   <p class="eyebrow">à n'ouvrir que si besoin</p>
   <h1>Au cas où</h1>
   <p class="sous">Quatre enveloppes, écrites à l'avance, pour les moments où je ne suis pas là au bon moment. Tu n'es pas obligée de les ouvrir. Elles ne périment jamais. Elles se rechargent à volonté.</p>
+  <div style="text-align:center;">
+    <button class="voix" data-audio="/au-cas-ou.mp3"><span>🔊</span> avant de lire, écoute ma voix</button>
+  </div>
 
   <div class="env" data-cle="doute">
     <div class="quand">Ouvre-moi si tu doutes de nous</div>
@@ -117,6 +129,20 @@ En attendant : envoie-moi un message, même juste un mot. Ou va sur la page de n
 (function(){
   var DB_URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
   var DB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  // bouton voix
+  (function(){
+    var lecteur = null;
+    document.querySelectorAll('.voix').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(lecteur && !lecteur.paused){ lecteur.pause(); lecteur.currentTime=0; btn.classList.remove('joue'); lecteur=null; return; }
+        lecteur = new Audio(btn.dataset.audio);
+        btn.classList.add('joue');
+        lecteur.play().catch(function(){ btn.classList.remove('joue'); });
+        lecteur.addEventListener('ended', function(){ btn.classList.remove('joue'); });
+      });
+    });
+  })();
+
   document.querySelectorAll('.env').forEach(function(env){
     env.addEventListener('click', function(){
       if(env.classList.contains('ouverte')) return;

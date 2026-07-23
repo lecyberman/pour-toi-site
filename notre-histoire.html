@@ -65,6 +65,15 @@
     display:inline-block;background:#F4ECF2;border-radius:100px;padding:6px 14px;
     font-size:.86rem;color:var(--encre-douce);margin-top:4px;
   }
+  .voix{
+    display:inline-flex;align-items:center;gap:7px;
+    background:var(--corail);color:#fff;border:none;border-radius:100px;
+    padding:9px 16px;font-family:var(--body);font-weight:700;font-size:.88rem;
+    cursor:pointer;margin-top:10px;box-shadow:0 8px 20px -12px rgba(225,128,111,.8);
+    transition:transform .18s;
+  }
+  .voix:hover{transform:translateY(-2px);}
+  .voix.joue{background:var(--miel);color:#4A3714;}
 
   /* Sa version */
   .saversion{margin-top:16px;border-top:1px dashed rgba(70,57,79,.15);padding-top:14px;}
@@ -147,7 +156,8 @@
       <p class="quand">1er janvier 2020 · Lyon</p>
       <h2>La première fois en vrai</h2>
       <p>Premier jour de l'année, première fois de nous. Le monde entier prenait des résolutions qu'il allait abandonner en février ; moi j'en ai pris une seule en te voyant arriver, et je la tiens encore. Il n'y a pas eu d'effet spécial, pas de musique de film. Juste une certitude, arrivée sans prévenir : c'était toi.</p>
-      <span class="chanson">🎵 notre chanson de cette époque : à toi de me la rappeler</span>
+      <span class="chanson">🎵 notre chanson de cette époque : à toi de me la rappeler</span><br>
+      <button class="voix" data-audio="/souvenir-lyon.mp3">🔊 écoute-moi te raconter ce jour</button>
       <div class="saversion" data-etape="lyon">
         <div class="titre">Ta version à toi</div>
         <div class="zone"></div>
@@ -160,6 +170,7 @@
       <p>La deuxième fois qu'on se voyait. On a parlé. De nos sentiments, de nos peurs, de nos envies, de tout ce qu'on gardait depuis des années. Le soleil s'est levé et on parlait encore. Certaines nuits font plus avancer une vie que des années entières : celle-là est la nôtre.</p>
       <p class="soft">C'est cette nuit-là que « toi et moi » est devenu « nous ».</p>
       <p><a href="/nuit" style="color:var(--corail);font-weight:700;text-decoration:none;">🌌 revivre cette nuit, minute par minute →</a></p>
+      <button class="voix" data-audio="/souvenir-nuit.mp3">🔊 écoute-moi te raconter notre nuit</button>
       <div class="saversion" data-etape="nuit">
         <div class="titre">Ta version à toi</div>
         <div class="zone"></div>
@@ -303,6 +314,22 @@
     });
   }
   chargerPremiers();
+
+  // Boutons voix (idée 11)
+  (function(){
+    var lecteur = null, courant = null;
+    document.querySelectorAll('.voix').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(courant === btn && lecteur && !lecteur.paused){ lecteur.pause(); btn.classList.remove('joue'); lecteur=null; courant=null; return; }
+        if(lecteur){ lecteur.pause(); }
+        if(courant){ courant.classList.remove('joue'); }
+        lecteur = new Audio(btn.dataset.audio); courant = btn;
+        btn.classList.add('joue');
+        lecteur.play().catch(function(){ btn.classList.remove('joue'); });
+        lecteur.addEventListener('ended', function(){ btn.classList.remove('joue'); });
+      });
+    });
+  })();
 
   // Pièce d'or (2/3)
   var piece = document.getElementById('piece');
