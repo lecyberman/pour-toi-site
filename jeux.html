@@ -132,6 +132,30 @@
     <div id="quizZone"></div>
   </div>
 
+  <!-- LA MACHINE À SOUS DE L'AMOUR -->
+  <div class="carte">
+    <h2>La machine à sous de l'amour 🎰</h2>
+    <p class="desc">Un clin d'œil à Monaco et à ton amour des jolies choses qui brillent. Tire le levier. La maison paie toujours, ici.</p>
+    <div id="rouleaux" style="display:flex;gap:10px;justify-content:center;font-size:2.6rem;margin:8px 0 14px;">
+      <span id="r0">🍒</span><span id="r1">💎</span><span id="r2">🔔</span>
+    </div>
+    <button class="btn" id="slotBtn">Tirer le levier 🎰</button>
+    <p id="slotVerdict" style="font-family:var(--display);font-size:1.15rem;color:var(--corail);margin-top:12px;min-height:26px;"></p>
+  </div>
+
+  <!-- PIERRE-FEUILLE-CISEAUX DES CORVÉES -->
+  <div class="carte">
+    <h2>Pierre-feuille-ciseaux des corvées ✊</h2>
+    <p class="desc">Pour trancher qui fait la vaisselle sans se disputer. Le perdant s'exécute (en principe).</p>
+    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:10px;">
+      <button class="opt" data-pfc="pierre" style="flex:0;font-size:1.6rem;padding:10px 16px;">✊</button>
+      <button class="opt" data-pfc="feuille" style="flex:0;font-size:1.6rem;padding:10px 16px;">✋</button>
+      <button class="opt" data-pfc="ciseaux" style="flex:0;font-size:1.6rem;padding:10px 16px;">✌️</button>
+    </div>
+    <p id="pfcVerdict" style="text-align:center;font-size:1rem;min-height:24px;"></p>
+    <p class="desc" id="pfcScore" style="text-align:center;"></p>
+  </div>
+
   <!-- QUI DE NOUS DEUX -->
   <div class="carte">
     <h2>Qui de nous deux ?</h2>
@@ -289,6 +313,72 @@
     dbInserer('quiz_resultats',{score:score, total:quiz.length});
   }
   montrerQuestion();
+
+  /* ============ MACHINE À SOUS DE L'AMOUR ============ */
+  (function(){
+    var symbolesAlea = ['🍒','💎','🔔','⭐','🍀','💰'];
+    var slotBtn = document.getElementById('slotBtn');
+    var verdict = document.getElementById('slotVerdict');
+    var enCours = false;
+    slotBtn.addEventListener('click', function(){
+      if(enCours) return;
+      enCours = true;
+      verdict.textContent = '';
+      var duree = [900, 1400, 2000];
+      [0,1,2].forEach(function(i){
+        var el = document.getElementById('r'+i);
+        var fin = Date.now() + duree[i];
+        var tour = setInterval(function(){
+          el.textContent = symbolesAlea[Math.floor(Math.random()*symbolesAlea.length)];
+          if(Date.now() >= fin){
+            clearInterval(tour);
+            el.textContent = '🤍'; // la maison paie toujours
+            if(i === 2){
+              setTimeout(function(){
+                verdict.textContent = '🎉 JACKPOT : 🤍🤍🤍 — tu m\'as gagné, moi. Le plus gros lot de la maison, et il est déjà à toi.';
+                pluie(['🤍','💰','🪙','✨','💗'], 40, 18);
+                enCours = false;
+              }, 300);
+            }
+          }
+        }, 80);
+      });
+    });
+  })();
+
+  /* ============ PIERRE-FEUILLE-CISEAUX DES CORVÉES ============ */
+  (function(){
+    var emoji = {pierre:'✊', feuille:'✋', ciseaux:'✌️'};
+    var bat = {pierre:'ciseaux', feuille:'pierre', ciseaux:'feuille'};
+    var verdict = document.getElementById('pfcVerdict');
+    var scoreEl = document.getElementById('pfcScore');
+    var score;
+    try{ score = JSON.parse(localStorage.getItem('pfc_score') || '{"toi":0,"site":0}'); }
+    catch(e){ score = {toi:0, site:0}; }
+    function majScore(){
+      scoreEl.textContent = 'Score : toi ' + score.toi + ' — le site ' + score.site + '. Le perdant fait la vaisselle. C\'est la règle, je l\'ai écrite.';
+    }
+    majScore();
+    document.querySelectorAll('[data-pfc]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var choixToi = b.dataset.pfc;
+        var opts = ['pierre','feuille','ciseaux'];
+        var choixSite = opts[Math.floor(Math.random()*3)];
+        var txt = 'Toi ' + emoji[choixToi] + ' contre ' + emoji[choixSite] + ' — ';
+        if(choixToi === choixSite){
+          txt += 'égalité. On rejoue, personne n\'échappe à la vaisselle comme ça.';
+        } else if(bat[choixToi] === choixSite){
+          score.toi++; txt += 'gagné ! La vaisselle est pour l\'autre. Savoure.';
+          pluie(['✨','🤍'], 8, 14);
+        } else {
+          score.site++; txt += 'perdu. Les gants t\'attendent. Courage, mon amour.';
+        }
+        verdict.textContent = txt;
+        try{ localStorage.setItem('pfc_score', JSON.stringify(score)); }catch(e){}
+        majScore();
+      });
+    });
+  })();
 
   /* ============ QUI DE NOUS DEUX ============ */
   var duels = [

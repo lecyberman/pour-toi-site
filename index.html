@@ -640,20 +640,29 @@
     </div>
   </div>
 
+  <!-- Accès discret au courrier de Mathieu (invisible pour elle) -->
+  <div id="facteur" title="" aria-hidden="true"
+       style="position:fixed;bottom:10px;right:12px;width:22px;height:22px;border-radius:50%;
+              z-index:9999;cursor:default;opacity:.12;font-size:13px;line-height:22px;text-align:center;
+              color:#7A6E82;user-select:none;">·</div>
+
   <script src="supabase.js"></script>
   <script src="script.js"></script>
   <script>
-  // Passage discret du facteur : trois appuis rapides sur ⌂ ouvrent le courrier.
+  // Passage discret du facteur : trois appuis rapides sur ⌂ OU sur le point en bas à droite ouvrent le courrier.
   (function(){
-    var clics = [];
-    document.addEventListener('click', function(e){
-      var b = e.target.closest('.btn-retour');
-      if(!b) return;
-      var t = Date.now();
-      clics = clics.filter(function(x){ return t - x < 1600; });
-      clics.push(t);
-      if(clics.length >= 3){ location.href = '/courrier'; }
-    });
+    function surveiller(selecteurTest){
+      var clics = [];
+      document.addEventListener('click', function(e){
+        if(!selecteurTest(e.target)) return;
+        var t = Date.now();
+        clics = clics.filter(function(x){ return t - x < 1600; });
+        clics.push(t);
+        if(clics.length >= 3){ location.href = '/courrier'; }
+      });
+    }
+    surveiller(function(el){ return el.closest && el.closest('.btn-retour'); });
+    surveiller(function(el){ return el.id === 'facteur'; });
   })();
   </script>
 </body>

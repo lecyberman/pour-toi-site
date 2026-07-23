@@ -1344,6 +1344,23 @@
     document.title = document.hidden ? 'reviens 🥺' : titreNormal;
   });
 
+  // Idée 95 : le favicon qui bat (un cœur dans l'onglet)
+  (function(){
+    if(reduce) return;
+    var lien = document.querySelector('link[rel="icon"]');
+    if(!lien){ lien = document.createElement('link'); lien.rel = 'icon'; document.head.appendChild(lien); }
+    var gros = true;
+    function battre(){
+      var taille = gros ? 30 : 24;
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">' +
+        '<text x="16" y="16" font-size="' + taille + '" text-anchor="middle" dominant-baseline="central">🤍</text></svg>';
+      lien.href = 'data:image/svg+xml,' + encodeURIComponent(svg);
+      gros = !gros;
+    }
+    battre();
+    setInterval(battre, 620);
+  })();
+
   /* ============ 7. SON (optionnel, off par défaut) ============ */
   var audio = document.getElementById('audio');
   var soundBtn = document.getElementById('soundBtn');
