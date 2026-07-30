@@ -68,6 +68,19 @@
     /* transition de sortie cinématique */
     #accueil.accueil-part{ transition:opacity .8s ease, filter .8s ease; opacity:0; filter:blur(6px); }
 
+    /* Menu masqué sur l'entrée : accueil pur, sans distraction */
+    #accueil.active ~ #nav-principale{ display:none !important; }
+
+    /* Popup d'accueil harmonisé avec la scène cinématique */
+    #popup-accueil .popup-fond{ background:rgba(16,14,32,.66) !important; }
+    #popup-accueil .popup-pour, #popup-accueil .popup-ornement{ color:#D9A441 !important; }
+    #popup-accueil .popup-titre{ font-family:'Fraunces',serif !important; font-weight:500 !important; }
+    #popup-accueil .popup-btn{
+      background:linear-gradient(135deg,#F3D08A,#E0A044) !important; color:#3A2416 !important;
+      font-family:'Nunito Sans',sans-serif !important; font-style:normal !important; font-weight:700 !important;
+      box-shadow:0 14px 34px -12px rgba(224,160,68,.7) !important;
+    }
+
     @media (prefers-reduced-motion:reduce){
       #accueil .btn-entrer{ animation:none; }
       #accueil-ciel{ display:none; }

@@ -2211,7 +2211,7 @@ const textePopupAccueil = {
 
   paragraphes: [
     {
-      texte: "Je l'ai créé pour notre anniversaire. Mais surtout parce que je voulais qu'il existe quelque chose de permanent — un endroit où nos moments ne disparaissent pas.",
+      texte: "Je l'ai créé pour notre anniversaire. Mais surtout parce que je voulais qu'il existe quelque chose de permanent, un endroit où nos moments ne disparaissent pas.",
       accent: false
     },
     {
@@ -2235,7 +2235,7 @@ const textePopupAccueil = {
   ],
 
   // ✏️ Change ça par ta façon de signer
-  signature: "— avec tout mon amour"
+  signature: "avec tout mon amour"
 };
 
 /* ================================================================
