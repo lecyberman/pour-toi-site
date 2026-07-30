@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Comment tu te sens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  body{ padding:34px 18px 80px; }
+  .wrap{ max-width:600px; margin:0 auto; position:relative; z-index:2; }
+  .tete{ text-align:center; margin-bottom:34px; }
+  .tete h1{ font-size:var(--fs-2xl); margin:.4rem 0 .5rem; }
+  .tete p{ color:var(--c-encre-douce); font-size:1rem; max-width:44ch; margin:0 auto; }
+  .bloc{ margin-bottom:26px; }
+  .bloc > h2{ font-family:var(--font-display); font-weight:500; font-size:1.4rem; margin:0 0 4px; }
+  .bloc > .desc{ color:var(--c-encre-douce); font-size:.94rem; margin:0 0 16px; }
+
+  /* Émotions : puces */
+  .emos{ display:flex; flex-wrap:wrap; gap:9px; }
+  .emo{
+    font-family:var(--font-body); font-weight:600; font-size:.95rem; color:var(--c-encre);
+    background:#fff; border:1px solid var(--bordure-forte); border-radius:100px;
+    padding:.6em 1.05em; cursor:pointer; transition:transform var(--t-fast) var(--ease), background var(--t-med), border-color var(--t-med);
+  }
+  .emo:hover{ transform:translateY(-2px); background:#FBF2F0; }
+  .emo.actif{ background:var(--c-corail); color:#fff; border-color:var(--c-corail); }
+  .reponse{ margin-top:16px; display:none; }
+  .reponse.on{ display:block; animation:rise .6s var(--ease) both; }
+  @keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
+  .reponse .msg{ font-size:1.06rem; line-height:1.7; }
+  .reponse .action{ margin-top:10px; font-size:.96rem; color:var(--c-encre-douce); }
+  .reponse .action b{ color:var(--c-corail); font-weight:700; }
+
+  /* Formulaires */
+  .champ{ margin-bottom:14px; }
+  .champ label{ display:block; font-weight:700; font-size:.82rem; letter-spacing:.06em; text-transform:uppercase; color:var(--c-corail); margin-bottom:6px; }
+  .range-row{ display:flex; align-items:center; gap:12px; }
+  input[type=range]{ flex:1; accent-color:var(--c-corail); }
+  .range-val{ font-family:var(--font-display); font-size:1.1rem; color:var(--c-corail); min-width:1.5em; text-align:center; }
+  .toggle{ display:flex; align-items:center; gap:10px; cursor:pointer; font-size:.98rem; user-select:none; }
+  .toggle input{ width:20px; height:20px; accent-color:var(--c-corail); }
+  .cond{ display:none; margin-top:10px; padding-left:14px; border-left:2px solid var(--corail-clr,var(--c-corail-clr)); }
+  .cond.on{ display:block; }
+  .prudence{ display:none; margin-top:12px; background:#FBF0EC; border:1px solid rgba(180,84,74,.3); border-radius:12px; padding:12px 14px; font-size:.92rem; color:#7a3c34; }
+  .prudence.on{ display:block; }
+  select.u-field{ appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A6E82' stroke-width='1.6' fill='none'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:34px; }
+
+  .liens{ margin-top:36px; text-align:center; font-size:.92rem; color:var(--c-encre-douce); }
+  .liens a{ color:var(--c-corail); text-decoration:none; font-weight:600; }
+  .signature-bas{ text-align:center; font-style:italic; font-family:var(--font-display); color:var(--c-corail); margin-top:22px; }
+</style>
+</head>
+<body class="u-theme u-grain">
+
+<div class="wrap">
+  <div class="tete u-reveal">
+    <p class="u-eyebrow">rien que pour toi</p>
+    <h1 class="u-display">Comment tu te sens ?</h1>
+    <p>Un endroit à toi, sans jugement, sans effort. Dis ce que tu veux, ou juste ce qui est vrai là, maintenant. Ce que tu déposes ici n'est lu que par moi.</p>
+  </div>
+
+  <!-- 1. Émotions -->
+  <div class="u-card is-hover bloc u-reveal">
+    <h2>Là, tout de suite</h2>
+    <p class="desc">Touche ce qui te ressemble le plus en ce moment.</p>
+    <div class="emos" id="emos"></div>
+    <div class="reponse" id="reponse">
+      <div class="msg" id="repMsg"></div>
+      <div class="action" id="repAction"></div>
+      <button class="u-btn u-magnet" id="repSavoir" style="margin-top:14px;font-size:.95rem;">je veux qu'il le sache</button>
+      <p class="u-state" id="repState"></p>
+    </div>
+  </div>
+
+  <!-- 2. Bien-être -->
+  <div class="u-card is-hover bloc u-reveal">
+    <h2>Un vrai point, si tu veux</h2>
+    <p class="desc">Ce n'est pas médical, juste un moment pour toi. Rien n'est obligatoire.</p>
+
+    <div class="champ">
+      <label>Ton énergie</label>
+      <div class="range-row"><input type="range" id="energie" min="1" max="5" value="3"><span class="range-val" id="energieV">3</span></div>
+    </div>
+    <div class="champ">
+      <label>Ton niveau de stress</label>
+      <div class="range-row"><input type="range" id="stress" min="1" max="5" value="2"><span class="range-val" id="stressV">2</span></div>
+    </div>
+    <div class="champ">
+      <label class="toggle"><input type="checkbox" id="mal"> J'ai un petit mal quelque part</label>
+      <div class="cond" id="malCond">
+        <div class="champ"><label>Où ?</label><input class="u-field" id="malZone" type="text" placeholder="tête, ventre, dos…"></div>
+        <div class="champ"><label>Intensité</label><div class="range-row"><input type="range" id="malInt" min="1" max="5" value="2"><span class="range-val" id="malIntV">2</span></div></div>
+      </div>
+    </div>
+    <div class="champ">
+      <label class="toggle"><input type="checkbox" id="malade"> Je me sens malade</label>
+    </div>
+    <div class="prudence" id="prudence">Si la douleur est forte, inhabituelle ou inquiétante, préviens vite quelqu'un de confiance ou un professionnel de santé. Prends soin de toi, pour de vrai.</div>
+    <div class="champ">
+      <label>De quoi tu aurais besoin, là ?</label>
+      <select class="u-field" id="besoin">
+        <option value="">…</option>
+        <option value="parler">parler</option>
+        <option value="calme">du calme</option>
+        <option value="rire">rire un peu</option>
+        <option value="rassuree">être rassurée</option>
+        <option value="attention">de l'attention</option>
+        <option value="rien">juste que tu saches</option>
+      </select>
+    </div>
+    <div class="champ">
+      <label>Un mot, si tu veux</label>
+      <textarea class="u-field" id="bienMsg" placeholder="ce que tu veux, ou rien du tout…"></textarea>
+    </div>
+    <label class="toggle" style="margin-bottom:14px;"><input type="checkbox" id="prevenir" checked> Je veux qu'il le sache</label>
+    <button class="u-btn u-magnet" id="bienBtn">Déposer mon point</button>
+    <p class="u-state" id="bienState"></p>
+  </div>
+
+  <!-- 3. Me demander -->
+  <div class="u-card is-hover bloc u-reveal">
+    <h2>Demande-moi quelque chose</h2>
+    <p class="desc">Une page, une photo, une musique, un appel, un moment à deux… tout ce que tu veux. Ça arrive directement chez moi.</p>
+    <div class="champ">
+      <label>Quoi</label>
+      <select class="u-field" id="demType">
+        <option value="page">une nouvelle page</option>
+        <option value="photo">ajouter une photo</option>
+        <option value="musique">une musique</option>
+        <option value="souvenir">un souvenir à garder</option>
+        <option value="capsule">une capsule</option>
+        <option value="appel">un appel</option>
+        <option value="moment">un moment à deux</option>
+        <option value="surprise">une surprise</option>
+        <option value="note">juste te laisser une note</option>
+        <option value="autre">autre chose</option>
+      </select>
+    </div>
+    <div class="champ"><label>En un titre</label><input class="u-field" id="demTitre" type="text" placeholder="ex : un appel ce soir"></div>
+    <div class="champ"><label>Dis-m'en plus</label><textarea class="u-field" id="demMsg" placeholder="explique comme tu veux…"></textarea></div>
+    <div class="champ" style="display:flex;gap:12px;">
+      <div style="flex:1;"><label>Priorité</label>
+        <select class="u-field" id="demPrio"><option value="tranquille">tranquille</option><option value="normal" selected>normale</option><option value="vite">j'aimerais vite</option></select>
+      </div>
+      <div style="flex:1;"><label>Pour quand ?</label><input class="u-field" id="demDate" type="date"></div>
+    </div>
+    <button class="u-btn u-magnet" id="demBtn">Envoyer ma demande</button>
+    <p class="u-state" id="demState"></p>
+  </div>
+
+  <!-- 4. Une idée -->
+  <div class="u-card is-hover bloc u-reveal">
+    <h2>Une idée pour notre espace</h2>
+    <p class="desc">Ce site est aussi le tien. Si tu imagines quelque chose, dis-le.</p>
+    <div class="champ">
+      <label>Catégorie</label>
+      <select class="u-field" id="ideeCat">
+        <option value="page">une page</option>
+        <option value="jeu">un jeu</option>
+        <option value="surprise">une surprise</option>
+        <option value="souvenir">un souvenir</option>
+        <option value="animation">une animation</option>
+        <option value="musique">une musique</option>
+        <option value="voyage">un voyage</option>
+        <option value="autre">autre</option>
+      </select>
+    </div>
+    <div class="champ"><label>Ton idée</label><textarea class="u-field" id="ideeTxt" placeholder="raconte…"></textarea></div>
+    <div class="champ"><label>Pourquoi (optionnel)</label><input class="u-field" id="ideeRaison" type="text" placeholder="ce que ça t'apporterait"></div>
+    <button class="u-btn u-magnet" id="ideeBtn">Proposer l'idée</button>
+    <p class="u-state" id="ideeState"></p>
+  </div>
+
+  <p class="signature-bas">quoi qu'il se passe, tu es aimée. Ton Mathieu.</p>
+  <p class="liens"><a href="/">⌂ accueil</a> · <a href="/dadoucherie">ta page</a> · <a href="/au-cas-ou">au cas où</a></p>
+</div>
+
+<script src="/db.js"></script>
+<script src="/app.js"></script>
+<script>
+(function(){
+  /* ===== Émotions ===== */
+  var EMOS = {
+    "heureuse":            { m:"Ça me rend heureux que tu le sois. Garde cette lumière un peu pour toi aujourd'hui.", a:"Dis-toi une chose dont tu es fière, là, maintenant." },
+    "fatiguée":            { m:"Alors on ralentit. Tu n'as rien à prouver aujourd'hui.", a:"Bois un verre d'eau, respire trois fois, et offre-toi cinq minutes de rien." },
+    "triste":              { m:"Je suis là, même de loin. La tristesse a le droit d'exister, elle finit toujours par passer.", a:"Écris-moi ce qui pèse, ou pose ton téléphone et respire un peu." },
+    "stressée":            { m:"On défait le nœud, doucement. Une seule chose à la fois.", a:"Nomme la plus petite étape possible, et fais seulement celle-là." },
+    "seule":               { m:"Tu ne l'es pas. Je pense à toi à cet instant précis.", a:"Ouvre 'au cas où', l'enveloppe 'si je te manque' est écrite pour ce moment." },
+    "nostalgique":         { m:"Les souvenirs qui remontent sont la preuve qu'on a vécu de belles choses.", a:"Va relire notre histoire, ou regarde nos rêves à venir." },
+    "inquiète":            { m:"Respire. La plupart des choses qu'on redoute n'arrivent jamais.", a:"Écris ton inquiétude ici : la sortir de ta tête l'allège déjà." },
+    "besoin de calme":     { m:"D'accord. Le monde peut attendre.", a:"Active le mode douceur sur ta page, et ne fais rien d'autre un moment." },
+    "besoin de rire":      { m:"Alors viens, on va s'en occuper.", a:"Passe par nos jeux ou nos dramas, c'est fait exactement pour ça." },
+    "besoin d'être rassurée":{ m:"Tu es aimée, exactement comme tu es, exactement aujourd'hui.", a:"Écoute ma voix sur ta page, ou dis-moi ce qui te tracasse." },
+    "besoin de parler":    { m:"Je t'écoute. Vraiment, sans te presser.", a:"Écris-moi un mot juste en dessous, il arrive directement chez moi." },
+    "besoin d'attention":  { m:"Tu l'as, toute.", a:"Envoie-moi une demande d'appel ou de moment à deux, un peu plus bas." }
+  };
+  var emosEl = document.getElementById('emos');
+  var reponse = document.getElementById('reponse');
+  var repMsg = document.getElementById('repMsg');
+  var repAction = document.getElementById('repAction');
+  var repState = document.getElementById('repState');
+  var emoActive = null;
+  Object.keys(EMOS).forEach(function(k){
+    var b = document.createElement('button');
+    b.className = 'emo'; b.textContent = k;
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.emo').forEach(function(x){x.classList.remove('actif');});
+      b.classList.add('actif'); emoActive = k;
+      repMsg.textContent = EMOS[k].m;
+      repAction.innerHTML = '<b>essaie :</b> ' + EMOS[k].a;
+      repState.textContent = '';
+      reponse.classList.add('on');
+      reponse.scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+    emosEl.appendChild(b);
+  });
+  document.getElementById('repSavoir').addEventListener('click', function(){
+    if(!emoActive) return;
+    App.submit(this, repState, function(){
+      return DB.insert('wellbeing_checkins', { mood:emoActive, need_type:emoActive, wants_me_to_know:true });
+    }, "C'est noté, il le saura. 🤍");
+  });
+
+  /* ===== Bien-être ===== */
+  function bind(id, valId){ var r=document.getElementById(id), v=document.getElementById(valId); r.addEventListener('input',function(){ v.textContent=r.value; maj(); }); }
+  bind('energie','energieV'); bind('stress','stressV'); bind('malInt','malIntV');
+  var mal=document.getElementById('mal'), malCond=document.getElementById('malCond');
+  var malade=document.getElementById('malade'), prudence=document.getElementById('prudence');
+  mal.addEventListener('change',function(){ malCond.classList.toggle('on', mal.checked); maj(); });
+  malade.addEventListener('change', maj);
+  function maj(){
+    var fort = (mal.checked && +document.getElementById('malInt').value>=4) || malade.checked;
+    prudence.classList.toggle('on', fort);
+  }
+  document.getElementById('bienBtn').addEventListener('click', function(){
+    App.submit(this, document.getElementById('bienState'), function(){
+      return DB.insert('wellbeing_checkins', {
+        energy_level:+document.getElementById('energie').value,
+        stress_level:+document.getElementById('stress').value,
+        has_pain:mal.checked,
+        pain_location: mal.checked ? (document.getElementById('malZone').value.trim()||null) : null,
+        pain_intensity: mal.checked ? +document.getElementById('malInt').value : null,
+        is_sick:malade.checked,
+        message: document.getElementById('bienMsg').value.trim()||null,
+        need_type: document.getElementById('besoin').value||null,
+        wants_me_to_know: document.getElementById('prevenir').checked
+      });
+    }, "Ton point est déposé. Merci de me laisser entrer un peu. 🤍");
+  });
+
+  /* ===== Me demander ===== */
+  document.getElementById('demBtn').addEventListener('click', function(){
+    var titre = document.getElementById('demTitre').value.trim();
+    var st = document.getElementById('demState');
+    if(!titre){ st.textContent="Ajoute au moins un petit titre."; st.className="u-state u-state--err"; return; }
+    App.submit(this, st, function(){
+      return DB.insert('site_requests', {
+        type: document.getElementById('demType').value,
+        title: titre,
+        message: document.getElementById('demMsg').value.trim()||null,
+        priority: document.getElementById('demPrio').value,
+        desired_date: document.getElementById('demDate').value||null
+      });
+    }, "Reçu. Je m'en occupe, promis. 🤍");
+  });
+
+  /* ===== Une idée ===== */
+  document.getElementById('ideeBtn').addEventListener('click', function(){
+    var idee = document.getElementById('ideeTxt').value.trim();
+    var st = document.getElementById('ideeState');
+    if(!idee){ st.textContent="Écris ton idée d'abord."; st.className="u-state u-state--err"; return; }
+    App.submit(this, st, function(){
+      return DB.insert('site_ideas', {
+        category: document.getElementById('ideeCat').value,
+        idea: idee,
+        reason: document.getElementById('ideeRaison').value.trim()||null
+      });
+    }, "Belle idée. Je la garde précieusement. ✨");
+  });
+})();
+</script>
+</body>
+</html>

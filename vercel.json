@@ -14,6 +14,7 @@
     { "source": "/avent", "destination": "/avent.html" },
     { "source": "/au-cas-ou", "destination": "/au-cas-ou.html" },
     { "source": "/demande", "destination": "/demande.html" },
+    { "source": "/toi", "destination": "/toi.html" },
     { "source": "/secret-juillet", "destination": "/index.html" }
   ],
   "headers": [
