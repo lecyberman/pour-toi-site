@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Reçu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  body{ padding:34px 18px 70px; }
+  .wrap{ max-width:620px; margin:0 auto; }
+  .tete{ text-align:center; margin-bottom:26px; }
+  .tete h1{ font-size:var(--fs-2xl); margin:.3rem 0; }
+  .tete p{ color:var(--c-encre-douce); }
+  .item{ background:#FBF2F0; border-radius:14px; padding:15px 17px; margin-bottom:12px; }
+  .item .haut{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; }
+  .item .type{ font-weight:700; font-size:.76rem; letter-spacing:.08em; text-transform:uppercase; color:var(--c-corail); }
+  .item .date{ font-size:.78rem; color:var(--c-encre-douce); }
+  .item .titre{ font-family:var(--font-display); font-size:1.12rem; margin:4px 0; }
+  .item .corps{ font-size:1rem; line-height:1.6; white-space:pre-wrap; }
+  .item .meta{ font-size:.85rem; color:var(--c-encre-douce); margin-top:8px; }
+  .badge{ display:inline-block; background:#F4ECF2; border-radius:100px; padding:3px 10px; font-size:.76rem; color:var(--c-encre-douce); margin:2px 4px 2px 0; }
+  .badge.alerte{ background:#FBE0DA; color:#8a3c33; }
+  .compte{ font-size:.82rem; color:var(--c-encre-douce); }
+  h2.sec{ font-family:var(--font-display); font-weight:500; font-size:1.4rem; margin:26px 0 12px; }
+  .vide{ color:var(--c-encre-douce); font-style:italic; font-size:.95rem; }
+  .setup{ background:#FBF3DF; border:1px solid rgba(180,140,60,.3); border-radius:14px; padding:16px 18px; font-size:.92rem; color:#6B5320; line-height:1.6; }
+  .setup code{ background:#fff; padding:1px 6px; border-radius:6px; font-size:.85em; }
+  .liens{ margin-top:30px; text-align:center; font-size:.9rem; color:var(--c-encre-douce); }
+  .liens a{ color:var(--c-corail); text-decoration:none; font-weight:600; }
+</style>
+</head>
+<body class="u-theme">
+<div class="wrap">
+  <div class="tete">
+    <p class="u-eyebrow">réservé à Mathieu</p>
+    <h1 class="u-display">Reçu</h1>
+    <p>Ce qu'elle a déposé, en privé, pour toi.</p>
+  </div>
+
+  <!-- Connexion -->
+  <div class="u-card" id="porte">
+    <div class="champ" style="margin-bottom:12px;">
+      <input class="u-field" id="pw" type="password" placeholder="Ton mot de passe de réception" />
+    </div>
+    <button class="u-btn u-magnet" id="entrer">Ouvrir</button>
+    <p class="u-state" id="porteState"></p>
+  </div>
+
+  <div id="contenu" style="display:none;">
+    <h2 class="sec">Ses demandes</h2>
+    <div id="reqZone"></div>
+    <h2 class="sec">Ses idées</h2>
+    <div id="ideaZone"></div>
+    <h2 class="sec">Ses points bien-être</h2>
+    <div id="wbZone"></div>
+  </div>
+
+  <p class="liens"><a href="/">⌂ accueil</a> · <a href="/courrier">le courrier</a></p>
+</div>
+
+<script src="/app.js"></script>
+<script>
+(function(){
+  var porte=document.getElementById('porte'), contenu=document.getElementById('contenu');
+  var pwInput=document.getElementById('pw'), porteState=document.getElementById('porteState');
+
+  function dateFr(iso){
+    var d=new Date(iso);
+    return d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  }
+  function el(html){ var d=document.createElement('div'); d.innerHTML=html; return d.firstElementChild; }
+  function esc(s){ return (s||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+
+  var DB_URL="https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var DB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  function charger(pw){
+    return fetch(DB_URL+'/rest/v1/rpc/get_inbox', {
+      method:'POST',
+      headers:{ 'apikey':DB_ANON, 'Authorization':'Bearer '+DB_ANON, 'Content-Type':'application/json' },
+      body: JSON.stringify({ p_secret: pw })
+    }).then(function(r){
+      return r.json().then(function(j){ return { status:r.status, data:j }; });
+    }).catch(function(e){ return { status:0, data:null }; });
+  }
+
+  function rendre(data){
+    // Demandes
+    var rz=document.getElementById('reqZone'); rz.innerHTML='';
+    if(!data.requests || !data.requests.length){ rz.appendChild(el('<p class="vide">Rien pour l\'instant.</p>')); }
+    else data.requests.forEach(function(r){
+      var prio = r.priority==='vite' ? '<span class="badge alerte">à faire vite</span>' : (r.priority==='tranquille'?'<span class="badge">tranquille</span>':'');
+      var d = el('<div class="item"><div class="haut"><span class="type">'+esc(r.type||'demande')+(r.read_by_me?'':' • nouveau')+'</span><span class="date">'+dateFr(r.created_at)+'</span></div>'+
+        '<div class="titre">'+esc(r.title||'')+'</div>'+
+        (r.message?'<div class="corps">'+esc(r.message)+'</div>':'')+
+        '<div class="meta">'+prio+(r.desired_date?'<span class="badge">pour le '+esc(r.desired_date)+'</span>':'')+'</div></div>');
+      rz.appendChild(d);
+    });
+    // Idées
+    var iz=document.getElementById('ideaZone'); iz.innerHTML='';
+    if(!data.ideas || !data.ideas.length){ iz.appendChild(el('<p class="vide">Aucune idée déposée.</p>')); }
+    else data.ideas.forEach(function(i){
+      iz.appendChild(el('<div class="item"><div class="haut"><span class="type">'+esc(i.category||'idée')+'</span><span class="date">'+dateFr(i.created_at)+'</span></div>'+
+        '<div class="corps">'+esc(i.idea)+'</div>'+(i.reason?'<div class="meta">parce que : '+esc(i.reason)+'</div>':'')+'</div>'));
+    });
+    // Bien-être
+    var wz=document.getElementById('wbZone'); wz.innerHTML='';
+    if(!data.wellbeing || !data.wellbeing.length){ wz.appendChild(el('<p class="vide">Aucun point pour l\'instant.</p>')); }
+    else data.wellbeing.forEach(function(w){
+      var badges='';
+      if(w.mood) badges+='<span class="badge">'+esc(w.mood)+'</span>';
+      if(w.need_type) badges+='<span class="badge">besoin : '+esc(w.need_type)+'</span>';
+      if(w.energy_level) badges+='<span class="badge">énergie '+w.energy_level+'/5</span>';
+      if(w.stress_level) badges+='<span class="badge">stress '+w.stress_level+'/5</span>';
+      if(w.has_pain) badges+='<span class="badge alerte">mal'+(w.pain_location?' : '+esc(w.pain_location):'')+(w.pain_intensity?' ('+w.pain_intensity+'/5)':'')+'</span>';
+      if(w.is_sick) badges+='<span class="badge alerte">malade</span>';
+      wz.appendChild(el('<div class="item"><div class="haut"><span class="type">point bien-être</span><span class="date">'+dateFr(w.created_at)+'</span></div>'+
+        '<div class="meta">'+badges+'</div>'+(w.message?'<div class="corps" style="margin-top:8px;">'+esc(w.message)+'</div>':'')+'</div>'));
+    });
+    porte.style.display='none'; contenu.style.display='block';
+  }
+
+  function tenter(pw){
+    porteState.textContent='Ouverture…'; porteState.className='u-state';
+    charger(pw).then(function(res){
+      if(res.status===200 && res.data && typeof res.data==='object'){
+        try{ sessionStorage.setItem('recu_pw', pw); }catch(e){}
+        rendre(res.data);
+      } else if(res.status===200 && (res.data===null || res.data===undefined)){
+        porteState.textContent='Mot de passe incorrect.'; porteState.className='u-state u-state--err';
+      } else {
+        porteState.textContent='Souci de connexion, réessaie dans un instant.'; porteState.className='u-state u-state--err';
+      }
+    });
+  }
+
+  document.getElementById('entrer').addEventListener('click', function(){ if(pwInput.value.trim()) tenter(pwInput.value.trim()); });
+  pwInput.addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('entrer').click(); });
+  try{ var saved=sessionStorage.getItem('recu_pw'); if(saved) tenter(saved); }catch(e){}
+})();
+</script>
+</body>
+</html>
