@@ -18,6 +18,10 @@
     { "source": "/recu", "destination": "/recu.html" },
     { "source": "/univers", "destination": "/univers.html" },
     { "source": "/souhaits", "destination": "/souhaits.html" },
+    { "source": "/mots", "destination": "/mots.html" },
+    { "source": "/galerie", "destination": "/galerie.html" },
+    { "source": "/photos", "destination": "/galerie.html" },
+    { "source": "/capsules", "destination": "/capsules.html" },
     { "source": "/secret-juillet", "destination": "/index.html" }
   ],
   "headers": [

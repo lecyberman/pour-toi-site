@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Notre galerie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  body{ padding:34px 18px 80px; }
+  .wrap{ max-width:940px; margin:0 auto; position:relative; z-index:2; }
+  .tete{ text-align:center; margin-bottom:30px; }
+  .tete h1{ font-size:var(--fs-2xl); margin:.3rem 0 .5rem; }
+  .tete p{ color:var(--c-encre-douce); max-width:46ch; margin:0 auto; }
+
+  .grille{ columns:3 220px; column-gap:16px; }
+  .cadre{
+    break-inside:avoid; margin:0 0 16px; background:#fff; padding:10px 10px 14px;
+    border-radius:6px; box-shadow:var(--sh-2); cursor:pointer;
+    transform:rotate(var(--r,0deg)); transition:transform var(--t-med) var(--ease), box-shadow var(--t-med);
+  }
+  .cadre:hover{ transform:rotate(0deg) translateY(-3px) scale(1.02); box-shadow:var(--sh-3); z-index:5; position:relative; }
+  .cadre .vue{ width:100%; border-radius:3px; display:block; background:linear-gradient(135deg,#EFE3EC,#F6DED8); aspect-ratio:4/5; object-fit:cover; }
+  .cadre .ph{ display:flex; align-items:center; justify-content:center; font-size:2.4rem; color:#C9A9C0; }
+  .cadre .leg{ font-family:var(--font-display); font-style:italic; font-size:.95rem; color:var(--c-encre); text-align:center; margin-top:10px; padding:0 4px; }
+  .cadre .dt{ font-size:.74rem; color:var(--c-encre-douce); text-align:center; margin-top:3px; }
+
+  /* plein écran */
+  .plein{ position:fixed; inset:0; z-index:50; background:rgba(16,14,28,.92); display:none; align-items:center; justify-content:center; padding:20px; }
+  .plein.on{ display:flex; }
+  .plein img{ max-width:min(92vw,700px); max-height:78vh; border-radius:8px; box-shadow:0 30px 80px rgba(0,0,0,.6); }
+  .plein .ph{ width:min(80vw,420px); aspect-ratio:4/5; background:linear-gradient(135deg,#3A3150,#5A4A55); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:4rem; color:#B79FB0; }
+  .plein .leg{ position:absolute; bottom:6vh; left:0; right:0; text-align:center; color:#F3EEF6; font-family:var(--font-display); font-style:italic; font-size:1.2rem; padding:0 20px; }
+  .plein .fermer{ position:absolute; top:18px; right:20px; background:none; border:none; color:#fff; font-size:1.6rem; cursor:pointer; }
+
+  .note{ text-align:center; font-size:.85rem; color:var(--c-encre-douce); margin-top:30px; background:#FBF3DF; border:1px solid rgba(180,140,60,.25); border-radius:12px; padding:12px 16px; }
+  .liens{ margin-top:22px; text-align:center; font-size:.92rem; color:var(--c-encre-douce); }
+  .liens a{ color:var(--c-corail); text-decoration:none; font-weight:600; }
+  @media (max-width:640px){ .grille{ columns:2 150px; } }
+</style>
+</head>
+<body class="u-theme u-grain">
+<div class="wrap">
+  <div class="tete u-reveal">
+    <p class="u-eyebrow">des instants précieux</p>
+    <h1 class="u-display">Notre galerie</h1>
+    <p>Chaque photo est un souvenir gardé, pas une image jetée sur une page. Touche-en une pour la voir en grand.</p>
+  </div>
+
+  <div class="grille" id="grille"></div>
+
+  <p class="note" id="note" hidden>Astuce (pour Mathieu) : ajoute tes photos dans Supabase, table <b>photos</b> (colonne <code>image</code> = l'URL, <code>legende</code>, <code>date</code>) ou table <b>galerie</b>. Elles s'afficheront ici automatiquement.</p>
+  <p class="liens"><a href="/">⌂ accueil</a> · <a href="/histoire">notre histoire</a> · <a href="/dadoucherie">ta page</a></p>
+</div>
+
+<div class="plein" id="plein" role="dialog" aria-modal="true">
+  <button class="fermer" id="pfermer" aria-label="Fermer">✕</button>
+  <div id="pcontenu"></div>
+  <div class="leg" id="pleg"></div>
+</div>
+
+<script src="/db.js"></script>
+<script src="/app.js"></script>
+<script>
+(function(){
+  var grille=document.getElementById('grille');
+  var plein=document.getElementById('plein'), pcontenu=document.getElementById('pcontenu'), pleg=document.getElementById('pleg');
+
+  Promise.all([ DB.select('photos','order=created_at.asc'), DB.select('galerie','order=created_at.asc') ]).then(function(res){
+    var items=[];
+    (res[0]||[]).forEach(function(p){ items.push({image:p.image, leg:p.legende, dt:p.date, emoji:p.emoji}); });
+    (res[1]||[]).forEach(function(g){ items.push({image:g.image, leg:g.titre, dt:'', emoji:g.emoji, texte:g.texte}); });
+    if(!items.length){
+      // placeholders élégants en attendant les vraies photos
+      var ph=[['🌙','Le premier soir'],['✨','La première fois qu\'on a ri'],['🌊','Malte, la lumière'],['🎆','Barcelone, la nuit'],['🕯️','Un dimanche sans rien'],['💫','Notre nuit']];
+      ph.forEach(function(p){ items.push({image:null, leg:p[1], emoji:p[0]}); });
+      document.getElementById('note').hidden=false;
+    }
+    items.forEach(function(it,i){
+      var c=document.createElement('div'); c.className='cadre u-reveal';
+      c.style.setProperty('--r', (((i%3)-1)*1.4)+'deg');
+      var vue = it.image ? ('<img class="vue" loading="lazy" src="'+it.image+'" alt="'+(it.leg||'souvenir')+'">')
+                         : ('<div class="vue ph">'+(it.emoji||'✦')+'</div>');
+      c.innerHTML = vue + (it.leg?'<div class="leg">'+esc(it.leg)+'</div>':'') + (it.dt?'<div class="dt">'+esc(it.dt)+'</div>':'');
+      c.addEventListener('click', function(){ ouvrir(it); });
+      grille.appendChild(c);
+    });
+    if(window.App) setTimeout(function(){ document.querySelectorAll('.u-reveal').forEach(function(e){e.classList.add('is-in');}); }, 50);
+  });
+
+  function esc(s){ return (s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function ouvrir(it){
+    pcontenu.innerHTML = it.image ? '<img src="'+it.image+'" alt="'+(it.leg||'')+'">' : '<div class="ph">'+(it.emoji||'✦')+'</div>';
+    pleg.textContent = it.texte || it.leg || '';
+    plein.classList.add('on');
+  }
+  document.getElementById('pfermer').addEventListener('click', function(){ plein.classList.remove('on'); });
+  plein.addEventListener('click', function(e){ if(e.target===plein) plein.classList.remove('on'); });
+})();
+</script>
+</body>
+</html>

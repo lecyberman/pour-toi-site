@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Nos mots à nous</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  body{ padding:34px 18px 80px; }
+  .wrap{ max-width:600px; margin:0 auto; position:relative; z-index:2; }
+  .tete{ text-align:center; margin-bottom:26px; }
+  .tete h1{ font-size:var(--fs-2xl); margin:.3rem 0 .5rem; }
+  .tete p{ color:var(--c-encre-douce); max-width:44ch; margin:0 auto; }
+  .mot{
+    background:var(--surface); border:1px solid var(--bordure); border-radius:var(--r-md);
+    padding:18px 20px; margin-bottom:12px; box-shadow:var(--sh-1); backdrop-filter:blur(var(--verre-blur));
+    position:relative;
+  }
+  .mot .terme{ font-family:var(--font-display); font-style:italic; font-weight:600; font-size:1.35rem; color:var(--c-corail); }
+  .mot .def{ font-size:1.02rem; line-height:1.65; margin-top:6px; }
+  .mot .par{ font-size:.78rem; color:var(--c-encre-douce); margin-top:8px; letter-spacing:.04em; }
+  .ajout{ margin-top:24px; }
+  .qui{ display:flex; gap:8px; margin-bottom:12px; }
+  .qui button{ flex:1; font-family:var(--font-body); font-weight:700; font-size:.9rem; border-radius:100px; padding:9px; cursor:pointer; border:1px solid var(--bordure-forte); background:#fff; color:var(--c-encre); }
+  .qui button.on{ background:var(--c-corail); color:#fff; border-color:var(--c-corail); }
+  .liens{ margin-top:30px; text-align:center; font-size:.92rem; color:var(--c-encre-douce); }
+  .liens a{ color:var(--c-corail); text-decoration:none; font-weight:600; }
+  .vide{ color:var(--c-encre-douce); font-style:italic; }
+</style>
+</head>
+<body class="u-theme u-grain">
+<div class="wrap">
+  <div class="tete u-reveal">
+    <p class="u-eyebrow">notre langue à nous</p>
+    <h1 class="u-display">Nos mots à nous</h1>
+    <p>Un carnet secret. Les mots, les surnoms, les private jokes qui n'appartiennent qu'à nous, avec leur vraie définition.</p>
+  </div>
+
+  <div id="liste"><p class="vide">J'ouvre le carnet…</p></div>
+
+  <div class="u-card ajout u-reveal">
+    <div class="qui" id="qui">
+      <button data-a="elle" class="on">c'est elle qui écrit</button>
+      <button data-a="mathieu">c'est Mathieu</button>
+    </div>
+    <input class="u-field" id="mMot" type="text" placeholder="Le mot ou l'expression" style="margin-bottom:10px;">
+    <textarea class="u-field" id="mDef" placeholder="Sa définition à nous…" style="margin-bottom:10px;"></textarea>
+    <button class="u-btn u-magnet" id="mBtn">Ajouter au dictionnaire</button>
+    <p class="u-state" id="mState"></p>
+  </div>
+
+  <p class="liens"><a href="/">⌂ accueil</a> · <a href="/jeux">nos jeux</a> · <a href="/dadoucherie">ta page</a></p>
+</div>
+
+<script src="/db.js"></script>
+<script src="/app.js"></script>
+<script>
+(function(){
+  var auteur='elle';
+  document.querySelectorAll('#qui button').forEach(function(b){
+    b.addEventListener('click', function(){ document.querySelectorAll('#qui button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); auteur=b.dataset.a; });
+  });
+  var listeEl=document.getElementById('liste');
+  function charger(){
+    DB.select('dico','order=created_at.asc').then(function(rows){
+      rows=rows||[]; listeEl.innerHTML='';
+      if(!rows.length){ listeEl.innerHTML='<p class="vide">Le carnet est vierge. Écris le premier mot, en dessous.</p>'; return; }
+      rows.forEach(function(m){
+        var d=document.createElement('div'); d.className='mot';
+        d.innerHTML='<div class="terme"></div><div class="def"></div><div class="par"></div>';
+        d.querySelector('.terme').textContent=m.mot;
+        d.querySelector('.def').textContent=m.definition;
+        d.querySelector('.par').textContent='ajouté par '+(m.auteur==='elle'?'elle':'Mathieu');
+        listeEl.appendChild(d);
+      });
+    });
+  }
+  document.getElementById('mBtn').addEventListener('click', function(){
+    var mot=document.getElementById('mMot').value.trim(), def=document.getElementById('mDef').value.trim();
+    var st=document.getElementById('mState');
+    if(!mot||!def){ st.textContent="Il faut un mot et sa définition."; st.className="u-state u-state--err"; return; }
+    App.submit(this, st, function(){ return DB.insert('dico',{mot:mot,definition:def,auteur:auteur}); }, "Ajouté à notre langue. 🤍").then(function(){
+      document.getElementById('mMot').value=''; document.getElementById('mDef').value=''; charger();
+    });
+  });
+  charger();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Capsules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  body{ padding:34px 18px 80px; }
+  .wrap{ max-width:600px; margin:0 auto; position:relative; z-index:2; }
+  .tete{ text-align:center; margin-bottom:28px; }
+  .tete h1{ font-size:var(--fs-2xl); margin:.3rem 0 .5rem; }
+  .tete p{ color:var(--c-encre-douce); max-width:44ch; margin:0 auto; }
+  .caps{
+    background:var(--surface); border:1px solid var(--bordure); border-radius:var(--r-md);
+    padding:20px 22px; margin-bottom:14px; box-shadow:var(--sh-2); backdrop-filter:blur(var(--verre-blur));
+    text-align:center;
+  }
+  .caps .emo{ font-size:2rem; }
+  .caps .titre{ font-family:var(--font-display); font-size:1.3rem; margin:6px 0 4px; }
+  .caps .etat{ font-size:.9rem; color:var(--c-encre-douce); }
+  .caps.verrou{ opacity:.9; }
+  .caps.verrou .sceau{ font-size:.82rem; color:#9A7B3A; margin-top:8px; background:#FBF3DF; border-radius:100px; display:inline-block; padding:4px 14px; }
+  .caps .ouvrir{ margin-top:12px; }
+  .caps .contenu{ display:none; margin-top:14px; border-top:1px dashed var(--bordure-forte); padding-top:14px; font-size:1.04rem; line-height:1.7; white-space:pre-line; text-align:left; }
+  .caps.ouverte .contenu{ display:block; animation:rise .7s var(--ease) both; }
+  @keyframes rise{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+  .liens{ margin-top:30px; text-align:center; font-size:.92rem; color:var(--c-encre-douce); }
+  .liens a{ color:var(--c-corail); text-decoration:none; font-weight:600; }
+  .vide{ color:var(--c-encre-douce); font-style:italic; text-align:center; }
+</style>
+</head>
+<body class="u-theme u-grain">
+<div class="wrap">
+  <div class="tete u-reveal">
+    <p class="u-eyebrow">certaines choses méritent d'attendre</p>
+    <h1 class="u-display">Nos capsules</h1>
+    <p>Des messages scellés jusqu'à leur date. Impossible d'ouvrir en avance, la patience fait partie du cadeau.</p>
+  </div>
+  <div id="liste"><p class="vide">J'ouvre le coffre…</p></div>
+  <p class="liens"><a href="/">⌂ accueil</a> · <a href="/dadoucherie">ta page</a></p>
+</div>
+
+<script src="/db.js"></script>
+<script src="/app.js"></script>
+<script>
+(function(){
+  var listeEl=document.getElementById('liste');
+  function texteDe(contenu){
+    if(!contenu) return '';
+    if(typeof contenu==='string') return contenu;
+    if(contenu.texte) return contenu.texte;
+    if(Array.isArray(contenu.paragraphes)) return contenu.paragraphes.map(function(p){return p.texte||p;}).join('\n\n');
+    if(Array.isArray(contenu)) return contenu.map(function(p){return p.texte||p;}).join('\n\n');
+    return '';
+  }
+  function dateFr(d){ return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}); }
+
+  DB.select('capsules','order=date_ouverture.asc').then(function(rows){
+    rows=rows||[]; listeEl.innerHTML='';
+    if(!rows.length){ listeEl.innerHTML='<p class="vide">Aucune capsule pour l\'instant.</p>'; return; }
+    rows.forEach(function(c){
+      var ouverte = new Date(c.date_ouverture+'T00:00:00') <= new Date();
+      var d=document.createElement('div'); d.className='caps u-reveal'+(ouverte?'':' verrou');
+      var head='<div class="emo">'+(c.emoji||(ouverte?'📬':'✉️'))+'</div><div class="titre">'+esc(c.titre||'Une capsule')+'</div>';
+      if(!ouverte){
+        var dodos=Math.ceil((new Date(c.date_ouverture+'T00:00:00')-Date.now())/86400000);
+        d.innerHTML=head+'<div class="etat">scellée jusqu\'au '+dateFr(c.date_ouverture)+'</div><div class="sceau">encore '+dodos+' dodo'+(dodos>1?'s':'')+'</div>';
+      } else {
+        d.innerHTML=head+'<div class="etat">prête à s\'ouvrir</div><div class="ouvrir"><button class="u-btn u-magnet">Ouvrir la capsule</button></div><div class="contenu"></div>';
+        d.querySelector('.contenu').textContent=texteDe(c.contenu);
+        d.querySelector('button').addEventListener('click', function(){ d.classList.add('ouverte'); this.parentNode.style.display='none'; });
+      }
+      listeEl.appendChild(d);
+    });
+    setTimeout(function(){ document.querySelectorAll('.u-reveal').forEach(function(e){e.classList.add('is-in');}); },50);
+  });
+  function esc(s){ return (s||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+})();
+</script>
+</body>
+</html>
