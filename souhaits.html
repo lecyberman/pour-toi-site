@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Nos rêves à deux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  body{ padding:34px 18px 80px; }
+  .wrap{ max-width:640px; margin:0 auto; position:relative; z-index:2; }
+  .tete{ text-align:center; margin-bottom:26px; }
+  .tete h1{ font-size:var(--fs-2xl); margin:.3rem 0 .5rem; }
+  .tete p{ color:var(--c-encre-douce); max-width:44ch; margin:0 auto; }
+
+  .ajout{ margin-bottom:26px; }
+  .ajout .ligne{ display:flex; gap:10px; flex-wrap:wrap; }
+  .ajout .ligne > *{ flex:1; min-width:120px; }
+  select.u-field{ appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A6E82' stroke-width='1.6' fill='none'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:34px; }
+
+  .groupe{ margin-bottom:22px; }
+  .groupe h2{ font-family:var(--font-display); font-weight:500; font-size:1.35rem; display:flex; align-items:center; gap:10px; margin:0 0 12px; }
+  .groupe h2 .n{ font-size:.8rem; color:var(--c-encre-douce); font-family:var(--font-body); font-weight:600; }
+  .reve{
+    background:var(--surface); border:1px solid var(--bordure); border-radius:var(--r-md);
+    padding:14px 16px; margin-bottom:10px; display:flex; gap:12px; align-items:flex-start;
+    box-shadow:var(--sh-1); backdrop-filter:blur(var(--verre-blur));
+  }
+  .reve .emo{ font-size:1.5rem; line-height:1.2; }
+  .reve .corps{ flex:1; }
+  .reve .nom{ font-family:var(--font-display); font-size:1.1rem; }
+  .reve .note{ font-size:.92rem; color:var(--c-encre-douce); margin-top:2px; }
+  .reve .bas{ margin-top:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .reve select{
+    font-family:var(--font-body); font-size:.82rem; font-weight:600; color:var(--c-encre);
+    border:1px solid var(--bordure-forte); border-radius:100px; padding:5px 12px; background:#fff; cursor:pointer;
+  }
+  .imp{ font-size:.72rem; padding:3px 9px; border-radius:100px; background:#F4ECF2; color:var(--c-encre-douce); }
+  .imp.fort{ background:#FBE0DA; color:#8a3c33; }
+  .groupe--realise .reve{ background:linear-gradient(135deg, rgba(251,243,223,.85), rgba(246,231,196,.7)); border-color:rgba(180,140,60,.3); }
+  .groupe--realise .nom::after{ content:" ✓"; color:#B4883C; }
+
+  .liens{ margin-top:30px; text-align:center; font-size:.92rem; color:var(--c-encre-douce); }
+  .liens a{ color:var(--c-corail); text-decoration:none; font-weight:600; }
+  .vide{ color:var(--c-encre-douce); font-style:italic; font-size:.94rem; }
+</style>
+</head>
+<body class="u-theme u-grain">
+<div class="wrap">
+  <div class="tete u-reveal">
+    <p class="u-eyebrow">à cocher, tous les deux</p>
+    <h1 class="u-display">Nos rêves à deux</h1>
+    <p>Tout ce qu'on veut vivre ensemble. Ajoute les tiens, et fais-les avancer. Le jour où un rêve devient réel, il s'illumine.</p>
+  </div>
+
+  <div class="u-card ajout u-reveal">
+    <div class="ligne" style="margin-bottom:10px;">
+      <input class="u-field" id="rNom" type="text" placeholder="Un rêve (ex : un road trip en Italie)" style="flex:3;">
+      <input class="u-field" id="rEmoji" type="text" placeholder="✦" maxlength="2" style="flex:0; min-width:64px; text-align:center;">
+    </div>
+    <input class="u-field" id="rNote" type="text" placeholder="Un mot, pourquoi ce rêve (optionnel)" style="margin-bottom:10px;">
+    <div class="ligne" style="margin-bottom:10px;">
+      <select class="u-field" id="rStatut">
+        <option value="un jour">un jour</option>
+        <option value="à faire">à faire</option>
+        <option value="en cours">en cours</option>
+        <option value="réalisé">réalisé</option>
+        <option value="secret">secret</option>
+      </select>
+      <select class="u-field" id="rImp">
+        <option value="normal">envie normale</option>
+        <option value="fort">grande envie</option>
+      </select>
+    </div>
+    <button class="u-btn u-magnet" id="rBtn">Ajouter ce rêve</button>
+    <p class="u-state" id="rState"></p>
+  </div>
+
+  <div id="liste"><p class="vide">Chargement de nos rêves…</p></div>
+
+  <p class="liens"><a href="/">⌂ accueil</a> · <a href="/reves">nos destinations rêvées 🗺️</a> · <a href="/dadoucherie">ta page</a></p>
+</div>
+
+<script src="/db.js"></script>
+<script src="/app.js"></script>
+<script>
+(function(){
+  var ORDRE = ['en cours','à faire','un jour','réalisé','secret'];
+  var TITRES = { 'en cours':'En cours', 'à faire':'À faire bientôt', 'un jour':'Un jour', 'réalisé':'Déjà réalisés', 'secret':'Nos rêves secrets' };
+  var listeEl = document.getElementById('liste');
+
+  function charger(){
+    DB.select('souhaits','order=created_at.asc').then(function(rows){
+      rows = rows || [];
+      listeEl.innerHTML='';
+      var parStatut = {}; ORDRE.forEach(function(s){ parStatut[s]=[]; });
+      rows.forEach(function(r){ var s = ORDRE.indexOf(r.statut)>=0 ? r.statut : 'un jour'; parStatut[s].push(r); });
+      var vide = true;
+      ORDRE.forEach(function(s){
+        var arr = parStatut[s]; if(!arr.length) return; vide=false;
+        var g = document.createElement('div');
+        g.className = 'groupe' + (s==='réalisé' ? ' groupe--realise' : '');
+        g.innerHTML = '<h2>'+TITRES[s]+' <span class="n">'+arr.length+'</span></h2>';
+        arr.forEach(function(r){ g.appendChild(carte(r)); });
+        listeEl.appendChild(g);
+      });
+      if(vide) listeEl.innerHTML='<p class="vide">Aucun rêve pour l\'instant. Ajoute le premier, là-haut.</p>';
+    });
+  }
+
+  function carte(r){
+    var d = document.createElement('div'); d.className='reve';
+    var imp = (r.importance==='fort') ? '<span class="imp fort">grande envie</span>' : '';
+    d.innerHTML =
+      '<div class="emo">'+(r.emoji||'✦')+'</div>'+
+      '<div class="corps">'+
+        '<div class="nom"></div>'+
+        (r.note?'<div class="note"></div>':'')+
+        '<div class="bas">'+imp+'</div>'+
+      '</div>';
+    d.querySelector('.nom').textContent = r.nom || '';
+    if(r.note) d.querySelector('.note').textContent = r.note;
+    // sélecteur de statut
+    var sel = document.createElement('select');
+    ['un jour','à faire','en cours','réalisé','secret'].forEach(function(s){
+      var o=document.createElement('option'); o.value=s; o.textContent=s; if(s===r.statut) o.selected=true; sel.appendChild(o);
+    });
+    sel.addEventListener('change', function(){
+      DB.update('souhaits','id=eq.'+r.id, { statut: sel.value, fait: sel.value==='réalisé' }).then(charger);
+    });
+    d.querySelector('.bas').appendChild(sel);
+    return d;
+  }
+
+  document.getElementById('rBtn').addEventListener('click', function(){
+    var nom = document.getElementById('rNom').value.trim();
+    var st = document.getElementById('rState');
+    if(!nom){ st.textContent="Écris d'abord ton rêve."; st.className="u-state u-state--err"; return; }
+    App.submit(this, st, function(){
+      return DB.insert('souhaits', {
+        nom: nom,
+        emoji: document.getElementById('rEmoji').value.trim() || '✦',
+        note: document.getElementById('rNote').value.trim() || '',
+        statut: document.getElementById('rStatut').value,
+        importance: document.getElementById('rImp').value,
+        fait: document.getElementById('rStatut').value==='réalisé'
+      });
+    }, "Ajouté à nos rêves. 🤍").then(function(){
+      document.getElementById('rNom').value=''; document.getElementById('rEmoji').value=''; document.getElementById('rNote').value='';
+      charger();
+    });
+  });
+
+  charger();
+})();
+</script>
+</body>
+</html>

@@ -17,6 +17,7 @@
     { "source": "/toi", "destination": "/toi.html" },
     { "source": "/recu", "destination": "/recu.html" },
     { "source": "/univers", "destination": "/univers.html" },
+    { "source": "/souhaits", "destination": "/souhaits.html" },
     { "source": "/secret-juillet", "destination": "/index.html" }
   ],
   "headers": [
