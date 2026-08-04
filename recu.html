@@ -51,6 +51,17 @@
   </div>
 
   <div id="contenu" style="display:none;">
+    <div class="u-card" style="margin-bottom:22px;">
+      <h2 class="sec" style="margin-top:0;">Ajouter des photos 📷</h2>
+      <p class="note" style="margin-bottom:12px;">Colle un lien d'image (une URL qui se termine par .jpg, .png, .webp…). Elle apparaît aussitôt dans la galerie. Astuce : tu peux héberger tes photos gratuitement et récupérer le lien, ou utiliser le Storage de Supabase.</p>
+      <input class="u-field" id="phImg" type="text" placeholder="Lien de l'image (https://…)" style="margin-bottom:10px;">
+      <input class="u-field" id="phLeg" type="text" placeholder="Légende (ex : Malte, la lumière)" style="margin-bottom:10px;">
+      <input class="u-field" id="phDate" type="text" placeholder="Date (optionnel, ex : Juillet 2023)" style="margin-bottom:10px;">
+      <button class="u-btn u-magnet" id="phBtn">Ajouter à la galerie</button>
+      <p class="u-state" id="phState"></p>
+      <div id="phListe" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;"></div>
+    </div>
+
     <h2 class="sec">Ses demandes</h2>
     <div id="reqZone"></div>
     <h2 class="sec">Ses idées</h2>
@@ -121,7 +132,41 @@
         '<div class="meta">'+badges+'</div>'+(w.message?'<div class="corps" style="margin-top:8px;">'+esc(w.message)+'</div>':'')+'</div>'));
     });
     porte.style.display='none'; contenu.style.display='block';
+    chargerPhotos();
   }
+
+  // ===== Gestionnaire de photos (ajout sécurisé + aperçu) =====
+  function chargerPhotos(){
+    fetch(DB_URL+'/rest/v1/photos?select=image,legende&order=created_at.desc', {
+      headers:{ 'apikey':DB_ANON, 'Authorization':'Bearer '+DB_ANON }
+    }).then(function(r){ return r.ok?r.json():[]; }).then(function(rows){
+      var z=document.getElementById('phListe'); z.innerHTML='';
+      (rows||[]).forEach(function(p){
+        if(!p.image) return;
+        var im=document.createElement('img');
+        im.src=p.image; im.alt=p.legende||''; im.title=p.legende||'';
+        im.style.cssText='width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid rgba(0,0,0,.1);';
+        z.appendChild(im);
+      });
+    }).catch(function(){});
+  }
+  document.getElementById('phBtn').addEventListener('click', function(){
+    var img=document.getElementById('phImg').value.trim();
+    var st=document.getElementById('phState');
+    var pw=''; try{ pw=sessionStorage.getItem('recu_pw')||''; }catch(e){}
+    if(!img){ st.textContent="Colle d'abord un lien d'image."; st.className='u-state u-state--err'; return; }
+    var btn=this;
+    App.submit(btn, st, function(){
+      return fetch(DB_URL+'/rest/v1/rpc/add_photo', {
+        method:'POST',
+        headers:{ 'apikey':DB_ANON, 'Authorization':'Bearer '+DB_ANON, 'Content-Type':'application/json' },
+        body: JSON.stringify({ p_secret:pw, p_image:img, p_legende:document.getElementById('phLeg').value.trim(), p_date:document.getElementById('phDate').value.trim() })
+      }).then(function(r){ return r.json(); }).then(function(ok){ return { ok: ok===true }; });
+    }, "Photo ajoutée à la galerie. 🤍").then(function(){
+      document.getElementById('phImg').value=''; document.getElementById('phLeg').value=''; document.getElementById('phDate').value='';
+      chargerPhotos();
+    });
+  });
 
   function tenter(pw){
     porteState.textContent='Ouverture…'; porteState.className='u-state';
