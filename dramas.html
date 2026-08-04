@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Nos dramas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  body{ padding:34px 18px 80px; }
+  .wrap{ max-width:600px; margin:0 auto; position:relative; z-index:2; }
+  .tete{ text-align:center; margin-bottom:26px; }
+  .tete h1{ font-size:var(--fs-2xl); margin:.3rem 0 .5rem; }
+  .tete p{ color:var(--c-encre-douce); max-width:44ch; margin:0 auto; }
+  .d{ background:var(--surface); border:1px solid var(--bordure); border-radius:var(--r-md); padding:15px 17px; margin-bottom:11px; box-shadow:var(--sh-1); backdrop-filter:blur(var(--verre-blur)); display:flex; gap:12px; align-items:flex-start; }
+  .d .emo{ font-size:1.6rem; }
+  .d .corps{ flex:1; }
+  .d .titre{ font-family:var(--font-display); font-size:1.12rem; }
+  .d .bas{ display:flex; gap:8px; align-items:center; margin-top:5px; flex-wrap:wrap; }
+  .d .statut{ font-size:.74rem; padding:3px 10px; border-radius:100px; background:#F4ECF2; color:var(--c-encre-douce); }
+  .d .statut.fini{ background:#E4F0DE; color:#5E7A50; }
+  .d .statut.coeur{ background:#FBE0DA; color:#a5514a; }
+  .d .note{ color:var(--c-or); font-size:.95rem; letter-spacing:1px; }
+  .d .com{ font-size:.9rem; color:var(--c-encre-douce); margin-top:5px; font-style:italic; }
+  .ajout{ margin-top:22px; }
+  .ligne{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+  .ligne > *{ flex:1; min-width:120px; }
+  select.u-field{ appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A6E82' stroke-width='1.6' fill='none'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:34px; }
+  .etoiles button{ background:none; border:none; font-size:1.4rem; cursor:pointer; color:#D8CEDE; padding:0 1px; }
+  .etoiles button.on{ color:var(--c-or); }
+  .liens{ margin-top:30px; text-align:center; font-size:.92rem; color:var(--c-encre-douce); }
+  .liens a{ color:var(--c-corail); text-decoration:none; font-weight:600; }
+  .vide{ color:var(--c-encre-douce); font-style:italic; }
+</style>
+</head>
+<body class="u-theme u-grain">
+<div class="wrap">
+  <div class="tete u-reveal">
+    <p class="u-eyebrow">nos petits épisodes</p>
+    <h1 class="u-display">Nos dramas</h1>
+    <p>Ce qu'on regarde, ce qu'on a aimé, ce qu'on veut voir. Nos soirées canapé, en une liste.</p>
+  </div>
+
+  <div id="liste"><p class="vide">Chargement…</p></div>
+
+  <div class="u-card ajout u-reveal">
+    <div class="ligne">
+      <input class="u-field" id="dTitre" type="text" placeholder="Le titre" style="flex:3;">
+      <input class="u-field" id="dEmoji" type="text" placeholder="📺" maxlength="2" style="flex:0;min-width:64px;text-align:center;">
+    </div>
+    <div class="ligne">
+      <select class="u-field" id="dStatut">
+        <option value="à voir">à voir</option>
+        <option value="en cours">en cours</option>
+        <option value="terminé">terminé</option>
+        <option value="coup de cœur">coup de cœur</option>
+        <option value="abandonné">abandonné</option>
+      </select>
+      <div class="etoiles u-field" id="dNote" style="display:flex;align-items:center;justify-content:center;gap:2px;background:#fff;">
+        <button data-n="1">★</button><button data-n="2">★</button><button data-n="3">★</button><button data-n="4">★</button><button data-n="5">★</button>
+      </div>
+    </div>
+    <input class="u-field" id="dCom" type="text" placeholder="Un commentaire (optionnel)" style="margin-bottom:10px;">
+    <button class="u-btn u-magnet" id="dBtn">Ajouter</button>
+    <p class="u-state" id="dState"></p>
+  </div>
+
+  <p class="liens"><a href="/">⌂ accueil</a> · <a href="/jeux">nos jeux</a> · <a href="/dadoucherie">ta page</a></p>
+</div>
+
+<script src="/db.js"></script>
+<script src="/app.js"></script>
+<script>
+(function(){
+  var note=0;
+  document.querySelectorAll('#dNote button').forEach(function(b){
+    b.addEventListener('click', function(){ note=+b.dataset.n; document.querySelectorAll('#dNote button').forEach(function(x){ x.classList.toggle('on', +x.dataset.n<=note); }); });
+  });
+  var listeEl=document.getElementById('liste');
+  function esc(s){ return (s||'').replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+  function etoilesTxt(n){ n=+n||0; return '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n); }
+  function charger(){
+    DB.select('dramas','order=created_at.desc').then(function(rows){
+      rows=rows||[]; listeEl.innerHTML='';
+      if(!rows.length){ listeEl.innerHTML='<p class="vide">Aucun drama pour l\'instant. Ajoute le premier.</p>'; return; }
+      rows.forEach(function(d){
+        var el=document.createElement('div'); el.className='d u-reveal';
+        var cls = d.statut==='terminé'?'fini':(d.statut==='coup de cœur'?'coeur':'');
+        el.innerHTML='<div class="emo">'+(d.emoji||'📺')+'</div><div class="corps"><div class="titre"></div>'+
+          '<div class="bas"><span class="statut '+cls+'">'+esc(d.statut||'')+'</span>'+(d.note?'<span class="note">'+etoilesTxt(d.note)+'</span>':'')+'</div>'+
+          (d.commentaire?'<div class="com"></div>':'')+'</div>';
+        el.querySelector('.titre').textContent=d.titre||'';
+        if(d.commentaire) el.querySelector('.com').textContent='« '+d.commentaire+' »';
+        listeEl.appendChild(el);
+      });
+      setTimeout(function(){ document.querySelectorAll('.u-reveal').forEach(function(e){e.classList.add('is-in');}); },50);
+    });
+  }
+  document.getElementById('dBtn').addEventListener('click', function(){
+    var t=document.getElementById('dTitre').value.trim(); var st=document.getElementById('dState');
+    if(!t){ st.textContent="Il faut au moins un titre."; st.className="u-state u-state--err"; return; }
+    App.submit(this, st, function(){ return DB.insert('dramas',{ titre:t, emoji:document.getElementById('dEmoji').value.trim()||'📺', statut:document.getElementById('dStatut').value, note:note||null, commentaire:document.getElementById('dCom').value.trim()||null }); }, "Ajouté à nos soirées. 🍿").then(function(){
+      document.getElementById('dTitre').value=''; document.getElementById('dEmoji').value=''; document.getElementById('dCom').value=''; note=0; document.querySelectorAll('#dNote button').forEach(function(x){x.classList.remove('on');}); charger();
+    });
+  });
+  charger();
+})();
+</script>
+</body>
+</html>

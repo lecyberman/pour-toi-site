@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Ses créations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  body{ padding:34px 18px 80px; }
+  .wrap{ max-width:720px; margin:0 auto; position:relative; z-index:2; }
+  .tete{ text-align:center; margin-bottom:28px; }
+  .tete h1{ font-size:var(--fs-2xl); margin:.3rem 0 .5rem; }
+  .tete p{ color:var(--c-encre-douce); max-width:46ch; margin:0 auto; }
+  .grille{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+  .crea{ background:var(--surface); border:1px solid var(--bordure); border-radius:var(--r-md); overflow:hidden; box-shadow:var(--sh-2); backdrop-filter:blur(var(--verre-blur)); }
+  .crea .vue{ width:100%; aspect-ratio:4/3; object-fit:cover; display:block; background:linear-gradient(135deg,#EFE3EC,#F6E7C4); }
+  .crea .ph{ display:flex; align-items:center; justify-content:center; font-size:2.4rem; color:#C9A9C0; }
+  .crea .in{ padding:14px 16px; }
+  .crea .titre{ font-family:var(--font-display); font-size:1.15rem; }
+  .crea .desc{ font-size:.94rem; color:var(--c-encre-douce); margin-top:4px; line-height:1.55; }
+  .ajout{ margin-top:24px; }
+  .liens{ margin-top:30px; text-align:center; font-size:.92rem; color:var(--c-encre-douce); }
+  .liens a{ color:var(--c-corail); text-decoration:none; font-weight:600; }
+  .vide{ color:var(--c-encre-douce); font-style:italic; }
+</style>
+</head>
+<body class="u-theme u-grain">
+<div class="wrap">
+  <div class="tete u-reveal">
+    <p class="u-eyebrow">ce qui te rend unique</p>
+    <h1 class="u-display">Ses créations</h1>
+    <p>Ce que tu fais, ce que tu crées, ce que tu inventes. Un espace à toi, pour montrer ce dont tu es fière.</p>
+  </div>
+
+  <div class="grille" id="grille"><p class="vide">Chargement…</p></div>
+
+  <div class="u-card ajout u-reveal">
+    <input class="u-field" id="cTitre" type="text" placeholder="Le titre de ta création" style="margin-bottom:10px;">
+    <textarea class="u-field" id="cDesc" placeholder="Raconte-la…" style="margin-bottom:10px;"></textarea>
+    <input class="u-field" id="cImg" type="text" placeholder="Lien d'une image (optionnel)" style="margin-bottom:10px;">
+    <button class="u-btn u-magnet" id="cBtn">Ajouter ma création</button>
+    <p class="u-state" id="cState"></p>
+  </div>
+
+  <p class="liens"><a href="/">⌂ accueil</a> · <a href="/dadoucherie">ta page</a></p>
+</div>
+
+<script src="/db.js"></script>
+<script src="/app.js"></script>
+<script>
+(function(){
+  var grille=document.getElementById('grille');
+  function esc(s){ return (s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function charger(){
+    DB.select('creations','order=created_at.desc').then(function(rows){
+      rows=rows||[]; grille.innerHTML='';
+      if(!rows.length){ grille.innerHTML='<p class="vide">Rien encore. Ajoute ta première création, en dessous.</p>'; return; }
+      rows.forEach(function(c){
+        var d=document.createElement('div'); d.className='crea u-reveal';
+        var vue = c.image ? '<img class="vue" loading="lazy" src="'+esc(c.image)+'" alt="'+esc(c.titre)+'">' : '<div class="vue ph">✦</div>';
+        d.innerHTML=vue+'<div class="in"><div class="titre"></div>'+(c.description?'<div class="desc"></div>':'')+'</div>';
+        d.querySelector('.titre').textContent=c.titre||'';
+        if(c.description) d.querySelector('.desc').textContent=c.description;
+        grille.appendChild(d);
+      });
+      setTimeout(function(){ document.querySelectorAll('.u-reveal').forEach(function(e){e.classList.add('is-in');}); },50);
+    });
+  }
+  document.getElementById('cBtn').addEventListener('click', function(){
+    var t=document.getElementById('cTitre').value.trim(); var st=document.getElementById('cState');
+    if(!t){ st.textContent="Donne un titre à ta création."; st.className="u-state u-state--err"; return; }
+    App.submit(this, st, function(){ return DB.insert('creations',{titre:t, description:document.getElementById('cDesc').value.trim()||null, image:document.getElementById('cImg').value.trim()||null}); }, "Ajouté. J'adore déjà. 🤍").then(function(){
+      document.getElementById('cTitre').value=''; document.getElementById('cDesc').value=''; document.getElementById('cImg').value=''; charger();
+    });
+  });
+  charger();
+})();
+</script>
+</body>
+</html>

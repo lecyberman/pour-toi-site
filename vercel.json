@@ -22,6 +22,9 @@
     { "source": "/galerie", "destination": "/galerie.html" },
     { "source": "/photos", "destination": "/galerie.html" },
     { "source": "/capsules", "destination": "/capsules.html" },
+    { "source": "/creations", "destination": "/creations.html" },
+    { "source": "/dramas", "destination": "/dramas.html" },
+    { "source": "/humeurs", "destination": "/humeurs.html" },
     { "source": "/secret-juillet", "destination": "/index.html" }
   ],
   "headers": [

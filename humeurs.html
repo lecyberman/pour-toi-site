@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Ce soir je me sens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  body{ padding:34px 18px 80px; transition:background 1s ease; }
+  .wrap{ max-width:580px; margin:0 auto; position:relative; z-index:2; }
+  .tete{ text-align:center; margin-bottom:26px; }
+  .tete h1{ font-size:var(--fs-2xl); margin:.3rem 0 .5rem; }
+  .tete p{ color:var(--c-encre-douce); max-width:42ch; margin:0 auto; }
+  .humeurs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:10px; }
+  .h{ background:#fff; border:1px solid var(--bordure-forte); border-radius:var(--r-md); padding:16px 10px; text-align:center; cursor:pointer; transition:transform var(--t-fast) var(--ease), background var(--t-med); }
+  .h:hover{ transform:translateY(-3px); background:#FBF2F0; }
+  .h .e{ font-size:1.8rem; }
+  .h .l{ font-size:.85rem; font-weight:600; margin-top:4px; color:var(--c-encre); }
+  .reponse{ margin-top:20px; display:none; }
+  .reponse.on{ display:block; animation:rise .6s var(--ease) both; }
+  @keyframes rise{ from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:none;} }
+  .reponse .msg{ font-family:var(--font-display); font-style:italic; font-size:1.25rem; color:var(--c-corail); text-align:center; line-height:1.5; }
+  .recent{ margin-top:30px; }
+  .recent h2{ font-family:var(--font-display); font-weight:500; font-size:1.25rem; margin-bottom:12px; }
+  .ligne-h{ display:flex; gap:10px; align-items:center; padding:9px 0; border-bottom:1px solid var(--bordure); }
+  .ligne-h .e{ font-size:1.3rem; }
+  .ligne-h .l{ flex:1; }
+  .ligne-h .dt{ font-size:.8rem; color:var(--c-encre-douce); }
+  .liens{ margin-top:30px; text-align:center; font-size:.92rem; color:var(--c-encre-douce); }
+  .liens a{ color:var(--c-corail); text-decoration:none; font-weight:600; }
+  .vide{ color:var(--c-encre-douce); font-style:italic; }
+</style>
+</head>
+<body class="u-theme u-grain">
+<div class="wrap">
+  <div class="tete u-reveal">
+    <p class="u-eyebrow">pas besoin de mots</p>
+    <h1 class="u-display">Ce soir, je me sens…</h1>
+    <p>Touche juste celle qui te ressemble ce soir. Je la garde, et je te réponds.</p>
+  </div>
+
+  <div class="humeurs" id="humeurs"></div>
+
+  <div class="reponse u-card" id="reponse"><div class="msg" id="repMsg"></div></div>
+
+  <div class="recent" id="recent"></div>
+
+  <p class="liens"><a href="/">⌂ accueil</a> · <a href="/toi">comment tu te sens</a> · <a href="/dadoucherie">ta page</a></p>
+</div>
+
+<script src="/db.js"></script>
+<script src="/app.js"></script>
+<script>
+(function(){
+  var HUMEURS = [
+    {e:'😊', l:'heureuse',   m:"Ça illumine ma soirée de te savoir bien. Garde ce sourire.", bg:'#FBF4E4'},
+    {e:'😌', l:'apaisée',    m:"Le calme te va bien. Profite de ce moment, il est à toi.", bg:'#EDF2E7'},
+    {e:'🥰', l:'amoureuse',  m:"Deux à deux, alors. Moi aussi, à cet instant précis.", bg:'#FBECEF'},
+    {e:'😴', l:'fatiguée',   m:"Alors on ralentit. Tu as le droit de ne rien faire ce soir.", bg:'#ECEAF3'},
+    {e:'😔', l:'triste',     m:"Je suis là, même de loin. Ça passera, et je reste en attendant.", bg:'#E8EAF2'},
+    {e:'😰', l:'stressée',   m:"Respire. Une seule chose à la fois, et je porte le reste avec toi.", bg:'#EFE7F0'},
+    {e:'🥺', l:'sensible',   m:"Ta sensibilité n'est pas une faiblesse, c'est une de tes plus belles choses.", bg:'#FBEFEA'},
+    {e:'🌙', l:'nostalgique',m:"Les souvenirs qui remontent sont la preuve qu'on a vécu de beaux moments.", bg:'#E9EAF5'},
+    {e:'😄', l:'taquine',    m:"Oh, ce soir tu cherches les ennuis. J'adore ça.", bg:'#FBF3E0'},
+    {e:'🤗', l:'câline',     m:"Note prise. Dès que je te vois, tu sais ce qui t'attend.", bg:'#FBEBE7'}
+  ];
+  var box=document.getElementById('humeurs'), rep=document.getElementById('reponse'), repMsg=document.getElementById('repMsg');
+  HUMEURS.forEach(function(h){
+    var d=document.createElement('button'); d.className='h';
+    d.innerHTML='<div class="e">'+h.e+'</div><div class="l">'+h.l+'</div>';
+    d.addEventListener('click', function(){
+      document.body.style.background=h.bg;
+      repMsg.textContent=h.m; rep.classList.add('on'); rep.scrollIntoView({behavior:'smooth',block:'nearest'});
+      DB.insert('humeurs',{emoji:h.e, label:h.l}).then(charger);
+    });
+    box.appendChild(d);
+  });
+  function dateFr(iso){ var d=new Date(iso); return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); }
+  function charger(){
+    DB.select('humeurs','order=created_at.desc&limit=8').then(function(rows){
+      rows=rows||[]; var r=document.getElementById('recent');
+      if(!rows.length){ r.innerHTML=''; return; }
+      r.innerHTML='<h2>Tes dernières humeurs</h2>';
+      rows.forEach(function(h){ var l=document.createElement('div'); l.className='ligne-h';
+        l.innerHTML='<span class="e">'+(h.emoji||'✦')+'</span><span class="l">'+(h.label||'')+'</span><span class="dt">'+dateFr(h.created_at)+'</span>'; r.appendChild(l); });
+    });
+  }
+  charger();
+})();
+</script>
+</body>
+</html>
