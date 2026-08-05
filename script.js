@@ -1,6 +1,6 @@
 /**
  * ================================================================
- * SCRIPT.JS — Pour toi, un espace à nous
+ * SCRIPT.JS, Pour toi, un espace à nous
  * ----------------------------------------------------------------
  * Pour modifier le contenu du site (textes, images, messages),
  * cherche les sections marquées :
@@ -12,7 +12,7 @@
  */
 
 /* ================================================================
-   ✏️  MODIFIER ICI — GALERIE DE LA RELATION
+   ✏️  MODIFIER ICI, GALERIE DE LA RELATION
    ----------------------------------------------------------------
    Chaque objet contient :
    - id       : identifiant unique (ne pas changer une fois créé)
@@ -20,7 +20,7 @@
    - titre    : titre de la carte
    - texte    : texte sous la carte (dans la modal)
    - image    : chemin vers l'image (ex: "assets/photo1.jpg")
-                Si pas d'image, utiliser null — un emoji s'affiche
+                Si pas d'image, utiliser null, un emoji s'affiche
    - emoji    : emoji de remplacement si pas d'image
    ----------------------------------------------------------------
    ➕ POUR AJOUTER : copier un bloc { } et le coller dans le tableau
@@ -70,7 +70,7 @@ const gallerieData = [
     id: 6,
     categorie: "aimer",
     titre: "Ta façon de te concentrer",
-    texte: "Quand tu dessines, tu n'es plus tout à fait là — et pourtant tu es entièrement toi. Je pourrais te regarder faire ça des heures.",
+    texte: "Quand tu dessines, tu n'es plus tout à fait là, et pourtant tu es entièrement toi. Je pourrais te regarder faire ça des heures.",
     image: null,
     emoji: "✏️"
   },
@@ -78,7 +78,7 @@ const gallerieData = [
     id: 7,
     categorie: "aimer",
     titre: "Ta sensibilité",
-    texte: "Tu ressens les choses profondément. Ce n'est pas une faiblesse — c'est ce qui te rend si vivante, si vraie.",
+    texte: "Tu ressens les choses profondément. Ce n'est pas une faiblesse, c'est ce qui te rend si vivante, si vraie.",
     image: null,
     emoji: "🌸"
   },
@@ -86,7 +86,7 @@ const gallerieData = [
     id: 8,
     categorie: "aimer",
     titre: "Ta curiosité",
-    texte: "La façon dont tu observes le monde — les détails, les textures, les petits riens. Tu vois des choses que les autres ne voient pas.",
+    texte: "La façon dont tu observes le monde, les détails, les textures, les petits riens. Tu vois des choses que les autres ne voient pas.",
     image: null,
     emoji: "🔍"
   },
@@ -102,7 +102,7 @@ const gallerieData = [
     id: 10,
     categorie: "voir",
     titre: "Une artiste qui s'ignore",
-    texte: "Ce que tu crées avec tes mains — les lignes, les formes, les couleurs — ce n'est pas « juste » du dessin. C'est une façon d'exister.",
+    texte: "Ce que tu crées avec tes mains, les lignes, les formes, les couleurs, ce n'est pas « juste » du dessin. C'est une façon d'exister.",
     image: null,
     emoji: "🎨"
   },
@@ -117,7 +117,7 @@ const gallerieData = [
 ];
 
 /* ================================================================
-   ✏️  MODIFIER ICI — SECTION COMPRENDRE
+   ✏️  MODIFIER ICI, SECTION COMPRENDRE
    ----------------------------------------------------------------
    Chaque objet contient :
    - titre : l'observation (phrase courte)
@@ -128,7 +128,7 @@ const gallerieData = [
 const comprendreData = [
   {
     titre: "Le monde peut être trop fort",
-    texte: "Quand tout arrive en même temps — les bruits, les visages, les attentes — ce n'est pas une plainte. C'est une réalité. Et j'apprends à en tenir compte."
+    texte: "Quand tout arrive en même temps, les bruits, les visages, les attentes, ce n'est pas une plainte. C'est une réalité. Et j'apprends à en tenir compte."
   },
   {
     titre: "Tu as besoin de temps pour traiter",
@@ -148,12 +148,12 @@ const comprendreData = [
   },
   {
     titre: "Tu n'as pas à te justifier d'être toi",
-    texte: "Ici, dans cet espace, et avec moi — tu peux exister sans explications. Sans performance. Sans effort de traduction."
+    texte: "Ici, dans cet espace, et avec moi, tu peux exister sans explications. Sans performance. Sans effort de traduction."
   }
 ];
 
 /* ================================================================
-   ✏️  MODIFIER ICI — UNIVERS INTERACTIF (étoiles cliquables)
+   ✏️  MODIFIER ICI, UNIVERS INTERACTIF (étoiles cliquables)
    ----------------------------------------------------------------
    Chaque objet contient :
    - label   : texte affiché sous l'étoile
@@ -215,7 +215,7 @@ const universObjets = [
 ];
 
 /* ================================================================
-   ✏️  MODIFIER ICI — TRADUCTEUR ÉMOTIONNEL
+   ✏️  MODIFIER ICI, TRADUCTEUR ÉMOTIONNEL
    ----------------------------------------------------------------
    Chaque clé correspond à un bouton d'émotion.
    - label    : texte du bouton
@@ -251,7 +251,7 @@ const emotionsData = {
   submergee: {
     label: "submergée",
     messages: [
-      "Trop de choses en même temps. C'est réel. Tu n'es pas fragile — tu es humaine et sensible, et ça mérite du respect.",
+      "Trop de choses en même temps. C'est réel. Tu n'es pas fragile, tu es humaine et sensible, et ça mérite du respect.",
       "Le monde est bruyant en ce moment. C'est normal d'avoir besoin de couper.",
       "Tu ressens beaucoup, et tu ressens fort. C'est une force, pas un problème.",
       "Personne ne peut tout porter en même temps. Toi non plus. Pose des trucs."
@@ -260,7 +260,7 @@ const emotionsData = {
       "Respire. Une seule chose à la fois.",
       "Tu n'as pas à tout gérer maintenant.",
       "Dis-moi ce dont tu as besoin. Ou dis rien.",
-      "Je suis là, pas pour résoudre — juste pour être.",
+      "Je suis là, pas pour résoudre, juste pour être.",
       "Coupe ce qui peut être coupé.",
       "Tu peux dire non. À tout. C'est ok.",
       "Trouve une chose petite et faisable. Juste une.",
@@ -270,7 +270,7 @@ const emotionsData = {
   heureuse: {
     label: "heureuse",
     messages: [
-      "Cette douceur que tu ressens — laisse-la être. Tu mérites le bonheur sans le questionner.",
+      "Cette douceur que tu ressens, laisse-la être. Tu mérites le bonheur sans le questionner.",
       "Tu es belle quand tu es heureuse. Reste dans cet instant.",
       "Profite. Vraiment, profite. Pas demain. Maintenant.",
       "Tu n'as pas besoin de comprendre pourquoi c'est bon. C'est bon, c'est tout."
@@ -288,7 +288,7 @@ const emotionsData = {
   doute: {
     label: "dans le doute",
     messages: [
-      "Le doute fait partie de toi. Il ne veut pas dire que tu te trompes — il veut dire que tu réfléchis avec soin.",
+      "Le doute fait partie de toi. Il ne veut pas dire que tu te trompes, il veut dire que tu réfléchis avec soin.",
       "Douter ne veut pas dire perdre. Ça veut juste dire que tu prends les choses au sérieux.",
       "Tes questions ont du sens, même si tu n'as pas encore les réponses.",
       "Le doute n'est pas l'ennemi. C'est juste un compagnon de route, parfois bavard."
@@ -314,7 +314,7 @@ const emotionsData = {
     mini: [
       "Ce que tu ressens est légitime.",
       "Tu n'as pas à la faire taire.",
-      "Elle passera, mais pour l'instant — laisse-la exister.",
+      "Elle passera, mais pour l'instant, laisse-la exister.",
       "Si tu veux en parler, je t'écoute.",
       "Marche un peu si tu peux.",
       "Écris ce qui te traverse, sans filtre.",
@@ -324,7 +324,7 @@ const emotionsData = {
   joie: {
     label: "dans la joie",
     messages: [
-      "Cette légèreté que tu ressens — c'est la tienne. Elle est vraie. Elle est belle.",
+      "Cette légèreté que tu ressens, c'est la tienne. Elle est vraie. Elle est belle.",
       "La joie t'va bien. Reste comme ça.",
       "Profite de ce sentiment sans le retenir trop fort. Il reviendra.",
       "Tu es lumineuse en ce moment, et je le vois."
@@ -341,7 +341,7 @@ const emotionsData = {
 };
 
 /* ================================================================
-   ✏️  MODIFIER ICI — MESSAGES APRÈS DESSIN
+   ✏️  MODIFIER ICI, MESSAGES APRÈS DESSIN
    Un message est choisi aléatoirement après que tu aies dessiné.
    ➕ POUR AJOUTER : ajouter une chaîne de texte dans le tableau
 ================================================================ */
@@ -357,15 +357,15 @@ const messagesApresDessin = [
 ];
 
 /* ================================================================
-   ✏️  MODIFIER ICI — TEXTE DE L'ŒUVRE FINALE
+   ✏️  MODIFIER ICI, TEXTE DE L'ŒUVRE FINALE
    Ce texte apparaît sur l'image générée de l'œuvre finale.
 ================================================================ */
-const oeuvreTexteFixe = "Pour toi — avec tout ce que les mots ne savent pas dire.";
+const oeuvreTexteFixe = "Pour toi, avec tout ce que les mots ne savent pas dire.";
 const oeuvreSignature = "Notre espace, à nous deux.";
 
 
 /* ================================================================
-   NE PAS MODIFIER EN DESSOUS — CODE TECHNIQUE
+   NE PAS MODIFIER EN DESSOUS, CODE TECHNIQUE
 ================================================================ */
 
 // ── Navigation ──────────────────────────────────────────────────
@@ -656,7 +656,7 @@ function initUnivers() {
   }
   scintiller();
 
-  // Objets cliquables — toujours reconstruire
+  // Objets cliquables, toujours reconstruire
   const conteneur = document.getElementById("univers-objets");
   conteneur.innerHTML = "";
 
@@ -1000,7 +1000,7 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
 // ── Initialisation gérée en bas du fichier ──
 
 /* ================================================================
-   ✏️  MODIFIER ICI — PHOTOS DE NOUS
+   ✏️  MODIFIER ICI, PHOTOS DE NOUS
    ----------------------------------------------------------------
    Chaque photo contient :
    - legende  : texte affiché sur la photo au survol et en modal
@@ -1059,7 +1059,7 @@ const photosData = [
 ];
 
 /* ================================================================
-   ✏️  MODIFIER ICI — CAPSULES TEMPORELLES
+   ✏️  MODIFIER ICI, CAPSULES TEMPORELLES
    ----------------------------------------------------------------
    Chaque capsule contient :
    - id         : identifiant unique
@@ -1074,7 +1074,7 @@ const photosData = [
    • "10ans"        → 10 ans après aujourd'hui
    ----------------------------------------------------------------
    ⚠️  Pour la capsule anniversaire, la date se recalcule chaque
-       année automatiquement — tu n'as rien à changer.
+       année automatiquement, tu n'as rien à changer.
    ⚠️  Pour les capsules 5 ans / 10 ans, change les dates manuellement
        selon votre date de début de relation.
 ================================================================ */
@@ -1107,7 +1107,7 @@ const capsulesData = [
     dateOuvert: prochainAnniversaire(), // S'ouvre chaque 15 février
     contenu: [
       "Joyeux anniversaire, mon amour.",
-      "Un an de plus. Un an de douceur, de silences partagés, de moments où j'ai su — encore une fois — que c'est toi.",
+      "Un an de plus. Un an de douceur, de silences partagés, de moments où j'ai su, encore une fois, que c'est toi.",
       "Je ne sais pas toujours trouver les mots au bon moment. Alors je les écris ici, à l'avance, pour être sûr·e qu'ils arrivent.",
       "Merci d'être toi. Merci d'être là. Merci de me laisser être moi à côté de toi.",
       "Cette année encore, je veux apprendre. Apprendre à mieux te connaître. Apprendre à mieux t'aimer.",
@@ -1137,7 +1137,7 @@ const capsulesData = [
     contenu: [
       "Dix ans.",
       "Je n'arrive pas vraiment à imaginer ce que sera notre vie à ce moment-là. Peut-être qu'on a déménagé. Peut-être qu'on a construit quelque chose de grand. Peut-être que les choses ont changé d'une façon que je ne pourrais pas deviner aujourd'hui.",
-      "Mais ce que je sais, c'est que je t'écris ça depuis un endroit où je t'aime profondément. Et cet amour-là, il ne disparaît pas. Il se transforme, il grandit, il apprend — mais il reste.",
+      "Mais ce que je sais, c'est que je t'écris ça depuis un endroit où je t'aime profondément. Et cet amour-là, il ne disparaît pas. Il se transforme, il grandit, il apprend, mais il reste.",
       "Je voulais qu'il y ait une trace. Quelque chose qui dise : à ce moment précis, j'ai choisi de t'écrire une lettre pour dans dix ans. Parce que tu en valais la peine.",
       "Tu en vaux toujours la peine.",
       "Joyeux anniversaire de nous deux. ✦"
@@ -1146,7 +1146,7 @@ const capsulesData = [
 ];
 
 /* ================================================================
-   LOGIQUE — PHOTOS
+   LOGIQUE, PHOTOS
 ================================================================ */
 function initPhotos() {
   const grille = document.getElementById("photos-grille");
@@ -1221,7 +1221,7 @@ function fermerModalPhoto() {
 }
 
 /* ================================================================
-   LOGIQUE — CAPSULES TEMPORELLES
+   LOGIQUE, CAPSULES TEMPORELLES
 ================================================================ */
 function initCapsules() {
   const liste = document.getElementById("capsules-liste");
@@ -1314,7 +1314,7 @@ function mettreAJourRebours(id, dateCible) {
 
 
 /* ================================================================
-   ✏️  MODIFIER ICI — ALBUMS PHOTOS
+   ✏️  MODIFIER ICI, ALBUMS PHOTOS
    ----------------------------------------------------------------
    Structure : un album par voyage/thème, chaque album contient
    des dossiers de photos organisés par thème.
@@ -1520,7 +1520,7 @@ const albumsData = [
 ];
 
 /* ================================================================
-   ✏️  MODIFIER ICI — VOYAGES INTERACTIFS
+   ✏️  MODIFIER ICI, VOYAGES INTERACTIFS
    ----------------------------------------------------------------
    Chaque voyage contient :
    - id        : identifiant (même que dans albumsData si lié)
@@ -1672,7 +1672,7 @@ const voyagesData = [
 ];
 
 /* ================================================================
-   ✏️  MODIFIER ICI — LISTE DE SOUHAITS (voyages rêvés)
+   ✏️  MODIFIER ICI, LISTE DE SOUHAITS (voyages rêvés)
    ----------------------------------------------------------------
    Elle peut modifier cette liste directement sur le site.
    Mais tu peux aussi pré-remplir ici des destinations.
@@ -1697,7 +1697,7 @@ const souhaitsPreremplis = [
 ];
 
 /* ================================================================
-   LOGIQUE — ALBUMS PHOTOS
+   LOGIQUE, ALBUMS PHOTOS
 ================================================================ */
 let albumActuel = null;
 let albumThemeActuel = null;
@@ -1780,7 +1780,7 @@ function afficherTheme(theme, btnActif) {
   grille.innerHTML = "";
 
   if (theme.photos.length === 0) {
-    grille.innerHTML = `<p class="album-vide">Aucune photo encore — ajoute-en dans script.js !</p>`;
+    grille.innerHTML = `<p class="album-vide">Aucune photo encore, ajoute-en dans script.js !</p>`;
     return;
   }
 
@@ -1818,7 +1818,7 @@ function fermerPhotoPleine() {
 }
 
 /* ================================================================
-   LOGIQUE — VOYAGES INTERACTIFS
+   LOGIQUE, VOYAGES INTERACTIFS
 ================================================================ */
 let voyageActuel = null;
 let carteInitialisee = false;
@@ -2013,7 +2013,7 @@ function fermerModalVoyage() {
 }
 
 /* ================================================================
-   LOGIQUE — LISTE DE SOUHAITS
+   LOGIQUE, LISTE DE SOUHAITS
    ----------------------------------------------------------------
    - Source de vérité : Supabase (table `souhaits`)
    - Cache localStorage : permet l'affichage instantané hors-ligne
@@ -2087,7 +2087,7 @@ async function synchroniserSouhaitsDepuisSupabase() {
 
     sauvegarderSouhaits(fusion);
   } catch(e) {
-    console.warn("Souhaits : sync Supabase échouée — on garde le cache local.", e);
+    console.warn("Souhaits : sync Supabase échouée, on garde le cache local.", e);
   }
 }
 
@@ -2108,7 +2108,7 @@ function afficherSouhaits() {
     const div = document.createElement("div");
     div.className = "souhait-item" + (souhait.fait ? " souhait-fait" : "");
     div.style.animationDelay = `${i * 0.05}s`;
-    // id échappé (UUID ou "custom-…") — utilisable comme attribut
+    // id échappé (UUID ou "custom-…"), utilisable comme attribut
     const idAttr = String(souhait.id).replace(/'/g, "\\'");
     div.innerHTML = `
       <button class="souhait-check" onclick="toggleSouhait('${idAttr}')"
@@ -2195,7 +2195,7 @@ async function ajouterSouhait() {
 
 
 /* ================================================================
-   ✏️  MODIFIER ICI — TEXTE DU POP-UP D'ACCUEIL
+   ✏️  MODIFIER ICI, TEXTE DU POP-UP D'ACCUEIL
    ----------------------------------------------------------------
    - titre      : phrase principale en grand
    - paragraphes: tableau de textes (chaque item = un §)
@@ -2239,7 +2239,7 @@ const textePopupAccueil = {
 };
 
 /* ================================================================
-   LOGIQUE — POP-UP
+   LOGIQUE, POP-UP
 ================================================================ */
 const POPUP_KEY = "popup_vu_v1";
 
@@ -2327,7 +2327,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function chargerDepuisSupabase() {
   if (typeof db === "undefined" || SUPABASE_URL.includes("XXXXXXXXXXXX")) {
-    console.info("Supabase non configuré — données statiques utilisées.");
+    console.info("Supabase non configuré, données statiques utilisées.");
     return;
   }
 
@@ -2500,7 +2500,7 @@ async function chargerDepuisSupabase() {
     console.info("✓ Données Supabase fusionnées avec données statiques");
 
   } catch(err) {
-    console.warn("Supabase non disponible — données statiques utilisées.", err);
+    console.warn("Supabase non disponible, données statiques utilisées.", err);
   }
 }
 
@@ -2530,14 +2530,14 @@ async function sauvegarderDessinEnLigne(canvasId, type, message = "") {
 
 /* ════════════════════════════════════════════════════════════════
    ════════════════════════════════════════════════════════════════
-                  AJOUTS V2 — PIN, capsule juillet,
+                  AJOUTS V2, PIN, capsule juillet,
               espaces privés, créations, dramas, humeurs
    ════════════════════════════════════════════════════════════════
    ════════════════════════════════════════════════════════════════ */
 
 
 /* ================================================================
-   PIN — Modal pavé numérique (réutilisable, accessible clavier)
+   PIN, Modal pavé numérique (réutilisable, accessible clavier)
 ================================================================ */
 const PIN_SECRET      = "5922";
 const PIN_SESSION_KEY = "pin_ok_v1";
@@ -2677,11 +2677,11 @@ const CAPSULE_JUILLET_DATE = "2026-07-15";
 
 const CAPSULE_JUILLET_TEXTE = [
   "Il y a trois ans, tu m'as dit qu'on n'était pas compatibles. Que tu ne savais pas comment me classer. Que je n'étais pas juste un ami, mais que tu ne savais pas non plus ce que j'étais. Et moi, j'ai souri, parce que je savais déjà.",
-  "Tu m'as dit que notre relation ne passerait pas un an. Tu avais tes doutes, tes questions, cette façon de tout analyser, de tout peser. Et moi je suis resté — pas parce que j'avais des certitudes, mais parce que même dans l'ambiguïté, être près de toi avait plus de sens que d'être loin.",
-  "Je t'ai appris à me connaître à travers des messages, parce que tu parles mieux par texte que par les mots qu'on dit à voix haute. J'ai appris à lire entre tes lignes. J'ai appris que quand tu regardes un drama chinois en boucle, c'est que le monde dehors est trop bruyant et que tu as besoin de ta bulle. Et j'ai appris à respecter cette bulle — à ne jamais forcer la porte, juste à rester dehors au cas où tu aurais envie de l'ouvrir.",
-  "Tu es restée toi-même — celle qui préfère le canapé à la rue, les histoires d'amour coréennes à la vraie vie sociale, les créations artistiques aux conversations inutiles. Celle qui dessine, qui crée, qui voit la beauté là où les autres voient du vide. Tu as fait des études de mode, tu es designeure industrielle, et tout ce que tu touches a quelque chose — une âme, une intention.",
-  "On a construit ensemble. Deux entreprises au Mali — MSK Création, Genesis. Des marques de sac au Togo — Isdalinia, Elvi Creation. On a fait des projets dans des pays différents, on a porté des choses lourdes ensemble, on a avancé même quand c'était compliqué.",
-  "Et pourtant tu doutes encore parfois. Je le sais. Tu réfléchis beaucoup — c'est ta nature, ce n'est pas un défaut. Mais moi je ne doute pas. Pas une seule seconde.",
+  "Tu m'as dit que notre relation ne passerait pas un an. Tu avais tes doutes, tes questions, cette façon de tout analyser, de tout peser. Et moi je suis resté, pas parce que j'avais des certitudes, mais parce que même dans l'ambiguïté, être près de toi avait plus de sens que d'être loin.",
+  "Je t'ai appris à me connaître à travers des messages, parce que tu parles mieux par texte que par les mots qu'on dit à voix haute. J'ai appris à lire entre tes lignes. J'ai appris que quand tu regardes un drama chinois en boucle, c'est que le monde dehors est trop bruyant et que tu as besoin de ta bulle. Et j'ai appris à respecter cette bulle, à ne jamais forcer la porte, juste à rester dehors au cas où tu aurais envie de l'ouvrir.",
+  "Tu es restée toi-même, celle qui préfère le canapé à la rue, les histoires d'amour coréennes à la vraie vie sociale, les créations artistiques aux conversations inutiles. Celle qui dessine, qui crée, qui voit la beauté là où les autres voient du vide. Tu as fait des études de mode, tu es designeure industrielle, et tout ce que tu touches a quelque chose, une âme, une intention.",
+  "On a construit ensemble. Deux entreprises au Mali, MSK Création, Genesis. Des marques de sac au Togo, Isdalinia, Elvi Creation. On a fait des projets dans des pays différents, on a porté des choses lourdes ensemble, on a avancé même quand c'était compliqué.",
+  "Et pourtant tu doutes encore parfois. Je le sais. Tu réfléchis beaucoup, c'est ta nature, ce n'est pas un défaut. Mais moi je ne doute pas. Pas une seule seconde.",
   "Trois ans après le début de ce que tu refusais d'appeler une relation, je suis toujours là. Et je veux te poser une question…"
 ];
 
@@ -2690,7 +2690,7 @@ const LETTRE_JUILLET = [
   "Tu m'avais dit que ça ne durerait pas. Regarde-nous.",
   "Je t'aime dans ta façon d'être différente, dans ton monde intérieur que peu de gens ont la chance de voir. Je t'aime quand tu regardes ton drama sans dire un mot pendant trois heures. Je t'aime quand tu crées quelque chose de tes mains. Je t'aime dans tes doutes, dans tes silences, dans ta façon de tout ressentir plus fort que les autres.",
   "Aujourd'hui, le 15 juillet, je veux juste te demander une chose.",
-  "Est-ce que tu veux bien rester avec moi — pour de vrai, pour toujours ?"
+  "Est-ce que tu veux bien rester avec moi, pour de vrai, pour toujours ?"
 ];
 
 // Injection dans capsulesData
@@ -2795,7 +2795,7 @@ initCapsules = function() {
   });
 };
 
-// Le reste de l'histoire — la page de la demande, au bord de la mer 🌊
+// Le reste de l'histoire, la page de la demande, au bord de la mer 🌊
 function allerALaDemande() {
   document.body.style.transition = "opacity 1.1s ease";
   document.body.style.opacity = "0";
@@ -2859,7 +2859,7 @@ function escapeHtml(s) {
 
 
 /* ================================================================
-   "NOS MOTS À NOUS" — journal partagé Elle/Lui (PIN-gated)
+   "NOS MOTS À NOUS", journal partagé Elle/Lui (PIN-gated)
 ================================================================ */
 let motsAuteurCourant = "elle";
 let motsImageUrl     = null;
@@ -3116,7 +3116,7 @@ async function afficherDramas() {
         </div>
         ${d.commentaire
           ? `<p class="drama-commentaire">${escapeHtml(d.commentaire)}</p>`
-          : `<p class="drama-commentaire drama-commentaire-vide">Aucun avis encore — touche ✎ pour en ajouter un</p>`}
+          : `<p class="drama-commentaire drama-commentaire-vide">Aucun avis encore, touche ✎ pour en ajouter un</p>`}
       </div>
       <div class="drama-actions">
         <button class="drama-modifier" onclick="modifierDrama('${d.id}')" aria-label="Modifier">✎</button>
