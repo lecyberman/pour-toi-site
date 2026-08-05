@@ -68,6 +68,24 @@
     /* transition de sortie cinématique */
     #accueil.accueil-part{ transition:opacity .8s ease, filter .8s ease; opacity:0; filter:blur(6px); }
 
+    /* ===== Accueil-hub : notre monde ===== */
+    #monde{ background:#14162E !important; }
+    #monde .monde-in{ max-width:980px; margin:0 auto; padding:64px 20px 90px; }
+    #monde .monde-tete{ text-align:center; margin-bottom:34px; }
+    #monde .monde-tete .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#E8C15C; font-size:1.1rem; }
+    #monde .monde-tete h2{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(1.9rem,6vw,2.8rem); color:#FBF4EA; margin:.3rem 0 .6rem; line-height:1.15; }
+    #monde .monde-tete p{ font-family:'Nunito Sans',sans-serif; color:#C9C1D8; max-width:46ch; margin:0 auto; line-height:1.65; }
+    #monde .grille{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:15px; }
+    #monde .kase{ display:block; text-decoration:none; cursor:pointer; text-align:left;
+      background:rgba(252,248,250,.055); border:1px solid rgba(255,255,255,.1); border-radius:18px;
+      padding:20px 20px 18px; color:#EDE9F3; backdrop-filter:blur(8px);
+      transition:transform .25s cubic-bezier(.22,.61,.36,1), background .3s, border-color .3s, box-shadow .3s; }
+    #monde .kase:hover{ transform:translateY(-4px); background:rgba(255,255,255,.1); border-color:rgba(232,193,92,.45); box-shadow:0 18px 40px -22px rgba(0,0,0,.6); }
+    #monde .kase .ic{ font-size:1.7rem; }
+    #monde .kase .t{ font-family:'Fraunces',serif; font-weight:500; font-size:1.18rem; margin-top:8px; color:#FBF4EA; }
+    #monde .kase .d{ font-family:'Nunito Sans',sans-serif; font-size:.86rem; color:#B4AAC8; margin-top:3px; line-height:1.45; }
+    #monde .monde-sign{ text-align:center; margin-top:36px; font-family:'Fraunces',serif; font-style:italic; color:#E8C15C; }
+
     /* Menu masqué sur l'entrée : accueil pur, sans distraction */
     #accueil.active ~ #nav-principale{ display:none !important; }
 
@@ -115,6 +133,36 @@
   </section>
 
   <!-- ============================================================
+       ACCUEIL-HUB : notre monde (vraie page d'accueil)
+  ============================================================ -->
+  <section id="monde" class="page">
+    <div class="monde-in">
+      <div class="monde-tete">
+        <p class="eyebrow" id="monde-salut">notre monde, rien qu'à nous</p>
+        <h2>Par où tu veux entrer ce soir ?</h2>
+        <p>Tout ici a été pensé pour toi. Prends ton temps, ouvre ce qui t'appelle. Rien ne presse.</p>
+      </div>
+      <div class="grille">
+        <a class="kase" href="/dadoucherie"><div class="ic">💌</div><div class="t">Ta page</div><div class="d">Ton bonjour, ta lettre du jour, ma voix.</div></a>
+        <a class="kase" href="/histoire"><div class="ic">✨</div><div class="t">Notre histoire</div><div class="d">De Snap à nous, en dates et en souvenirs.</div></a>
+        <a class="kase" href="/univers"><div class="ic">✦</div><div class="t">Notre univers</div><div class="d">Nos moments, en constellation.</div></a>
+        <a class="kase" href="/toi"><div class="ic">🕯️</div><div class="t">Comment tu te sens</div><div class="d">Dis-moi, demande-moi, dépose un mot.</div></a>
+        <a class="kase" href="/galerie"><div class="ic">📷</div><div class="t">Notre galerie</div><div class="d">Nos photos, en polaroïds.</div></a>
+        <a class="kase" href="/souhaits"><div class="ic">🗺️</div><div class="t">Nos rêves à deux</div><div class="d">Ce qu'on veut vivre, ensemble.</div></a>
+        <a class="kase" href="/reves"><div class="ic">🌍</div><div class="t">Nos voyages rêvés</div><div class="d">Les endroits où je veux t'emmener.</div></a>
+        <a class="kase" href="/mots"><div class="ic">📖</div><div class="t">Nos mots</div><div class="d">Notre journal, nos petits mots.</div></a>
+        <a class="kase" href="/capsules"><div class="ic">✉️</div><div class="t">Nos capsules</div><div class="d">Des lettres à ouvrir plus tard.</div></a>
+        <a class="kase" href="/humeurs"><div class="ic">🌙</div><div class="t">Ce soir je me sens</div><div class="d">Touche l'humeur qui te ressemble.</div></a>
+        <a class="kase" href="/dramas"><div class="ic">🍿</div><div class="t">Nos dramas</div><div class="d">Nos soirées canapé, en liste.</div></a>
+        <a class="kase" href="/jeux"><div class="ic">🎲</div><div class="t">Nos jeux</div><div class="d">Un moment léger, juste pour rire.</div></a>
+        <a class="kase" href="/nuit"><div class="ic">🌌</div><div class="t">Notre nuit</div><div class="d">Le 15 juillet, notre ciel.</div></a>
+        <a class="kase" href="/creations"><div class="ic">🎨</div><div class="t">Nos créations</div><div class="d">Ce qu'on dessine, ce qu'on imagine.</div></a>
+      </div>
+      <p class="monde-sign">tout ça, parce que c'est toi</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
        NAVIGATION FLOTTANTE
   ============================================================ -->
   <nav id="nav-principale" aria-label="Navigation principale" hidden>
@@ -137,7 +185,7 @@
     <button onclick="location.href='/dadoucherie'" aria-label="Pour toi">💌 Pour toi</button>
     <button onclick="location.href='/histoire'"    aria-label="Notre histoire">✨ Histoire</button>
     <button onclick="location.href='/jeux'"        aria-label="Nos jeux">🎲 Jeux</button>
-    <button onclick="naviguer('accueil')"    class="btn-retour"     aria-label="Retour accueil">⌂</button>
+    <button onclick="naviguer('monde')"    class="btn-retour"     aria-label="Retour accueil">⌂</button>
   </nav>
 
   <!-- ============================================================
@@ -745,12 +793,14 @@
 
     // Entrée fondue puis navigation
     var btn = document.getElementById("btn-entrer");
-    if(btn) btn.addEventListener("click", function(){
+    function entrerDansLeMonde(){
       var acc = document.getElementById("accueil");
-      if(reduce){ naviguer("galerie"); return; }
+      try{ localStorage.setItem("intro_vue_v1","1"); }catch(e){}
+      if(reduce || !acc){ naviguer("monde"); return; }
       acc.classList.add("accueil-part");
-      setTimeout(function(){ naviguer("galerie"); setTimeout(function(){ acc.classList.remove("accueil-part"); }, 60); }, 780);
-    });
+      setTimeout(function(){ naviguer("monde"); setTimeout(function(){ acc.classList.remove("accueil-part"); }, 60); }, 780);
+    }
+    if(btn) btn.addEventListener("click", entrerDansLeMonde);
 
     // La scène (canvas)
     var cv = document.getElementById("accueil-ciel");

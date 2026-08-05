@@ -2294,14 +2294,25 @@ function fermerPopupAccueil() {
 
 // ── Lancer le popup au chargement ────────────────────────────────
 document.addEventListener("DOMContentLoaded", async () => {
-  document.getElementById("accueil").classList.add("active");
-  document.getElementById("nav-principale").hidden = true;
+  // L'intro cinématique ne se joue qu'à la première visite.
+  // Ensuite, on arrive directement sur la vraie page d'accueil (le hub "notre monde").
+  var introVue = false;
+  try { introVue = localStorage.getItem("intro_vue_v1") === "1"; } catch(e) {}
+  var forcerIntro = /[?#]intro/.test(location.href); // /?intro pour revoir l'entrée
+
+  if (introVue && !forcerIntro) {
+    document.getElementById("accueil").classList.remove("active");
+    naviguer("monde");
+  } else {
+    document.getElementById("accueil").classList.add("active");
+    document.getElementById("nav-principale").hidden = true;
+  }
 
   // Charger les données depuis Supabase (si configuré)
   await chargerDepuisSupabase();
 
-  // Afficher le popup après chargement
-  setTimeout(afficherPopupAccueil, 600);
+  // Le popup de bienvenue n'apparaît qu'avec l'intro (première visite)
+  if (!introVue || forcerIntro) setTimeout(afficherPopupAccueil, 600);
 });
 
 
