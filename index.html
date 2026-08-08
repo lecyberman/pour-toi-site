@@ -132,6 +132,928 @@
       #accueil{ background:linear-gradient(180deg,#232A4A,#4A3A55 60%,#7A5A52) !important; }
     }
   </style>
+<style id="theme-toggle-css">
+    /* ===== Interrupteur clair / sombre ===== */
+    #bascule-theme{ position:fixed; left:16px; bottom:16px; z-index:10000; width:46px; height:46px; border-radius:50%; border:1px solid rgba(255,255,255,.2); background:#1E2036; color:#EDE9F3; font-size:1.15rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px -12px rgba(0,0,0,.6); transition:transform .2s ease, background .3s; }
+    #bascule-theme:hover{ transform:translateY(-2px); }
+    html[data-theme="clair"] #bascule-theme{ background:#fff; color:#3E3446; border-color:rgba(62,52,70,.15); }
+    html[data-theme="clair"] #accueil{ background:#FBF6F1 !important; }
+    html[data-theme="clair"] #accueil-ciel{ display:none !important; }
+    html[data-theme="clair"] #accueil .accueil-texte::before{ background:radial-gradient(closest-side, rgba(251,246,241,.65), transparent 72%) !important; }
+    html[data-theme="clair"] #accueil .accueil-titre{ color:#3E3446 !important; text-shadow:none !important; }
+    html[data-theme="clair"] #accueil .accueil-description{ color:#5c5266 !important; text-shadow:none !important; }
+    html[data-theme="clair"] #accueil .accueil-sous-titre{ color:#8E6FBF !important; text-shadow:none !important; }
+    html[data-theme="clair"] #accueil .accueil-indice{ color:rgba(62,52,70,.5) !important; }
+    html[data-theme="clair"] #monde, html[data-theme="clair"] #comprendre, html[data-theme="clair"] #dessin, html[data-theme="clair"] #oeuvre, html[data-theme="clair"] #emotions{ background:#FBF6F1 !important; color:#3E3446; }
+    html[data-theme="clair"] #monde .monde-tete h2, html[data-theme="clair"] #monde .kase .t, html[data-theme="clair"] #comprendre .section-titre, html[data-theme="clair"] #dessin .section-titre, html[data-theme="clair"] #oeuvre .section-titre, html[data-theme="clair"] #emotions .section-titre{ color:#3E3446 !important; }
+    html[data-theme="clair"] #monde .monde-tete p, html[data-theme="clair"] #monde .kase .d, html[data-theme="clair"] #comprendre .section-sous-titre, html[data-theme="clair"] #dessin .section-sous-titre, html[data-theme="clair"] #oeuvre .section-sous-titre, html[data-theme="clair"] #emotions .section-sous-titre{ color:#6b6175 !important; }
+    html[data-theme="clair"] #monde .monde-tete .eyebrow, html[data-theme="clair"] #monde .monde-sign{ color:#8E6FBF !important; }
+    html[data-theme="clair"] #monde .kase{ background:#fff !important; border-color:rgba(62,52,70,.1) !important; color:#3E3446 !important; }
+    html[data-theme="clair"] #monde .kase:hover{ border-color:rgba(142,111,191,.4) !important; box-shadow:0 14px 30px -18px rgba(62,52,70,.3) !important; }
+    html[data-theme="clair"] #comprendre .comprendre-item{ background:#fff !important; border-left-color:#8E6FBF !important; }
+    html[data-theme="clair"] #comprendre .comprendre-item h3{ color:#3E3446 !important; }
+    html[data-theme="clair"] #comprendre .comprendre-item p{ color:#6b6175 !important; }
+    html[data-theme="clair"] #dessin .dessin-label, html[data-theme="clair"] #oeuvre .dessin-label{ color:#6b6175 !important; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       SECTION 1, ACCUEIL
+  ============================================================ -->
+  <section id="accueil" class="page active" aria-label="Page d'accueil">
+    <canvas id="accueil-ciel" aria-hidden="true"></canvas>
+    <div class="accueil-inner">
+      <!-- ancien canvas de particules, remplacé par la scène ci-dessus -->
+      <canvas id="particules-canvas" aria-hidden="true"></canvas>
+
+      <div class="accueil-texte fade-in">
+        <p class="accueil-sous-titre" id="accueil-salut">pour toi,</p>
+        <h1 class="accueil-titre">J'ai construit un endroit<br>où le temps ralentit.</h1>
+        <p class="accueil-description">
+          Rien à faire, rien à réussir. Juste un espace qui garde une trace de nous,
+          et qui t'attend quand tu veux, comme tu veux.
+        </p>
+        <button class="btn-entrer u-magnet" id="btn-entrer" aria-label="Entrer dans l'espace">
+          Entrer, doucement
+        </button>
+        <p class="accueil-indice">prends ton temps, il n'y a pas de fin à ce couloir</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ACCUEIL-HUB : notre monde (vraie page d'accueil)
+  ============================================================ -->
+  <section id="monde" class="page">
+    <div class="monde-in">
+      <div class="monde-tete">
+        <p class="eyebrow" id="monde-salut">notre monde, rien qu'à nous</p>
+        <h2>Par où tu veux entrer ce soir ?</h2>
+        <p>Tout ici a été pensé pour toi. Prends ton temps, ouvre ce qui t'appelle. Rien ne presse.</p>
+      </div>
+      <div class="grille">
+        <a class="kase" href="/dadoucherie"><div class="ic">💌</div><div class="t">Ta page</div><div class="d">Ton bonjour, ta lettre du jour, ma voix.</div></a>
+        <a class="kase" href="/histoire"><div class="ic">✨</div><div class="t">Notre histoire</div><div class="d">De Snap à nous, en dates et en souvenirs.</div></a>
+        <a class="kase" href="/univers"><div class="ic">✦</div><div class="t">Notre univers</div><div class="d">Nos moments, en constellation.</div></a>
+        <a class="kase" href="/toi"><div class="ic">🕯️</div><div class="t">Comment tu te sens</div><div class="d">Dis-moi, demande-moi, dépose un mot.</div></a>
+        <a class="kase" href="/galerie"><div class="ic">📷</div><div class="t">Notre galerie</div><div class="d">Nos photos, en polaroïds.</div></a>
+        <a class="kase" href="/souhaits"><div class="ic">🗺️</div><div class="t">Nos rêves à deux</div><div class="d">Ce qu'on veut vivre, ensemble.</div></a>
+        <a class="kase" href="/reves"><div class="ic">🌍</div><div class="t">Nos voyages rêvés</div><div class="d">Les endroits où je veux t'emmener.</div></a>
+        <a class="kase" href="/mots"><div class="ic">📖</div><div class="t">Nos mots</div><div class="d">Notre journal, nos petits mots.</div></a>
+        <a class="kase" href="/capsules"><div class="ic">✉️</div><div class="t">Nos capsules</div><div class="d">Des lettres à ouvrir plus tard.</div></a>
+        <a class="kase" href="/humeurs"><div class="ic">🌙</div><div class="t">Ce soir je me sens</div><div class="d">Touche l'humeur qui te ressemble.</div></a>
+        <a class="kase" href="/dramas"><div class="ic">🍿</div><div class="t">Nos dramas</div><div class="d">Nos soirées canapé, en liste.</div></a>
+        <a class="kase" href="/jeux"><div class="ic">🎲</div><div class="t">Nos jeux</div><div class="d">Un moment léger, juste pour rire.</div></a>
+        <a class="kase" href="/nuit"><div class="ic">🌌</div><div class="t">Notre nuit</div><div class="d">Le 15 juillet, notre ciel.</div></a>
+        <a class="kase" href="/creations"><div class="ic">🖼️</div><div class="t">Nos créations</div><div class="d">Ce qu'on garde, ce qu'on imagine.</div></a>
+        <a class="kase" onclick="naviguer('comprendre')"><div class="ic">💭</div><div class="t">Ce que je comprends de toi</div><div class="d">Mes observations, avec amour.</div></a>
+        <a class="kase" onclick="naviguer('dessin')"><div class="ic">🎨</div><div class="t">Ton espace de dessin</div><div class="d">Dessine, je serai là après.</div></a>
+        <a class="kase" onclick="naviguer('oeuvre')"><div class="ic">✍️</div><div class="t">Notre œuvre</div><div class="d">Un dessin, quelques mots, gardés.</div></a>
+      </div>
+      <p class="monde-sign">tout ça, parce que c'est toi</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       NAVIGATION FLOTTANTE
+  ============================================================ -->
+  <nav id="nav-principale" aria-label="Navigation" hidden>
+    <button onclick="naviguer('monde')" class="btn-retour" aria-label="Retour à l'accueil">⌂ Accueil</button>
+    <button onclick="location.href='/dadoucherie'" aria-label="Ta page">💌 Ta page</button>
+  </nav>
+
+  <!-- ============================================================
+       SECTION 2, GALERIE DE LA RELATION
+       ✏️  MODIFIER : voir script.js → gallerieData[]
+  ============================================================ -->
+  <section id="galerie" class="page" aria-label="Galerie de notre relation">
+    <div class="section-inner">
+      <h2 class="section-titre">Notre galerie</h2>
+      <p class="section-sous-titre">Des instants que je veux garder précieusement.</p>
+
+      <!-- Filtres catégories -->
+      <div class="galerie-filtres" role="group" aria-label="Filtrer par catégorie">
+        <button class="filtre actif" data-cat="tous" onclick="filtrerGalerie('tous')">Tout voir</button>
+        <button class="filtre" data-cat="debut"   onclick="filtrerGalerie('debut')">Notre début</button>
+        <button class="filtre" data-cat="calme"   onclick="filtrerGalerie('calme')">Moments calmes</button>
+        <button class="filtre" data-cat="aimer"   onclick="filtrerGalerie('aimer')">Ce que j'aime</button>
+        <button class="filtre" data-cat="voir"    onclick="filtrerGalerie('voir')">Ce que je vois</button>
+      </div>
+
+      <!-- Grille de cartes (générée par JS) -->
+      <div id="galerie-grille" class="galerie-grille" role="list" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Modal galerie -->
+  <div id="modal-galerie" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titre" hidden>
+    <div class="modal-fond" onclick="fermerModal()"></div>
+    <div class="modal-contenu">
+      <button class="modal-fermer" onclick="fermerModal()" aria-label="Fermer">✕</button>
+      <img id="modal-image" src="" alt="" />
+      <h3 id="modal-titre"></h3>
+      <p id="modal-texte"></p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 3, COMPRÉHENSION
+       ✏️  MODIFIER : voir script.js → comprendreData[]
+  ============================================================ -->
+  <section id="comprendre" class="page" aria-label="Les choses que je comprends de toi">
+    <div class="section-inner comprendre-inner">
+      <h2 class="section-titre">Les choses que je comprends de toi</h2>
+      <p class="section-sous-titre">Pas des suppositions. Des observations avec amour.</p>
+      <div id="comprendre-liste" class="comprendre-liste"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 4, UNIVERS INTERACTIF (Ciel étoilé)
+  ============================================================ -->
+  <section id="univers" class="page" aria-label="Univers interactif, ciel étoilé">
+    <div class="univers-inner">
+      <canvas id="ciel-canvas" aria-hidden="true"></canvas>
+
+      <!-- Objets cliquables -->
+      <div id="univers-objets" aria-label="Objets interactifs dans le ciel">
+        <!-- Générés par JS via universObjets[] -->
+      </div>
+
+      <!-- Bulle de message -->
+      <div id="univers-message" class="univers-message" role="status" aria-live="polite" hidden>
+        <p id="univers-message-texte"></p>
+        <button onclick="fermerUniversMessage()" aria-label="Fermer le message">Fermer doucement</button>
+      </div>
+
+      <p class="univers-indice" aria-label="Indication">Clique sur une étoile pour découvrir quelque chose…</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 5, DESSIN INTERACTIF
+  ============================================================ -->
+  <section id="dessin" class="page" aria-label="Espace de dessin">
+    <div class="section-inner dessin-inner">
+      <h2 class="section-titre">Ton espace de dessin</h2>
+      <p class="section-sous-titre">Dessine ce que tu veux. Je serai là quand tu auras fini.</p>
+
+      <div class="dessin-outils" role="toolbar" aria-label="Outils de dessin">
+        <!-- Couleurs -->
+        <div class="dessin-couleurs" role="group" aria-label="Couleurs">
+          <button class="couleur-btn actif" style="background:#c9a8d4" data-couleur="#c9a8d4" onclick="choisirCouleur(this)" aria-label="Lavande"></button>
+          <button class="couleur-btn" style="background:#a8c8d4" data-couleur="#a8c8d4" onclick="choisirCouleur(this)" aria-label="Bleu doux"></button>
+          <button class="couleur-btn" style="background:#d4c4a8" data-couleur="#d4c4a8" onclick="choisirCouleur(this)" aria-label="Sable"></button>
+          <button class="couleur-btn" style="background:#a8d4b8" data-couleur="#a8d4b8" onclick="choisirCouleur(this)" aria-label="Vert doux"></button>
+          <button class="couleur-btn" style="background:#d4a8b8" data-couleur="#d4a8b8" onclick="choisirCouleur(this)" aria-label="Rose poudré"></button>
+          <button class="couleur-btn" style="background:#e8e0d0" data-couleur="#e8e0d0" onclick="choisirCouleur(this)" aria-label="Crème"></button>
+          <button class="couleur-btn" style="background:#2d2d2d" data-couleur="#2d2d2d" onclick="choisirCouleur(this)" aria-label="Charbon"></button>
+        </div>
+
+        <!-- Taille pinceau -->
+        <label class="dessin-label" for="taille-pinceau">Épaisseur</label>
+        <input id="taille-pinceau" type="range" min="1" max="20" value="4"
+               oninput="changerTaille(this.value)" aria-label="Épaisseur du trait" />
+
+        <!-- Actions -->
+        <button class="btn-secondaire" onclick="effacerDessin()" aria-label="Tout effacer">Effacer</button>
+        <button class="btn-secondaire" onclick="telechargerDessin()" aria-label="Télécharger le dessin">Télécharger</button>
+      </div>
+
+      <canvas id="dessin-canvas" aria-label="Zone de dessin"></canvas>
+
+      <!-- Message après dessin -->
+      <div id="message-apres-dessin" class="message-apres-dessin" hidden>
+        <p id="message-apres-texte"></p>
+      </div>
+
+      <button class="btn-primaire" onclick="validerDessin()" aria-label="Partager ton dessin">
+        Montrer ce que j'ai créé ✦
+      </button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 6, TRADUCTEUR ÉMOTIONNEL
+       ✏️  MODIFIER : voir script.js → emotionsData{}
+  ============================================================ -->
+  <section id="emotions" class="page" aria-label="Traducteur émotionnel">
+    <div class="section-inner emotions-inner">
+      <h2 class="section-titre">Comment tu te sens ?</h2>
+      <p class="section-sous-titre">Il n'y a pas de mauvaise réponse. Juste toi.</p>
+
+      <div id="emotions-boutons" class="emotions-boutons" role="group" aria-label="Choisir une émotion">
+        <!-- Générés par JS via emotionsData{} -->
+      </div>
+
+      <div id="emotions-reponse" class="emotions-reponse" role="status" aria-live="polite" hidden>
+        <p id="emotions-message"></p>
+        <div id="emotions-minis" class="emotions-minis"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 7, ŒUVRE FINALE
+  ============================================================ -->
+  <section id="oeuvre" class="page" aria-label="Créer ton œuvre finale">
+    <div class="section-inner oeuvre-inner">
+      <h2 class="section-titre">Notre œuvre</h2>
+      <p class="section-sous-titre">Ajoute un dessin, écris quelques mots. Je garderai ça précieusement.</p>
+
+      <div class="oeuvre-form">
+        <!-- Upload image -->
+        <div class="oeuvre-upload">
+          <label for="oeuvre-image-input" class="btn-upload" aria-label="Ajouter un dessin">
+            + Ajouter un dessin ou une image
+          </label>
+          <input id="oeuvre-image-input" type="file" accept="image/*"
+                 onchange="chargerImageOeuvre(event)" aria-label="Choisir une image" />
+          <img id="oeuvre-apercu" src="" alt="Aperçu de ton image" hidden />
+        </div>
+
+        <!-- Message personnel -->
+        <label for="oeuvre-message-input" class="dessin-label">Ton message (facultatif)</label>
+        <textarea id="oeuvre-message-input" placeholder="Ce que tu veux dire, ou rien du tout…"
+                  rows="4" aria-label="Ton message"></textarea>
+
+        <button class="btn-primaire" onclick="genererOeuvre()" aria-label="Créer l'œuvre finale">
+          Créer notre œuvre ✦
+        </button>
+      </div>
+
+      <!-- Rendu final -->
+      <div id="oeuvre-resultat" class="oeuvre-resultat" hidden>
+        <canvas id="oeuvre-canvas" aria-label="Ton œuvre finale"></canvas>
+        <div class="oeuvre-actions">
+          <button class="btn-secondaire" onclick="telechargerOeuvre()" aria-label="Télécharger l'œuvre">
+            Télécharger l'image
+          </button>
+          <button class="btn-secondaire" onclick="telechargerTexte()" aria-label="Télécharger le texte">
+            Télécharger le message
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECTION 8, PHOTOS DE NOUS
+       ✏️  MODIFIER : voir script.js → photosData[]
+  ============================================================ -->
+  <section id="photos" class="page" aria-label="Nos photos">
+    <div class="section-inner">
+      <h2 class="section-titre">Nous deux</h2>
+      <p class="section-sous-titre">Des moments capturés. Des preuves qu'on existe ensemble.</p>
+
+      <!-- Grande photo mise en avant -->
+      <div id="photos-hero" class="photos-hero" hidden>
+        <img id="photos-hero-img" src="" alt="" />
+        <p id="photos-hero-legende"></p>
+      </div>
+
+      <!-- Grille photos -->
+      <div id="photos-grille" class="photos-grille" role="list"></div>
+
+      <!-- Modal photo -->
+      <div id="modal-photo" class="modal" role="dialog" aria-modal="true" hidden>
+        <div class="modal-fond" onclick="fermerModalPhoto()"></div>
+        <div class="modal-contenu modal-photo-contenu">
+          <button class="modal-fermer" onclick="fermerModalPhoto()" aria-label="Fermer">✕</button>
+          <img id="modal-photo-img" src="" alt="" />
+          <p id="modal-photo-legende"></p>
+          <p id="modal-photo-date" class="modal-photo-date"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 9, CAPSULES TEMPORELLES
+       ✏️  MODIFIER : voir script.js → capsulesData[]
+  ============================================================ -->
+  <section id="capsules" class="page" aria-label="Capsules temporelles">
+    <div class="section-inner capsules-inner">
+      <h2 class="section-titre">Des mots pour plus tard</h2>
+      <p class="section-sous-titre">Certaines choses méritent d'attendre leur moment.</p>
+      <div id="capsules-liste" class="capsules-liste"></div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECTION 10, ALBUMS PHOTOS (par voyage + thème)
+       ✏️  MODIFIER : voir script.js → albumsData[]
+  ============================================================ -->
+  <section id="albums" class="page" aria-label="Albums photos">
+    <div class="section-inner">
+      <!-- Vue liste des albums -->
+      <div id="albums-liste-vue">
+        <h2 class="section-titre">Albums photos</h2>
+        <p class="section-sous-titre">Nos photos, organisées par voyage et par thème.</p>
+        <div id="albums-grille" class="albums-grille" role="list"></div>
+      </div>
+
+      <!-- Vue détail d'un album -->
+      <div id="albums-detail" hidden>
+        <button class="btn-retour-album" onclick="afficherListeAlbums()" aria-label="Retour aux albums">
+          ← Tous les albums
+        </button>
+        <h2 id="album-detail-titre" class="section-titre"></h2>
+        <p id="album-detail-lieu" class="section-sous-titre"></p>
+
+        <!-- Onglets thèmes -->
+        <div id="album-themes-onglets" class="album-themes-onglets" role="tablist"></div>
+
+        <!-- Grille photos du thème -->
+        <div id="album-photos-grille" class="album-photos-grille" role="list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal photo pleine -->
+  <div id="modal-photo-pleine" class="modal" role="dialog" aria-modal="true" hidden>
+    <div class="modal-fond" onclick="fermerPhotoPleine()"></div>
+    <div class="modal-photo-pleine-contenu">
+      <button class="modal-fermer" onclick="fermerPhotoPleine()" aria-label="Fermer">✕</button>
+      <img id="modal-photo-pleine-img" src="" alt="" />
+      <p id="modal-photo-pleine-leg"></p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 11, VOYAGES INTERACTIFS
+       ✏️  MODIFIER : voir script.js → voyagesData[]
+  ============================================================ -->
+  <section id="voyages" class="page" aria-label="Nos voyages">
+    <div class="section-inner voyages-inner">
+      <h2 class="section-titre">Nos voyages</h2>
+      <p class="section-sous-titre">Clique sur un point de la carte, ou sur une carte postale.</p>
+
+      <!-- Carte du monde -->
+      <div class="carte-monde-wrapper">
+        <canvas id="carte-monde-canvas" aria-label="Carte du monde avec nos destinations"></canvas>
+        <p class="carte-legende">Clique sur un point orangé pour ouvrir le voyage</p>
+      </div>
+
+      <!-- Cartes postales -->
+      <h3 class="voyages-sous-titre">Nos destinations</h3>
+      <div id="voyages-cartes-grille" class="voyages-cartes-grille" role="list"></div>
+    </div>
+  </section>
+
+  <!-- Modal voyage -->
+  <div id="modal-voyage" class="modal" role="dialog" aria-modal="true" hidden>
+    <div class="modal-fond" onclick="fermerModalVoyage()"></div>
+    <div class="modal-contenu modal-voyage-contenu">
+      <button class="modal-fermer" onclick="fermerModalVoyage()" aria-label="Fermer">✕</button>
+
+      <div class="mv-header">
+        <span id="mv-emoji" class="mv-emoji"></span>
+        <div>
+          <h3 id="mv-titre" class="mv-titre"></h3>
+          <p id="mv-pays" class="mv-pays"></p>
+        </div>
+      </div>
+
+      <p id="mv-resume" class="mv-resume"></p>
+
+      <h4 class="mv-section-titre">Moments forts</h4>
+      <ul id="mv-moments" class="mv-moments"></ul>
+
+      <div id="mv-video-zone" hidden>
+        <h4 class="mv-section-titre">Vidéo souvenir</h4>
+        <iframe id="mv-video-iframe" src="" frameborder="0" allowfullscreen
+                title="Vidéo du voyage" class="mv-video"></iframe>
+      </div>
+
+      <div id="mv-photos-section" hidden>
+        <h4 class="mv-section-titre">Quelques photos</h4>
+        <div id="mv-photos-grille" class="mv-photos-grille"></div>
+      </div>
+
+      <button id="mv-lien-album" class="btn-primaire mv-btn-album" hidden>
+        Voir l'album complet →
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 12, LISTE DE SOUHAITS
+       ✏️  Elle peut modifier directement sur le site
+  ============================================================ -->
+  <section id="souhaits" class="page" aria-label="Liste de souhaits de voyages">
+    <div class="section-inner souhaits-inner">
+      <h2 class="section-titre">Notre liste de souhaits</h2>
+      <p class="section-sous-titre">Les endroits qu'on rêve de voir ensemble.</p>
+
+      <p id="souhaits-compteur" class="souhaits-compteur" aria-live="polite"></p>
+
+      <!-- Ajouter un souhait -->
+      <div class="souhait-ajouter" role="form" aria-label="Ajouter un souhait">
+        <input id="souhait-input-emoji" type="text" placeholder="🌍" maxlength="4"
+               aria-label="Emoji du pays" class="souhait-input souhait-input-emoji" />
+        <input id="souhait-input-nom" type="text" placeholder="Nom du pays ou de la ville"
+               aria-label="Destination" class="souhait-input souhait-input-nom"
+               onkeydown="if(event.key==='Enter') ajouterSouhait()" />
+        <input id="souhait-input-note" type="text" placeholder="Pourquoi ? (optionnel)"
+               aria-label="Note" class="souhait-input souhait-input-note"
+               onkeydown="if(event.key==='Enter') ajouterSouhait()" />
+        <button class="btn-primaire souhait-btn-ajouter" onclick="ajouterSouhait()"
+                aria-label="Ajouter à la liste">+ Ajouter</button>
+      </div>
+
+      <!-- Liste -->
+      <div id="souhaits-liste" class="souhaits-liste" role="list" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       INDICATEUR DE CHARGEMENT (transitions de section)
+  ============================================================ -->
+  <div id="loader-transition" class="loader-transition" aria-hidden="true"></div>
+
+
+  <!-- ============================================================
+       POP-UP D'ACCUEIL, S'affiche une seule fois à la première visite
+       ✏️  MODIFIER : voir script.js → textePopupAccueil{}
+  ============================================================ -->
+  <div id="popup-accueil" class="popup-accueil" role="dialog" aria-modal="true"
+       aria-labelledby="popup-titre" hidden>
+    <div class="popup-fond"></div>
+    <div class="popup-contenu">
+      <!-- Ornement -->
+      <div class="popup-ornement" aria-hidden="true">✦</div>
+
+      <!-- Texte -->
+      <p class="popup-pour">pour toi,</p>
+      <h2 id="popup-titre" class="popup-titre"></h2>
+      <div id="popup-corps" class="popup-corps"></div>
+
+      <!-- Signature -->
+      <p id="popup-signature" class="popup-signature"></p>
+
+      <!-- Bouton -->
+      <button class="btn-entrer popup-btn" onclick="fermerPopupAccueil()"
+              aria-label="Entrer dans le site">
+        Je suis prête ✦
+      </button>
+
+      <!-- Option "ne plus afficher" -->
+      <button class="popup-skip" onclick="fermerPopupAccueil()"
+              aria-label="Continuer">
+        Continuer →
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       SECTION, NOS MOTS À NOUS (PIN-gated)
+  ============================================================ -->
+  <section id="mots" class="page" aria-label="Nos mots à nous">
+    <div class="section-inner mots-inner">
+      <h2 class="section-titre">Nos mots à nous</h2>
+      <p class="section-sous-titre">Un espace tranquille, juste pour nous deux.</p>
+
+      <!-- Gate PIN -->
+      <div id="mots-gate" class="mots-gate">
+        <p class="mots-gate-texte">Cet espace est privé. Entre le code pour y accéder.</p>
+        <button class="btn-entrer" onclick="demanderPinMots()">Ouvrir notre journal 🔑</button>
+      </div>
+
+      <!-- Contenu (révélé après PIN) -->
+      <div id="mots-contenu" class="mots-contenu" hidden>
+        <div class="mots-form">
+          <div class="mots-auteur-choix" role="group" aria-label="Qui écrit ?">
+            <button class="mots-auteur-btn actif" data-auteur="elle" onclick="basculerAuteurMot('elle')">Elle</button>
+            <button class="mots-auteur-btn"        data-auteur="lui"  onclick="basculerAuteurMot('lui')">Lui</button>
+          </div>
+          <textarea id="mots-texte" class="mots-textarea" rows="4"
+                    placeholder="Ce que tu veux dire, ou rien du tout…" aria-label="Ton message"></textarea>
+          <div class="mots-actions">
+            <label for="mots-image-input" class="mots-image-btn" aria-label="Ajouter une image">+ image</label>
+            <input id="mots-image-input" type="file" accept="image/*" hidden
+                   onchange="uploadImageMot(this)" />
+            <div id="mots-image-apercu" class="mots-image-apercu"></div>
+            <button class="btn-entrer mots-envoyer" onclick="envoyerMot()">Déposer ✦</button>
+          </div>
+          <p id="mots-erreur" class="mots-erreur" role="status" aria-live="polite"></p>
+        </div>
+
+        <!-- Fil chronologique -->
+        <div id="mots-fil" class="mots-fil" role="feed" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION, SES CRÉATIONS 🎨
+  ============================================================ -->
+  <section id="creations" class="page" aria-label="Ses créations">
+    <div class="section-inner">
+      <h2 class="section-titre">Ses créations</h2>
+      <p class="section-sous-titre">Ton espace à toi. Dessins, photos, choses que tu fais.</p>
+
+      <details class="creations-form-wrap">
+        <summary class="creations-form-toggle">+ Ajouter une création</summary>
+        <div class="creations-form">
+          <input id="creation-titre-input" type="text" placeholder="Titre (facultatif)" class="creation-input" />
+          <textarea id="creation-desc-input" rows="2" placeholder="Quelques mots… (facultatif)" class="creation-input"></textarea>
+          <label for="creation-image-input" class="mots-image-btn">+ image</label>
+          <input id="creation-image-input" type="file" accept="image/*" hidden onchange="uploadImageCreation(this)" />
+          <div id="creation-image-apercu" class="creation-image-apercu"></div>
+          <button class="btn-entrer" onclick="envoyerCreation()">Ajouter ✦</button>
+        </div>
+      </details>
+
+      <div id="creations-grille" class="creations-grille" role="list" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION, NOS DRAMAS 📺
+  ============================================================ -->
+  <section id="dramas" class="page" aria-label="Nos dramas">
+    <div class="section-inner">
+      <h2 class="section-titre">Nos dramas</h2>
+      <p class="section-sous-titre">Ce qu'on regarde, ce qu'on a aimé, ce qu'on veut voir.</p>
+
+      <details class="dramas-form-wrap">
+        <summary class="dramas-form-toggle">+ Ajouter un drama</summary>
+        <div class="dramas-form">
+          <input id="drama-titre-input" type="text" placeholder="Titre du drama" class="drama-input" />
+
+          <!-- Statut : 3 gros boutons à toucher -->
+          <div class="drama-statut-choix" role="group" aria-label="Où en est-on ?">
+            <button type="button" class="drama-statut-btn actif" data-statut="a_voir"
+                    onclick="choisirStatutDrama('a_voir')">
+              <span class="drama-statut-emoji">🔖</span>
+              <span class="drama-statut-label">À voir</span>
+            </button>
+            <button type="button" class="drama-statut-btn" data-statut="en_cours"
+                    onclick="choisirStatutDrama('en_cours')">
+              <span class="drama-statut-emoji">▶️</span>
+              <span class="drama-statut-label">En cours</span>
+            </button>
+            <button type="button" class="drama-statut-btn" data-statut="fini"
+                    onclick="choisirStatutDrama('fini')">
+              <span class="drama-statut-emoji">✓</span>
+              <span class="drama-statut-label">Vu</span>
+            </button>
+          </div>
+          <input id="drama-statut-select" type="hidden" value="a_voir" />
+
+          <!-- Note : 5 étoiles à toucher -->
+          <div class="drama-note-zone">
+            <label class="drama-note-label">Ta note (facultatif)</label>
+            <div class="drama-etoiles" id="drama-etoiles" role="group" aria-label="Note de 0 à 5 étoiles">
+              <button type="button" class="drama-etoile" data-note="1" onclick="choisirNoteDrama(1)" aria-label="1 étoile">☆</button>
+              <button type="button" class="drama-etoile" data-note="2" onclick="choisirNoteDrama(2)" aria-label="2 étoiles">☆</button>
+              <button type="button" class="drama-etoile" data-note="3" onclick="choisirNoteDrama(3)" aria-label="3 étoiles">☆</button>
+              <button type="button" class="drama-etoile" data-note="4" onclick="choisirNoteDrama(4)" aria-label="4 étoiles">☆</button>
+              <button type="button" class="drama-etoile" data-note="5" onclick="choisirNoteDrama(5)" aria-label="5 étoiles">☆</button>
+              <button type="button" class="drama-note-effacer" onclick="choisirNoteDrama(0)" aria-label="Pas de note">✕</button>
+            </div>
+            <input id="drama-note-input" type="hidden" value="0" />
+          </div>
+
+          <!-- Emoji : picker visuel -->
+          <div class="drama-emoji-zone">
+            <label class="drama-note-label">Emoji (facultatif), touche ce que tu veux</label>
+            <div class="emoji-choix-site" id="drama-emoji-choix" role="group"></div>
+            <input id="drama-emoji-input" type="hidden" value="🎬" />
+          </div>
+
+          <textarea id="drama-commentaire-input" rows="2" placeholder="Ce qu'on en pense (facultatif)" class="drama-input"></textarea>
+          <button class="btn-entrer" onclick="ajouterDrama()">Ajouter ✦</button>
+        </div>
+      </details>
+
+      <div id="dramas-liste" class="dramas-liste" role="list" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION, CE SOIR JE ME SENS… 🌙
+  ============================================================ -->
+  <section id="humeurs" class="page" aria-label="Ce soir je me sens">
+    <div class="section-inner">
+      <h2 class="section-titre">Ce soir je me sens…</h2>
+      <p class="section-sous-titre">Pas besoin de mots. Touche juste celui qui te ressemble.</p>
+
+      <div id="humeurs-boutons" class="humeurs-boutons" role="group" aria-label="Choisis une humeur"></div>
+      <p id="humeurs-confirmation" class="humeurs-confirmation" role="status" aria-live="polite"></p>
+
+      <h3 class="humeurs-fil-titre">Les jours d'avant</h3>
+      <div id="humeurs-fil" class="humeurs-fil" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER discret avec icône 🔑 admin
+  ============================================================ -->
+  <footer class="footer-discret" aria-label="Pied de page">
+    <button class="footer-cle" onclick="ouvrirAdminAvecPin()" aria-label="Accès admin" title="🔑">🔑</button>
+  </footer>
+
+  <!-- ============================================================
+       MODALE, PIN PAVÉ NUMÉRIQUE
+  ============================================================ -->
+  <div id="pin-modal" class="pin-modal" role="dialog" aria-modal="true" aria-labelledby="pin-titre" hidden>
+    <div class="pin-fond" onclick="fermerPin()" aria-hidden="true"></div>
+    <div class="pin-boite">
+      <h2 id="pin-titre" class="pin-titre">Entrer le code</h2>
+      <div class="pin-dots" aria-hidden="true">
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+      </div>
+      <p id="pin-message" class="pin-message" role="status" aria-live="polite"></p>
+      <div class="pin-pave" role="group" aria-label="Pavé numérique">
+        <button class="pin-touche" onclick="tapeChiffre('1')">1</button>
+        <button class="pin-touche" onclick="tapeChiffre('2')">2</button>
+        <button class="pin-touche" onclick="tapeChiffre('3')">3</button>
+        <button class="pin-touche" onclick="tapeChiffre('4')">4</button>
+        <button class="pin-touche" onclick="tapeChiffre('5')">5</button>
+        <button class="pin-touche" onclick="tapeChiffre('6')">6</button>
+        <button class="pin-touche" onclick="tapeChiffre('7')">7</button>
+        <button class="pin-touche" onclick="tapeChiffre('8')">8</button>
+        <button class="pin-touche" onclick="tapeChiffre('9')">9</button>
+        <button class="pin-touche pin-touche-vide" disabled aria-hidden="true"></button>
+        <button class="pin-touche" onclick="tapeChiffre('0')">0</button>
+        <button class="pin-touche pin-touche-effacer" onclick="effacerChiffre()" aria-label="Effacer">⌫</button>
+      </div>
+      <button class="pin-annuler" onclick="fermerPin()">Annuler</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODALE, LETTRE JUILLET (capsule 💍)
+  ============================================================ -->
+  <div id="lettre-juillet" class="lettre-juillet" role="dialog" aria-modal="true" aria-labelledby="lettre-juillet-titre" hidden>
+    <div class="lettre-fond" aria-hidden="true">
+      <span class="petal p1">🌸</span><span class="petal p2">🌸</span><span class="petal p3">🌸</span>
+      <span class="petal p4">🌸</span><span class="petal p5">🌸</span>
+    </div>
+    <div class="lettre-boite">
+      <button class="lettre-fermer" onclick="fermerLettreJuillet()" aria-label="Fermer">✕</button>
+      <h2 id="lettre-juillet-titre" class="lettre-titre">Une lettre pour toi</h2>
+      <div id="lettre-juillet-corps" class="lettre-corps"></div>
+    </div>
+  </div>
+
+  <!-- Accès discret au courrier de Mathieu (invisible pour elle) -->
+  <div id="facteur" title="" aria-hidden="true"
+       style="position:fixed;bottom:10px;right:12px;width:22px;height:22px;border-radius:50%;
+              z-index:9999;cursor:default;opacity:.12;font-size:13px;line-height:22px;text-align:center;
+              color:#7A6E82;user-select:none;">·</div>
+
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
+  <script src="app.js"></script>
+  <script>
+  /* ===== Accueil : scène cinématique + entrée fondue ===== */
+  (function(){
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Salutation selon l'heure (discrète)
+    var h = new Date().getHours();
+    var salut = (h>=5&&h<11) ? "bonjour, toi" : (h>=11&&h<18) ? "coucou, toi"
+              : (h>=18&&h<23) ? "bonsoir, toi" : "il est tard, toi";
+    var el = document.getElementById("accueil-salut"); if(el) el.textContent = salut;
+
+    // Entrée fondue puis navigation
+    var btn = document.getElementById("btn-entrer");
+    function entrerDansLeMonde(){
+      var acc = document.getElementById("accueil");
+      try{ localStorage.setItem("intro_vue_v1","1"); }catch(e){}
+      if(reduce || !acc){ naviguer("monde"); return; }
+      acc.classList.add("accueil-part");
+      setTimeout(function(){ naviguer("monde"); setTimeout(function(){ acc.classList.remove("accueil-part"); }, 60); }, 780);
+    }
+    if(btn) btn.addEventListener("click", entrerDansLeMonde);
+
+    // La scène (canvas)
+    var cv = document.getElementById("accueil-ciel");
+    if(!cv || reduce) return;
+    var ctx = cv.getContext("2d"); var W,H,DPR;
+    function resize(){
+      DPR=Math.min(window.devicePixelRatio||1,2); W=window.innerWidth; H=window.innerHeight;
+      cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+"px"; cv.style.height=H+"px";
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+    }
+    window.addEventListener("resize", resize); resize();
+    function rnd(a,b){ return a+Math.random()*(b-a); }
+
+    // palette selon l'heure : haut profond -> bas chaud
+    var bas = (h>=5&&h<11) ? [190,172,214] : (h>=11&&h<18) ? [180,166,206]
+            : (h>=18&&h<23) ? [130,96,150] : [58,52,90];
+    var haut = (h>=23||h<5) ? [11,14,34] : [23,27,58];
+
+    var motes=[]; for(var i=0;i<30;i++) motes.push({x:Math.random(),y:Math.random(),r:rnd(.8,2.4),v:rnd(.02,.06),ph:rnd(0,6.3)});
+    var etoiles=[]; for(var i=0;i<90;i++) etoiles.push({x:Math.random(),y:Math.random()*.5,r:rnd(.3,1.3),tw:rnd(0,6.3),v:rnd(.5,1.3)});
+    var mx=.5,my=.5;
+    window.addEventListener("mousemove",function(e){ mx=e.clientX/W; my=e.clientY/H; },{passive:true});
+
+    var t0=performance.now();
+    function frame(now){
+      requestAnimationFrame(frame);
+      var acc=document.getElementById("accueil");
+      if(!acc || !acc.classList.contains("active")) return;   // on ne peint que sur l'accueil
+      var t=(now-t0)/1000;
+
+      var g=ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0,"rgb("+haut[0]+","+haut[1]+","+haut[2]+")");
+      g.addColorStop(.55,"rgb("+Math.round((haut[0]+bas[0])/2)+","+Math.round((haut[1]+bas[1])/2)+","+Math.round((haut[2]+bas[2])/2)+")");
+      g.addColorStop(1,"rgb("+bas[0]+","+bas[1]+","+bas[2]+")");
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+      // horizon lumineux chaud, bas-centre
+      var hx=W*.5+(mx-.5)*-30, hy=H*1.02;
+      var halo=ctx.createRadialGradient(hx,hy,0,hx,hy,Math.max(W,H)*.75);
+      halo.addColorStop(0,"rgba(190,170,224,.42)");
+      halo.addColorStop(.3,"rgba(180,160,214,.16)");
+      halo.addColorStop(1,"rgba(180,160,214,0)");
+      ctx.fillStyle=halo; ctx.fillRect(0,0,W,H);
+
+      // étoiles (nuit surtout)
+      var nuit = (h>=23||h<6)?1:(h>=18?.5:.15);
+      if(nuit>.05){
+        for(var i=0;i<etoiles.length;i++){ var s=etoiles[i];
+          var a=(.4+.5*Math.sin(t*s.v+s.tw))*nuit;
+          ctx.beginPath(); ctx.arc(s.x*W+(mx-.5)*-12, s.y*H+(my-.5)*-8, s.r,0,6.283);
+          ctx.fillStyle="rgba(240,238,255,"+a.toFixed(3)+")"; ctx.fill();
+        }
+      }
+      // motes de lumière qui montent
+      for(var i=0;i<motes.length;i++){ var m=motes[i];
+        m.y-=m.v*.004; if(m.y<-.05){ m.y=1.05; m.x=Math.random(); }
+        ctx.beginPath(); ctx.arc(m.x*W+Math.sin(t*.6+m.ph)*8, m.y*H, m.r,0,6.283);
+        ctx.fillStyle="rgba(240,234,250,.3)"; ctx.fill();
+      }
+    }
+    requestAnimationFrame(frame);
+  })();
+
+  // Passage discret du facteur : trois appuis rapides sur ⌂ OU sur le point en bas à droite ouvrent le courrier.
+  (function(){
+    function surveiller(selecteurTest){
+      var clics = [];
+      document.addEventListener('click', function(e){
+        if(!selecteurTest(e.target)) return;
+        var t = Date.now();
+        clics = clics.filter(function(x){ return t - x < 1600; });
+        clics.push(t);
+        if(clics.length >= 3){ location.href = '/courrier'; }
+      });
+    }
+    surveiller(function(el){ return el.closest && el.closest('.btn-retour'); });
+    surveiller(function(el){ return el.id === 'facteur'; });
+  })();
+  </script>
+  <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}</script>
+  <button id="bascule-theme" type="button" aria-label="Changer le theme clair ou sombre">☀</button>
+  <script>(function(){var K="theme_pref_v1",root=document.documentElement;function cur(){return root.getAttribute("data-theme")||"sombre";}function apply(t){root.setAttribute("data-theme",t);var b=document.getElementById("bascule-theme");if(b){b.textContent=t==="sombre"?"☀":"☾";}}var p="sombre";try{p=localStorage.getItem(K)||"sombre";}catch(e){}apply(p);document.addEventListener("DOMContentLoaded",function(){var b=document.getElementById("bascule-theme");if(!b)return;b.textContent=cur()==="sombre"?"☀":"☾";b.addEventListener("click",function(){var t=cur()==="sombre"?"clair":"sombre";try{localStorage.setItem(K,t);}catch(e){}apply(t);});});})();</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pour toi, un espace à nous</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts : Cormorant Garamond + Lato (site) + Fraunces + Nunito Sans (design system) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="theme.css" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#14162E" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Pour toi" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+
+  <!-- ===== Accueil : entrée cinématique (refonte) ===== -->
+  <style>
+    #accueil{ background:#14162E !important; overflow:hidden; }
+    #accueil-ciel{ position:fixed; inset:0; width:100vw; height:100vh; z-index:0; display:block; }
+    #accueil .accueil-inner{ z-index:1; }
+    #accueil #particules-canvas{ display:none !important; }  /* remplacé par la nouvelle scène */
+
+    #accueil .accueil-texte{
+      position:relative; z-index:2; max-width:600px; padding:2rem 1.4rem;
+    }
+    /* voile de lisibilité derrière le texte */
+    #accueil .accueil-texte::before{
+      content:""; position:absolute; inset:-40% -20%; z-index:-1;
+      background:radial-gradient(closest-side, rgba(18,20,42,.55), transparent 72%);
+      filter:blur(20px); pointer-events:none;
+    }
+    #accueil .accueil-sous-titre{
+      font-family:'Fraunces',serif; font-style:italic; font-weight:400;
+      font-size:1.15rem; color:#B49BDA; letter-spacing:.02em;
+      text-shadow:0 2px 20px rgba(0,0,0,.5);
+    }
+    #accueil .accueil-titre{
+      font-family:'Fraunces',serif; font-weight:500;
+      font-size:clamp(2rem,6.5vw,3.4rem); line-height:1.16; letter-spacing:-.01em;
+      color:#FBF4EA; margin:.4rem 0 1.1rem;
+      text-shadow:0 4px 40px rgba(0,0,0,.55);
+    }
+    #accueil .accueil-description{
+      font-family:'Nunito Sans',sans-serif; font-weight:400;
+      font-size:clamp(1rem,2.6vw,1.12rem); line-height:1.7; color:#E4DCEC;
+      max-width:34ch; margin:0 auto 2rem; text-shadow:0 2px 20px rgba(0,0,0,.5);
+    }
+    #accueil .btn-entrer{
+      display:inline-flex; align-items:center; gap:.55em;
+      font-family:'Nunito Sans',sans-serif; font-style:normal; font-weight:700;
+      font-size:1.05rem; letter-spacing:.01em;
+      padding:.95em 1.9em; border-radius:100px; cursor:pointer;
+      color:#FFF6F4; background:linear-gradient(135deg,#C7B2E6,#8E6FBF);
+      box-shadow:0 14px 34px -12px rgba(124,82,168,.7), 0 0 0 0 rgba(180,155,218,.5);
+      animation:accueilRespire 3.4s ease-in-out infinite, monterDouce 1.2s ease 1.2s both;
+      transition:transform .2s cubic-bezier(.22,.61,.36,1), box-shadow .3s;
+      will-change:transform;
+    }
+    #accueil .btn-entrer:hover{ transform:translateY(-2px); box-shadow:0 20px 42px -14px rgba(124,82,168,.85); }
+    @keyframes accueilRespire{
+      0%,100%{ box-shadow:0 14px 34px -12px rgba(124,82,168,.7), 0 0 0 0 rgba(180,155,218,.45); }
+      50%{ box-shadow:0 16px 38px -12px rgba(124,82,168,.8), 0 0 0 12px rgba(180,155,218,0); }
+    }
+    /* indice de respiration sous le bouton */
+    #accueil .accueil-indice{
+      margin-top:1.6rem; font-family:'Nunito Sans',sans-serif; font-size:.82rem;
+      color:rgba(232,225,240,.6); letter-spacing:.04em;
+      opacity:0; animation:monterDouce 1.4s ease 1.8s forwards;
+    }
+    /* transition de sortie cinématique */
+    #accueil.accueil-part{ transition:opacity .8s ease, filter .8s ease; opacity:0; filter:blur(6px); }
+
+    /* ===== Accueil-hub : notre monde ===== */
+    #monde{ background:#14162E !important; }
+    #monde .monde-in{ max-width:980px; margin:0 auto; padding:64px 20px 90px; }
+    #monde .monde-tete{ text-align:center; margin-bottom:34px; }
+    #monde .monde-tete .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:1.1rem; }
+    #monde .monde-tete h2{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(1.9rem,6vw,2.8rem); color:#FBF4EA; margin:.3rem 0 .6rem; line-height:1.15; }
+    #monde .monde-tete p{ font-family:'Nunito Sans',sans-serif; color:#C9C1D8; max-width:46ch; margin:0 auto; line-height:1.65; }
+    #monde .grille{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:15px; }
+    #monde .kase{ display:block; text-decoration:none; cursor:pointer; text-align:left;
+      background:rgba(252,248,250,.055); border:1px solid rgba(255,255,255,.1); border-radius:18px;
+      padding:20px 20px 18px; color:#EDE9F3; backdrop-filter:blur(8px);
+      transition:transform .25s cubic-bezier(.22,.61,.36,1), background .3s, border-color .3s, box-shadow .3s; }
+    #monde .kase:hover{ transform:translateY(-4px); background:rgba(255,255,255,.1); border-color:rgba(180,155,218,.45); box-shadow:0 18px 40px -22px rgba(0,0,0,.6); }
+    #monde .kase .ic{ font-size:1.7rem; }
+    #monde .kase .t{ font-family:'Fraunces',serif; font-weight:500; font-size:1.18rem; margin-top:8px; color:#FBF4EA; }
+    #monde .kase .d{ font-family:'Nunito Sans',sans-serif; font-size:.86rem; color:#B4AAC8; margin-top:3px; line-height:1.45; }
+    #monde .monde-sign{ text-align:center; margin-top:36px; font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; }
+
+    /* ===== Harmonisation des sections internes gardées ===== */
+    #comprendre, #dessin, #oeuvre, #emotions{ background:#14162E !important; color:#EDE9F3; }
+    #comprendre .section-inner, #dessin .section-inner, #oeuvre .section-inner, #emotions .section-inner{ max-width:840px; margin:0 auto; padding:64px 20px 90px; }
+    #comprendre .section-titre, #dessin .section-titre, #oeuvre .section-titre, #emotions .section-titre{ font-family:'Fraunces',serif !important; font-weight:500 !important; color:#FBF4EA !important; font-size:clamp(1.8rem,5.5vw,2.5rem) !important; text-align:center; }
+    #comprendre .section-sous-titre, #dessin .section-sous-titre, #oeuvre .section-sous-titre, #emotions .section-sous-titre{ font-family:'Nunito Sans',sans-serif !important; color:#C9C1D8 !important; text-align:center; max-width:46ch; margin:.5rem auto 0 !important; }
+    #comprendre .comprendre-item{ background:rgba(252,248,250,.06) !important; border-left:3px solid #B49BDA !important; box-shadow:none !important; backdrop-filter:blur(8px); }
+    #comprendre .comprendre-item h3{ color:#FBF4EA !important; font-family:'Fraunces',serif !important; }
+    #comprendre .comprendre-item p{ color:#C9C1D8 !important; }
+    #dessin .dessin-label, #oeuvre .dessin-label{ color:#C9C1D8 !important; }
+    #dessin #dessin-canvas{ background:#FBF7F2 !important; border-radius:16px !important; box-shadow:0 18px 40px -22px rgba(0,0,0,.6); }
+    #oeuvre #oeuvre-message-input, #oeuvre .btn-upload{ background:rgba(255,255,255,.06) !important; color:#EDE9F3 !important; border:1px solid rgba(255,255,255,.18) !important; border-radius:12px !important; }
+    #oeuvre #oeuvre-message-input::placeholder{ color:#8f86a3; }
+    #dessin .btn-primaire, #oeuvre .btn-primaire{ background:linear-gradient(180deg,#B49BDA,#7E52A8) !important; color:#FFF6F4 !important; border:none !important; box-shadow:0 14px 30px -12px rgba(124,82,168,.7) !important; }
+    #dessin .btn-secondaire, #oeuvre .btn-secondaire{ background:rgba(255,255,255,.08) !important; color:#EDE9F3 !important; border:1px solid rgba(255,255,255,.22) !important; }
+    #dessin .couleur-btn.actif{ outline:2px solid #B49BDA; outline-offset:2px; }
+
+    /* Menu masqué sur l'entrée : accueil pur, sans distraction */
+    #accueil.active ~ #nav-principale,
+    #monde.active ~ #nav-principale{ display:none !important; }
+    /* nav minimale, centrée et discrète */
+    #nav-principale .btn-retour{ font-family:'Fraunces',serif; }
+
+    /* Popup d'accueil harmonisé avec la scène cinématique */
+    #popup-accueil .popup-fond{ background:rgba(16,14,32,.66) !important; }
+    #popup-accueil .popup-pour, #popup-accueil .popup-ornement{ color:#7E52A8 !important; }
+    #popup-accueil .popup-titre{ font-family:'Fraunces',serif !important; font-weight:500 !important; }
+    #popup-accueil .popup-btn{
+      background:linear-gradient(135deg,#C7B2E6,#8E6FBF) !important; color:#FFF6F4 !important;
+      font-family:'Nunito Sans',sans-serif !important; font-style:normal !important; font-weight:700 !important;
+      box-shadow:0 14px 34px -12px rgba(124,82,168,.7) !important;
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      #accueil .btn-entrer{ animation:none; }
+      #accueil-ciel{ display:none; }
+      #accueil{ background:linear-gradient(180deg,#232A4A,#4A3A55 60%,#7A5A52) !important; }
+    }
+  </style>
 </head>
 <body>
 
