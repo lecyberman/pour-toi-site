@@ -1,4 +1,4 @@
-/* PASTE_TEST_123 *//* ============================================================
+/* ============================================================
    THEME.CSS — Design system central de "Pour toi"
    Romantique mature, cinématique, doux, premium. Zéro kitsch.
    Une seule source de vérité pour couleurs, typo, espaces,
@@ -217,3 +217,20 @@ html:not([data-theme="clair"]) body.u-theme .tete h1{ color:#FBF4EA; }
 #install-banner .ib-actions{ display:flex; gap:8px; justify-content:flex-end; }
 #install-banner .ib-yes{ background:var(--c-corail); color:#fff; border:none; border-radius:100px; padding:9px 18px; font-family:var(--font-body); font-weight:700; cursor:pointer; }
 #install-banner .ib-no{ background:transparent; color:var(--c-encre-douce); border:none; padding:9px 12px; font-family:var(--font-body); cursor:pointer; }
+
+
+/* ===== Confort mobile (zones tactiles, anti-zoom iOS, scroll fluide) ===== */
+button, a, .u-btn, .kase, input, select, textarea, [role="button"] { -webkit-tap-highlight-color: transparent; }
+button, .u-btn, .kase, a, [role="button"] { touch-action: manipulation; }
+img, video, canvas, svg { max-width: 100%; height: auto; }
+html, body { overflow-x: hidden; }
+body { -webkit-overflow-scrolling: touch; }
+@media (max-width: 640px) {
+  .u-btn { min-height: 46px; }
+  input, select, textarea { font-size: 16px; }
+  a, button, .kase, [role="button"] { min-height: 44px; }
+}
+#bascule-theme, #btn-partage { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
