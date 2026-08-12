@@ -206,3 +206,14 @@ html:not([data-theme="clair"]) body.u-theme h2,
 html:not([data-theme="clair"]) body.u-theme .tete h1{ color:#FBF4EA; }
 #bascule-theme{ position:fixed; left:16px; bottom:16px; z-index:10000; width:46px; height:46px; border-radius:50%; border:1px solid var(--bordure-forte); background:var(--surface-solide); color:var(--c-encre); font-size:1.15rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:var(--sh-2); transition:transform .2s ease; }
 #bascule-theme:hover{ transform:translateY(-2px); }
+
+
+/* ===== UI mobile : bouton partage + banniere d'installation ===== */
+#btn-partage{ position:fixed; right:16px; bottom:calc(16px + env(safe-area-inset-bottom)); z-index:10000; width:46px; height:46px; border-radius:50%; border:1px solid var(--bordure-forte); background:var(--surface-solide); color:var(--c-encre); font-size:1.25rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:var(--sh-2); transition:transform .2s ease; }
+#btn-partage:hover{ transform:translateY(-2px); }
+#install-banner{ position:fixed; left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); z-index:10001; max-width:520px; margin:0 auto; background:var(--surface-solide); border:1px solid var(--bordure-forte); border-radius:16px; padding:14px 16px; box-shadow:var(--sh-3); display:flex; flex-direction:column; gap:10px; transform:translateY(160%); transition:transform .45s cubic-bezier(.22,.61,.36,1); }
+#install-banner.on{ transform:none; }
+#install-banner span{ font-size:.92rem; line-height:1.5; color:var(--c-encre); }
+#install-banner .ib-actions{ display:flex; gap:8px; justify-content:flex-end; }
+#install-banner .ib-yes{ background:var(--c-corail); color:#fff; border:none; border-radius:100px; padding:9px 18px; font-family:var(--font-body); font-weight:700; cursor:pointer; }
+#install-banner .ib-no{ background:transparent; color:var(--c-encre-douce); border:none; padding:9px 12px; font-family:var(--font-body); cursor:pointer; }
