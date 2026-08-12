@@ -96,3 +96,66 @@
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
+
+
+/* ===== Fonctions mobiles : haptique douce, partage natif, invitation a installer ===== */
+(function () {
+  var HKEY = "haptique_off";
+  function canBuzz(){ try { return "vibrate" in navigator && localStorage.getItem(HKEY) !== "1"; } catch (e) { return "vibrate" in navigator; } }
+  function buzz(ms){ if (canBuzz()) { try { navigator.vibrate(ms || 8); } catch (e) {} } }
+  window.buzzDoux = buzz;
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest && e.target.closest("button, .u-btn, .u-magnet, .kase, .h, .emo, .chip, .reve select");
+    if (t) buzz(8);
+  }, { passive: true });
+
+  function initShare() {
+    if (!navigator.share || document.getElementById("btn-partage")) return;
+    var b = document.createElement("button");
+    b.id = "btn-partage"; b.type = "button";
+    b.setAttribute("aria-label", "Partager cette page");
+    b.textContent = "\u2197";
+    b.addEventListener("click", function () {
+      buzz(10);
+      navigator.share({ title: document.title, text: "Un petit bout de notre monde.", url: location.href }).catch(function(){});
+    });
+    document.body.appendChild(b);
+  }
+
+  var deferred = null, DKEY = "install_masque";
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferred = e; showInstall(false); });
+  function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+  function standalone(){ return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; }
+  function masque(){ try { return localStorage.getItem(DKEY) === "1"; } catch (e) { return false; } }
+  function hideInstall(){ var w = document.getElementById("install-banner"); if (w) { w.classList.remove("on"); setTimeout(function(){ w.remove(); }, 400); } }
+  function showInstall(ios) {
+    if (standalone() || masque() || document.getElementById("install-banner")) return;
+    var wrap = document.createElement("div"); wrap.id = "install-banner";
+    var span = document.createElement("span");
+    span.textContent = ios
+      ? "Ajoute Pour toi a ton ecran d accueil : touche Partager, puis Sur l ecran d accueil."
+      : "Installe Pour toi sur ton ecran d accueil, pour l ouvrir comme une vraie app.";
+    wrap.appendChild(span);
+    var actions = document.createElement("div"); actions.className = "ib-actions";
+    if (!ios) {
+      var yes = document.createElement("button"); yes.textContent = "Installer"; yes.className = "ib-yes";
+      yes.addEventListener("click", function () {
+        buzz(10);
+        if (deferred) { deferred.prompt(); deferred.userChoice.finally(function(){ deferred = null; hideInstall(); }); } else { hideInstall(); }
+      });
+      actions.appendChild(yes);
+    }
+    var no = document.createElement("button"); no.textContent = "Plus tard"; no.className = "ib-no";
+    no.addEventListener("click", function () { try { localStorage.setItem(DKEY, "1"); } catch (e) {} hideInstall(); });
+    actions.appendChild(no);
+    wrap.appendChild(actions);
+    document.body.appendChild(wrap);
+    requestAnimationFrame(function(){ wrap.classList.add("on"); });
+  }
+
+  function bootMobile() {
+    initShare();
+    if (isIOS() && !standalone()) setTimeout(function(){ showInstall(true); }, 4500);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bootMobile); else bootMobile();
+})();
