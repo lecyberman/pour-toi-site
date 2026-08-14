@@ -115,11 +115,7 @@
   var roleChoix=document.getElementById("roleChoix"), appli=document.getElementById("appli"), hors=document.getElementById("hors");
   if (!window.supabase || !window.supabase.createClient){ hors.style.display="block"; hors.textContent="La connexion en direct n'a pas pu se charger. Vérifie ta connexion internet et réessaie."; return; }
 
-  var role=null; try{ role=localStorage.getItem("moi_role"); }catch(e){}
-  if (role!=="elle" && role!=="lui"){ roleChoix.style.display="block";
-    document.querySelectorAll("#roleChoix [data-role]").forEach(function(b){ b.addEventListener("click", function(){ role=b.dataset.role; try{localStorage.setItem("moi_role",role);}catch(e){} roleChoix.style.display="none"; demarrer(); }); });
-  } else { demarrer(); }
-
+  var role=null;
   var client, canal, autrePresent=false;
 
   function buzz(m){ try{ if(navigator.vibrate) navigator.vibrate(m||14); }catch(e){} }
@@ -234,6 +230,12 @@
     monTxt.addEventListener("input", function(){ clearTimeout(t); t=setTimeout(function(){ envoyer({ game:"mot", texte:monTxt.value }); }, 90); });
     handler=function(p){ if(p.game==="mot"){ saTxt.textContent = p.texte||"…"; } };
   }
+
+  // ===== démarrage : rôle puis connexion (après que tout soit défini) =====
+  try{ role=localStorage.getItem("moi_role"); }catch(e){}
+  if (role!=="elle" && role!=="lui"){ roleChoix.style.display="block";
+    document.querySelectorAll("#roleChoix [data-role]").forEach(function(b){ b.addEventListener("click", function(){ role=b.dataset.role; try{localStorage.setItem("moi_role",role);}catch(e){} roleChoix.style.display="none"; demarrer(); }); });
+  } else { demarrer(); }
 })();
 </script>
 </body>
