@@ -6,7 +6,6 @@
     { "source": "/le-15", "destination": "/anniv.html" },
     { "source": "/fleurs", "destination": "/fleurs.html" },
     { "source": "/pour-lui", "destination": "/pour-lui.html" },
-    { "source": "/jeux-a-deux", "destination": "/jeux-deux.html" },
     { "source": "/ensemble", "destination": "/ensemble.html" },
     { "source": "/dadoucherie", "destination": "/pour-dadoucherie.html" },
     { "source": "/histoire", "destination": "/notre-histoire.html" },
