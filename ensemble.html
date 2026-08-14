@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0d0b1a" />
+<title>Ensemble, en direct</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -8%, #271f45 0%, transparent 55%),
+      radial-gradient(90% 60% at 88% 108%, #1d2246 0%, transparent 60%),
+      #0d0b1a; overflow-x:hidden; }
+  .wrap{ max-width:600px; margin:0 auto; padding:max(24px,env(safe-area-inset-top)) 22px 90px; }
+  a.retour{ display:inline-block; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; margin-bottom:20px; }
+  a.retour:hover{ color:#fff; }
+  .tete{ text-align:center; margin-bottom:8px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.06rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(1.9rem,7vw,2.7rem); margin:0; color:#FBF4EA; }
+
+  .presence{ text-align:center; margin:16px 0 20px; padding:12px 16px; border-radius:16px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(180,155,218,.2); font-size:1rem; color:#E4DEEE; }
+  .presence .dot{ display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+  .on2{ color:#CBB4EC; font-weight:700; }
+
+  .role-choix{ text-align:center; }
+  .role-choix p{ color:#C9C1D8; margin:.4rem 0 14px; }
+  .rrow{ display:flex; gap:10px; justify-content:center; }
+
+  .btn{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.95rem; border-radius:100px; padding:12px 22px; cursor:pointer; border:1px solid transparent; transition:transform .2s, background .25s; }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.p{ color:#1a1430; background:linear-gradient(180deg,#CBB4EC,#A886DA); box-shadow:0 10px 26px -12px rgba(168,134,218,.8); }
+  .btn.g{ color:#EDE9F3; background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.16); }
+  .btn.g:hover{ background:rgba(255,255,255,.14); }
+
+  .menu{ display:flex; flex-direction:column; gap:12px; }
+  .jeu{ text-align:left; width:100%; cursor:pointer; color:#EDE9F3; background:rgba(255,255,255,.045);
+    border:1px solid rgba(180,155,218,.22); border-radius:18px; padding:18px; display:flex; align-items:center; gap:15px; transition:.25s; }
+  .jeu:hover{ transform:translateY(-2px); background:rgba(255,255,255,.075); border-color:rgba(180,155,218,.45); }
+  .jeu .em{ font-size:1.7rem; }
+  .jeu .tt{ font-family:'Fraunces',serif; font-weight:500; font-size:1.2rem; color:#FBF4EA; }
+  .jeu .ss{ color:#A99CC4; font-size:.88rem; margin-top:2px; }
+
+  .vue{ display:none; }
+  .vue.on{ display:block; }
+  .barre{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .lienretour{ cursor:pointer; color:#C7B2E6; font-size:.9rem; background:none; border:none; }
+  .info{ text-align:center; color:#B4A9C8; font-size:.95rem; min-height:1.3em; margin-bottom:10px; }
+
+  /* morpion */
+  .grille{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:300px; margin:0 auto; }
+  .cell{ aspect-ratio:1; background:rgba(255,255,255,.05); border:1px solid rgba(180,155,218,.25); border-radius:14px;
+    display:flex; align-items:center; justify-content:center; font-size:2.2rem; cursor:pointer; transition:.15s; }
+  .cell:hover{ background:rgba(255,255,255,.09); }
+
+  /* main dans la main */
+  .main-zone{ text-align:center; }
+  .jauge{ height:22px; background:rgba(255,255,255,.08); border-radius:100px; overflow:hidden; margin:16px 0; border:1px solid rgba(180,155,218,.2); }
+  .jauge > div{ height:100%; width:0%; background:linear-gradient(90deg,#8E6FBF,#E9DEF7); transition:width .12s linear; }
+  .mains-etat{ display:flex; justify-content:space-around; margin:10px 0; font-size:.95rem; color:#B4A9C8; }
+  .grosbtn{ font-size:1.1rem; padding:18px 28px; border-radius:100px; user-select:none; -webkit-user-select:none; touch-action:none; }
+
+  /* mot en direct */
+  .bulle{ background:rgba(142,111,191,.14); border:1px solid rgba(199,178,230,.3); border-radius:16px; padding:14px 16px; min-height:3em; color:#E9DEF7; line-height:1.6; white-space:pre-wrap; margin-bottom:12px; }
+  .bulle .lbl{ display:block; color:#A99CC4; font-size:.82rem; margin-bottom:4px; }
+  textarea{ width:100%; background:rgba(255,255,255,.05); color:#F2ECFB; border:1px solid rgba(180,155,218,.3); border-radius:14px; padding:12px 14px; font-family:'Nunito Sans'; font-size:16px; line-height:1.6; min-height:70px; resize:vertical; }
+
+  .attente{ text-align:center; color:#8E82A6; font-size:.9rem; margin-top:18px; line-height:1.6; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="retour" href="/">⌂ Accueil</a>
+    <div class="tete"><p class="eyebrow">à distance, mais en même temps</p><h1>Ensemble</h1></div>
+
+    <div id="roleChoix" class="role-choix" style="display:none">
+      <p>Qui es-tu ?</p>
+      <div class="rrow">
+        <button class="btn p" data-role="elle" type="button">Moi, dadoucherie 🤍</button>
+        <button class="btn g" data-role="lui" type="button">Moi, Mathieu</button>
+      </div>
+    </div>
+
+    <div id="appli" style="display:none">
+      <div class="presence" id="presence">connexion…</div>
+      <div class="menu" id="menu"></div>
+
+      <div class="vue" id="vue">
+        <div class="barre">
+          <button class="lienretour" id="retourMenu" type="button">← les jeux</button>
+          <span class="lienretour" id="rejouer" style="display:none">recommencer ↺</span>
+        </div>
+        <div class="info" id="info"></div>
+        <div id="zone"></div>
+      </div>
+    </div>
+
+    <div id="hors" style="display:none" class="attente"></div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  "use strict";
+  var URL="https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  var NOMS={ elle:"dadoucherie", lui:"Mathieu" };
+
+  var roleChoix=document.getElementById("roleChoix"), appli=document.getElementById("appli"), hors=document.getElementById("hors");
+  if (!window.supabase || !window.supabase.createClient){ hors.style.display="block"; hors.textContent="La connexion en direct n'a pas pu se charger. Vérifie ta connexion internet et réessaie."; return; }
+
+  var role=null; try{ role=localStorage.getItem("moi_role"); }catch(e){}
+  if (role!=="elle" && role!=="lui"){ roleChoix.style.display="block";
+    document.querySelectorAll("#roleChoix [data-role]").forEach(function(b){ b.addEventListener("click", function(){ role=b.dataset.role; try{localStorage.setItem("moi_role",role);}catch(e){} roleChoix.style.display="none"; demarrer(); }); });
+  } else { demarrer(); }
+
+  var client, canal, autrePresent=false;
+
+  function buzz(m){ try{ if(navigator.vibrate) navigator.vibrate(m||14); }catch(e){} }
+
+  function demarrer(){
+    appli.style.display="block";
+    client = window.supabase.createClient(URL, ANON, { realtime:{ params:{ eventsPerSecond: 20 } } });
+    canal = client.channel("nous-deux-live", { config:{ presence:{ key: role }, broadcast:{ self:false } } });
+
+    canal.on("presence", { event:"sync" }, majPresence);
+    canal.on("broadcast", { event:"jeu" }, function(m){ recevoir(m.payload); });
+
+    canal.subscribe(function(status){
+      if (status==="SUBSCRIBED"){ canal.track({ role:role, at:Date.now() }); majPresence(); }
+    });
+
+    construireMenu();
+  }
+
+  function rolesEnLigne(){ try{ return Object.keys(canal.presenceState()); }catch(e){ return []; } }
+  function majPresence(){
+    var en=rolesEnLigne(); autrePresent = en.indexOf(role==="elle"?"lui":"elle")>-1;
+    var pres=document.getElementById("presence");
+    var moiNom=NOMS[role], autreNom=NOMS[role==="elle"?"lui":"elle"];
+    if (autrePresent){ pres.innerHTML='<span class="dot" style="background:#8ee6a0"></span> Vous êtes <span class="on2">tous les deux là</span> 🤍 — jouez en direct !'; }
+    else { pres.innerHTML='<span class="dot" style="background:#e6c98e"></span> Toi ('+moiNom+') es là. '+autreNom+' n\'est pas encore connecté·e — dès qu\'il/elle ouvre cette page, vous y serez ensemble.'; }
+    if (typeof onPresence==="function") onPresence();
+  }
+  var onPresence=null;
+
+  function envoyer(p){ p.from=role; canal.send({ type:"broadcast", event:"jeu", payload:p }); }
+  var handler=null;
+  function recevoir(p){ if(p.from===role) return; if(typeof handler==="function") handler(p); }
+
+  // ===== menu =====
+  var JEUX=[
+    { id:"morpion", em:"❤️✦", tt:"Morpion à deux", ss:"Toi les cœurs, lui les étoiles. En direct." },
+    { id:"main", em:"🤝", tt:"Main dans la main", ss:"Tenez-vous la main en même temps." },
+    { id:"mot", em:"✍️", tt:"Un mot en direct", ss:"Écris-lui, il te voit taper en vrai." }
+  ];
+  var menu=document.getElementById("menu"), vue=document.getElementById("vue"), zone=document.getElementById("zone"), info=document.getElementById("info");
+  var rejouer=document.getElementById("rejouer");
+  function construireMenu(){
+    menu.innerHTML="";
+    JEUX.forEach(function(j){ var b=document.createElement("button"); b.className="jeu"; b.type="button";
+      b.innerHTML='<span class="em">'+j.em+'</span><span><span class="tt">'+j.tt+'</span><span class="ss">'+j.ss+'</span></span>';
+      b.addEventListener("click", function(){ ouvrirJeu(j.id); }); menu.appendChild(b); });
+  }
+  document.getElementById("retourMenu").addEventListener("click", function(){ vue.classList.remove("on"); menu.style.display="flex"; document.getElementById("presence").style.display=""; handler=null; onPresence=null; rejouer.style.display="none"; });
+  function ouvrirJeu(id){ menu.style.display="none"; document.getElementById("presence").style.display=""; vue.classList.add("on"); rejouer.style.display="none"; window.scrollTo({top:0,behavior:"smooth"});
+    if(id==="morpion") jeuMorpion(); else if(id==="main") jeuMain(); else jeuMot();
+  }
+
+  // ===== Morpion =====
+  function jeuMorpion(){
+    var board=Array(9).fill(""), tour="elle", fini=false;
+    var MARK={ elle:"❤️", lui:"✦" };
+    function rendre(){
+      info.textContent = fini ? "" : (tour===role ? "À toi de jouer." : "C'est à "+NOMS[tour]+"…");
+      zone.innerHTML='<div class="grille" id="g"></div>';
+      var g=document.getElementById("g");
+      board.forEach(function(v,i){ var c=document.createElement("div"); c.className="cell"; c.textContent=v?MARK[v]:"";
+        c.addEventListener("click", function(){ jouer(i); }); g.appendChild(c); });
+    }
+    function jouer(i){ if(fini||board[i]) return; if(tour!==role){ info.textContent="Attends ton tour 🙂"; return; }
+      poser(i, role); envoyer({ game:"morpion", cell:i, mark:role }); }
+    function poser(i, who){ board[i]=who; buzz(12); var g=winner();
+      if(g){ fini=true; } else { tour=(who==="elle"?"lui":"elle"); }
+      rendre();
+      if(g){ info.textContent = g==="nul" ? "Match nul 🤍 On rejoue ?" : (g===role?"Tu as gagné ! 🎉":NOMS[g]+" a gagné 🤍"); rejouer.style.display=""; } }
+    function winner(){ var L=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      for(var k=0;k<L.length;k++){ var a=L[k]; if(board[a[0]]&&board[a[0]]===board[a[1]]&&board[a[1]]===board[a[2]]) return board[a[0]]; }
+      return board.every(function(x){return x;})?"nul":null; }
+    handler=function(p){ if(p.game==="morpion"){ if(p.reset){ board=Array(9).fill(""); tour="elle"; fini=false; rendre(); } else if(typeof p.cell==="number"){ poser(p.cell, p.mark); } } };
+    rejouer.onclick=function(){ board=Array(9).fill(""); tour="elle"; fini=false; rendre(); envoyer({ game:"morpion", reset:true }); rejouer.style.display="none"; };
+    rendre();
+  }
+
+  // ===== Main dans la main (coop) =====
+  function jeuMain(){
+    var moi=false, autre=false, fill=0, done=false;
+    zone.innerHTML='<div class="main-zone"><div class="mains-etat"><span id="m1">Ta main : ✋</span><span id="m2">Sa main : ✋</span></div>'
+      +'<div class="jauge"><div id="jb"></div></div>'
+      +'<button class="btn p grosbtn" id="tenir" type="button">Tiens ma main 🤍</button>'
+      +'<p class="attente" id="mmsg">Appuie et garde le doigt. Quand vous tenez tous les deux en même temps, ça se remplit.</p></div>';
+    info.textContent = autrePresent ? "" : "Attends qu'il/elle soit là pour jouer ensemble.";
+    var jb=document.getElementById("jb"), m1=document.getElementById("m1"), m2=document.getElementById("m2"), mmsg=document.getElementById("mmsg");
+    var tenir=document.getElementById("tenir");
+    function setMoi(v){ if(moi===v)return; moi=v; m1.textContent="Ta main : "+(v?"🤝":"✋"); envoyer({ game:"main", holding:v }); }
+    tenir.addEventListener("pointerdown", function(e){ e.preventDefault(); setMoi(true); });
+    ["pointerup","pointercancel","pointerleave"].forEach(function(ev){ tenir.addEventListener(ev, function(){ setMoi(false); }); });
+    handler=function(p){ if(p.game==="main"){ autre=!!p.holding; m2.textContent="Sa main : "+(autre?"🤝":"✋"); } };
+    onPresence=function(){ if(!autrePresent){ autre=false; m2.textContent="Sa main : ✋"; } };
+    var timer=setInterval(function(){
+      if(done) return;
+      if(moi&&autre){ fill=Math.min(100, fill+1.4); mmsg.textContent="Vous vous tenez la main 🤍 continuez…"; }
+      else if(fill>0 && fill<100){ fill=Math.max(0, fill-0.6); }
+      jb.style.width=fill+"%";
+      if(fill>=100&&!done){ done=true; mmsg.textContent="Vous l'avez rempli, ensemble. 🤍 Voilà, c'est ça, nous deux."; buzz([30,60,30,60,30]); }
+    }, 60);
+    // nettoyage quand on quitte la vue
+    var obs=setInterval(function(){ if(!vue.classList.contains("on")){ clearInterval(timer); clearInterval(obs); setMoi(false); } }, 500);
+  }
+
+  // ===== Mot en direct =====
+  function jeuMot(){
+    zone.innerHTML='<div class="bulle" id="saBulle"><span class="lbl">'+NOMS[role==="elle"?"lui":"elle"]+' écrit…</span><span id="saTxt">…</span></div>'
+      +'<textarea id="monTxt" placeholder="Écris-lui quelque chose, il/elle te voit en direct…"></textarea>';
+    info.textContent="Ce que tu écris apparaît chez l'autre, lettre par lettre.";
+    var monTxt=document.getElementById("monTxt"), saTxt=document.getElementById("saTxt");
+    var t=null;
+    monTxt.addEventListener("input", function(){ clearTimeout(t); t=setTimeout(function(){ envoyer({ game:"mot", texte:monTxt.value }); }, 90); });
+    handler=function(p){ if(p.game==="mot"){ saTxt.textContent = p.texte||"…"; } };
+  }
+})();
+</script>
+</body>
+</html>
