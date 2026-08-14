@@ -31,6 +31,26 @@
     ]
   };
 
+  // Le 15 de chaque mois : notre jour.
+  var QUINZE = {
+    heure: [9, 0],
+    titre: "C'est le 15 🤍",
+    url: "/le-15",
+    msg: [
+      "C'est le 15, notre jour 🤍 Viens voir, je t'ai préparé quelque chose rien que pour toi.",
+      "Joyeux 15, ma dadoucherie. J'ai laissé une lettre et un cadeau pour toi →",
+      "On est le 15 🌙 Notre rendez-vous du mois. Ouvre, c'est pour toi."
+    ]
+  };
+  function prochainQuinze(moisPlus) {
+    var d = new Date();
+    d.setDate(15); d.setHours(QUINZE.heure[0], QUINZE.heure[1], 0, 0);
+    if (d <= new Date()) d.setMonth(d.getMonth() + 1);
+    if (moisPlus) d.setMonth(d.getMonth() + moisPlus);
+    d.setDate(15);
+    return d;
+  }
+
   function cfg() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
   function save(c) { try { localStorage.setItem(KEY, JSON.stringify(c)); } catch (e) {} }
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
@@ -70,6 +90,12 @@
         try { reg.showNotification(TITRES[slot], o); } catch (e) {}
       }
     });
+    // les 3 prochains "15"
+    for (var q = 0; q < 3; q++) {
+      var tq = prochainQuinze(q);
+      var oq = { body: pick(QUINZE.msg), icon: "/icon-192.png", badge: "/icon-192.png", data: { url: QUINZE.url }, tag: "quinze-" + tq.toDateString() };
+      try { oq.showTrigger = new window.TimestampTrigger(tq.getTime()); reg.showNotification(QUINZE.titre, oq); } catch (e) {}
+    }
     return true;
   }
 
@@ -92,6 +118,14 @@
           }
         }
       });
+      // le 15 a 9h (repli quand l'app est ouverte)
+      if (n.getDate() === 15 && hh === QUINZE.heure[0] && mm >= QUINZE.heure[1] && mm < QUINZE.heure[1] + 8) {
+        var cle15 = "quinze-" + jour;
+        if (!c.shown[cle15]) {
+          c.shown[cle15] = 1; save(c);
+          swReady().then(function (reg) { reg.showNotification(QUINZE.titre, { body: pick(QUINZE.msg), icon: "/icon-192.png", badge: "/icon-192.png", data: { url: QUINZE.url } }); }).catch(function () {});
+        }
+      }
     }
     verifier(); setInterval(verifier, 60000);
     document.addEventListener("visibilitychange", function () { if (!document.hidden) verifier(); });

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0d0b1a" />
+<title>Tes fleurs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -8%, #271f45 0%, transparent 55%),
+      radial-gradient(90% 60% at 12% 108%, #1d2246 0%, transparent 60%),
+      #0d0b1a; overflow-x:hidden; }
+  .wrap{ max-width:600px; margin:0 auto; padding:max(24px,env(safe-area-inset-top)) 22px 90px; }
+  a.retour{ display:inline-block; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; margin-bottom:22px; }
+  a.retour:hover{ color:#fff; }
+  .tete{ text-align:center; margin-bottom:6px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.08rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.9rem); margin:0; color:#FBF4EA; }
+
+  .scene{ text-align:center; margin-top:16px; }
+  #fleurCanvas{ width:230px; height:230px; max-width:70vw; }
+  .nom{ font-family:'Fraunces',serif; font-style:italic; color:#E9DEF7; font-size:1.25rem; margin:2px 0 2px; min-height:1.4em; }
+  .sens{ color:#A99CC4; font-size:.92rem; margin:0 0 6px; min-height:1.2em; }
+  .mot{ color:#E2DCEC; font-size:1.06rem; line-height:1.8; max-width:440px; margin:14px auto 0; min-height:2em; transition:opacity .5s; }
+
+  .actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:24px; }
+  .btn{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.95rem; border-radius:100px; padding:12px 22px; cursor:pointer; border:1px solid transparent; text-decoration:none; transition:transform .2s, background .25s; }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.p{ color:#1a1430; background:linear-gradient(180deg,#CBB4EC,#A886DA); box-shadow:0 10px 26px -12px rgba(168,134,218,.8); }
+  .btn.g{ color:#EDE9F3; background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.16); }
+  .btn.g:hover{ background:rgba(255,255,255,.14); }
+
+  .bouquet{ margin-top:38px; background:rgba(255,255,255,.035); border:1px solid rgba(180,155,218,.18); border-radius:20px; padding:20px 18px; text-align:center; }
+  .bouquet h2{ font-family:'Fraunces',serif; font-weight:500; font-size:1.2rem; color:#FBF4EA; margin:0 0 4px; }
+  .bouquet .cnt{ color:#C7B2E6; font-family:'Fraunces',serif; font-style:italic; font-size:1.05rem; margin:0 0 12px; }
+  #jardin{ display:flex; flex-wrap:wrap; gap:4px; justify-content:center; }
+  #jardin canvas{ width:34px; height:34px; }
+  .bouquet .vide{ color:#8E82A6; font-size:.9rem; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="retour" href="/">⌂ Accueil</a>
+    <div class="tete">
+      <p class="eyebrow">parce que je t'en offre, même de loin</p>
+      <h1>Tes fleurs</h1>
+    </div>
+
+    <div class="scene">
+      <canvas id="fleurCanvas" width="460" height="460"></canvas>
+      <div class="nom" id="nom"></div>
+      <div class="sens" id="sens"></div>
+      <div class="mot" id="mot"></div>
+      <div class="actions">
+        <button class="btn p" id="btnRecevoir" type="button">Reçois ta fleur du jour</button>
+        <a class="btn g" href="/le-15">Notre 15</a>
+      </div>
+    </div>
+
+    <div class="bouquet">
+      <h2>Ton bouquet</h2>
+      <div class="cnt" id="cnt"></div>
+      <div id="jardin"></div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var FLEURS = [
+    { nom:"Pivoine",       sens:"la tendresse et le bonheur d'aimer", col:["#C99BE0","#E7C6F2"], p:16, forme:"ronde" },
+    { nom:"Rose lavande",  sens:"le coup de foudre, encore intact",   col:["#B49BDA","#D9C6F0"], p:12, forme:"rose" },
+    { nom:"Lys",           sens:"la pureté de ce qu'on ressent",       col:["#CBB4EC","#EFE3FB"], p:6,  forme:"pointue" },
+    { nom:"Tulipe",        sens:"un amour simple et sincère",          col:["#A886DA","#C7B2E6"], p:6,  forme:"tulipe" },
+    { nom:"Marguerite",    sens:"je pense à toi, tout le temps",       col:["#D7C4F0","#F1E8FC"], p:14, forme:"ronde" },
+    { nom:"Iris",          sens:"un message d'espoir : on se revoit bientôt", col:["#8E6FBF","#B49BDA"], p:5, forme:"pointue" },
+    { nom:"Orchidée",      sens:"tu es rare, et précieuse",            col:["#BE9BE0","#E3CDF5"], p:5,  forme:"rose" },
+    { nom:"Fleur de cerisier", sens:"la douceur des instants qui passent", col:["#E7C6F2","#FBEEFB"], p:5, forme:"ronde" }
+  ];
+  var MOTS = [
+    "Tiens, une fleur pour toi. J'aurais préféré te la tendre en vrai, mais celle-ci ne fanera pas.",
+    "Je t'en offre une aujourd'hui, comme je le ferais si tu étais là, contre moi.",
+    "Une fleur de plus dans ton bouquet. Une pensée de plus qui te dit : tu me manques.",
+    "Pour toi, ma dadoucherie. Parce que tu mérites des fleurs, souvent, et pas seulement les grands jours.",
+    "Celle-ci pousse rien que pour toi. Garde-la, elle vient de loin mais elle vient du cœur.",
+    "Une petite fleur, un grand je t'aime. La distance n'y change rien.",
+    "Je continuerai à t'en offrir chaque jour, jusqu'à pouvoir remplacer celles-ci par des vraies."
+  ];
+
+  function seedJour(){ var d=new Date(); return d.getFullYear()*366 + (d.getMonth()*31) + d.getDate(); }
+  function rng(seed){ return function(){ seed=(seed*9301+49297)%233280; return seed/233280; }; }
+
+  var jour = seedJour();
+  var fleur = FLEURS[jour % FLEURS.length];
+  var mot = MOTS[jour % MOTS.length];
+
+  // ---- dessin d'une fleur ----
+  function dessine(ctx, cx, cy, R, f, ouv){
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    // tige
+    ctx.strokeStyle="#6f8f5f"; ctx.lineWidth=R*0.06; ctx.beginPath();
+    ctx.moveTo(cx, cy+R*0.2); ctx.quadraticCurveTo(cx+R*0.15, cy+R*1.0, cx, cy+R*1.7); ctx.stroke();
+    // feuille
+    ctx.fillStyle="#6f8f5f"; ctx.beginPath();
+    ctx.ellipse(cx+R*0.28, cy+R*0.95, R*0.28, R*0.13, -0.5, 0, 6.28); ctx.fill();
+    var n=f.p, ang=(Math.PI*2)/n;
+    ctx.save(); ctx.translate(cx,cy);
+    for (var i=0;i<n;i++){
+      ctx.save(); ctx.rotate(i*ang);
+      var g=ctx.createLinearGradient(0,0,0,-R*ouv);
+      g.addColorStop(0,f.col[0]); g.addColorStop(1,f.col[1]);
+      ctx.fillStyle=g;
+      ctx.beginPath();
+      if (f.forme==="pointue"){ ctx.moveTo(0,0); ctx.quadraticCurveTo(R*0.16*ouv,-R*0.5*ouv, 0,-R*ouv); ctx.quadraticCurveTo(-R*0.16*ouv,-R*0.5*ouv, 0,0); }
+      else if (f.forme==="tulipe"){ ctx.moveTo(0,0); ctx.quadraticCurveTo(R*0.34*ouv,-R*0.4*ouv, R*0.14*ouv,-R*0.92*ouv); ctx.quadraticCurveTo(0,-R*ouv,-R*0.14*ouv,-R*0.92*ouv); ctx.quadraticCurveTo(-R*0.34*ouv,-R*0.4*ouv,0,0); }
+      else if (f.forme==="rose"){ ctx.moveTo(0,0); ctx.quadraticCurveTo(R*0.30*ouv,-R*0.35*ouv, 0,-R*0.86*ouv); ctx.quadraticCurveTo(-R*0.30*ouv,-R*0.35*ouv,0,0); }
+      else { ctx.moveTo(0,0); ctx.quadraticCurveTo(R*0.26*ouv,-R*0.55*ouv, 0,-R*ouv); ctx.quadraticCurveTo(-R*0.26*ouv,-R*0.55*ouv,0,0); }
+      ctx.fill();
+      ctx.restore();
+    }
+    // coeur
+    ctx.fillStyle="#F3E6B0"; ctx.beginPath(); ctx.arc(0,0,R*0.2*ouv,0,6.28); ctx.fill();
+    ctx.fillStyle="rgba(180,140,80,.5)"; for(var k=0;k<8;k++){ ctx.beginPath(); ctx.arc(Math.cos(k)*R*0.09*ouv, Math.sin(k*1.7)*R*0.09*ouv, R*0.03*ouv,0,6.28); ctx.fill(); }
+    ctx.restore();
+  }
+
+  var canvas=document.getElementById("fleurCanvas"), ctx=canvas.getContext("2d");
+  var nomEl=document.getElementById("nom"), sensEl=document.getElementById("sens"), motEl=document.getElementById("mot");
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function eclore(){
+    if (reduce){ dessine(ctx,230,210,150,fleur,1); return; }
+    var t=0; (function anim(){ t+=0.045; var o=Math.min(1, t); var e=1-Math.pow(1-o,3);
+      dessine(ctx,230,210,150,fleur,e); if(o<1) requestAnimationFrame(anim); })();
+  }
+
+  // état affiché
+  var revele=false;
+  function reveler(){
+    revele=true;
+    nomEl.textContent=fleur.nom; sensEl.textContent="— "+fleur.sens;
+    motEl.style.opacity=0; setTimeout(function(){ motEl.textContent=mot; motEl.style.opacity=1; },250);
+    eclore();
+    try{ if(navigator.vibrate) navigator.vibrate([15,40,15]); }catch(e){}
+    ajouterAuBouquet();
+  }
+
+  // bouquet persistant (localStorage) : +1 par jour
+  var KEY="bouquet_v1";
+  function etat(){ try{ return JSON.parse(localStorage.getItem(KEY))||{total:0,dernier:null,jours:[]}; }catch(e){ return {total:0,dernier:null,jours:[]}; } }
+  function ajouterAuBouquet(){
+    var c=etat(); var cle=new Date().toDateString();
+    if (c.dernier!==cle){ c.total=(c.total||0)+1; c.dernier=cle; c.jours=(c.jours||[]); c.jours.push(fleur.nom); if(c.jours.length>60)c.jours=c.jours.slice(-60);
+      try{ localStorage.setItem(KEY, JSON.stringify(c)); }catch(e){} }
+    majBouquet();
+  }
+  function majBouquet(){
+    var c=etat(); var cnt=document.getElementById("cnt"), jardin=document.getElementById("jardin");
+    cnt.textContent = c.total>0 ? (c.total===1?"1 fleur reçue de lui 🤍":(c.total+" fleurs reçues de lui 🤍")) : "";
+    jardin.innerHTML="";
+    if (!c.total){ jardin.innerHTML='<span class="vide">Ta première fleur t\'attend, juste au-dessus.</span>'; return; }
+    var noms=(c.jours&&c.jours.length)?c.jours:[];
+    var toShow=Math.min(c.total, 40);
+    for (var i=0;i<toShow;i++){
+      var f=FLEURS[(jour+i)%FLEURS.length]; var nm=noms[noms.length-1-i];
+      if(nm){ for(var z=0;z<FLEURS.length;z++){ if(FLEURS[z].nom===nm){ f=FLEURS[z]; break; } } }
+      var mc=document.createElement("canvas"); mc.width=mc.height=68; var mx=mc.getContext("2d");
+      dessine(mx,34,30,22,f,1); jardin.appendChild(mc);
+    }
+  }
+
+  // rendu initial : bouton fleur du jour
+  document.getElementById("btnRecevoir").addEventListener("click", function(){ if(!revele) reveler(); });
+  // petit aperçu fermé (bouton fleur)
+  dessine(ctx,230,210,150,fleur,0.12);
+  majBouquet();
+})();
+</script>
+</body>
+</html>

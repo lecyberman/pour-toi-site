@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0d0b1a" />
+<title>Le 15</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -8%, #2a1f47 0%, transparent 55%),
+      radial-gradient(90% 60% at 88% 108%, #1d2144 0%, transparent 60%),
+      #0d0b1a; overflow-x:hidden; }
+  .petals{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+  .wrap{ position:relative; z-index:1; max-width:640px; margin:0 auto; padding:max(24px,env(safe-area-inset-top)) 22px 90px; }
+
+  a.retour{ display:inline-block; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; margin-bottom:24px; }
+  a.retour:hover{ color:#fff; }
+
+  .tete{ text-align:center; margin-bottom:14px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.1rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2.1rem,7.5vw,3.1rem); margin:0; color:#FBF4EA; letter-spacing:-.01em; }
+  .compteur{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:1.15rem; text-align:center; margin:6px 0 0; }
+
+  /* lettre */
+  .lettre{ background:rgba(255,255,255,.04); border:1px solid rgba(180,155,218,.22); border-radius:22px;
+    padding:26px 24px; margin:26px 0 0; box-shadow:0 26px 70px -40px rgba(0,0,0,.85); }
+  .lettre .salut{ font-family:'Fraunces',serif; font-style:italic; font-size:1.4rem; color:#E9DEF7; margin:0 0 14px; }
+  .lettre p{ font-size:1.06rem; line-height:1.85; color:#E2DCEC; margin:0 0 15px; }
+  .lettre .sign{ text-align:right; font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.1rem; margin-top:10px; }
+
+  /* cadeau */
+  .cadeau-zone{ text-align:center; margin-top:30px; }
+  .paquet{ font-size:4.6rem; line-height:1; cursor:pointer; display:inline-block; transition:transform .3s; filter:drop-shadow(0 10px 24px rgba(142,111,191,.5)); }
+  .paquet:hover{ transform:translateY(-4px) rotate(-3deg); }
+  .paquet.secoue{ animation:secoue .6s ease; }
+  @keyframes secoue{ 0%,100%{transform:rotate(0);} 20%{transform:rotate(-8deg);} 40%{transform:rotate(7deg);} 60%{transform:rotate(-5deg);} 80%{transform:rotate(4deg);} }
+  .cadeau-hint{ color:#A99CC4; font-size:.95rem; margin-top:10px; }
+  #cadeauOuvert{ opacity:0; visibility:hidden; transition:opacity .6s ease, transform .6s cubic-bezier(.22,.61,.36,1); transform:translateY(10px);
+    margin-top:22px; background:linear-gradient(180deg, rgba(142,111,191,.18), rgba(142,111,191,.06));
+    border:1px solid rgba(199,178,230,.4); border-radius:20px; padding:24px 22px; }
+  #cadeauOuvert.on{ opacity:1; visibility:visible; transform:none; }
+  #cadeauOuvert .ct{ font-family:'Fraunces',serif; font-weight:500; font-size:1.4rem; color:#FBF4EA; margin:0 0 10px; }
+  #cadeauOuvert p{ font-size:1.05rem; line-height:1.8; color:#E4DEEE; margin:0; }
+
+  .actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:26px; }
+  .btn{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.95rem; border-radius:100px; padding:11px 20px; cursor:pointer; border:1px solid transparent; text-decoration:none; transition:transform .2s, background .25s; }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.p{ color:#1a1430; background:linear-gradient(180deg,#CBB4EC,#A886DA); box-shadow:0 10px 26px -12px rgba(168,134,218,.8); }
+  .btn.g{ color:#EDE9F3; background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.16); }
+  .btn.g:hover{ background:rgba(255,255,255,.14); }
+
+  /* mode "pas encore le 15" */
+  .attente{ text-align:center; }
+  .attente .grand{ font-size:3.4rem; margin:18px 0 8px; }
+  .attente p{ color:#C9C1D8; line-height:1.8; font-size:1.05rem; max-width:460px; margin:0 auto; }
+  .pensee{ margin-top:22px; font-family:'Fraunces',serif; font-style:italic; color:#D8CBEF; font-size:1.12rem; line-height:1.7; }
+
+  @media (prefers-reduced-motion:reduce){ .paquet.secoue{ animation:none; } }
+</style>
+</head>
+<body>
+  <canvas class="petals" id="petals"></canvas>
+  <div class="wrap">
+    <a class="retour" href="/">⌂ Accueil</a>
+    <div id="contenu"></div>
+  </div>
+
+<script src="/rappels.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     LE 15 — chaque 15 du mois, quelque chose de nouveau.
+     Rotation par mois : lettres + cadeaux tournent (≈ un an sans répétition).
+     Ton : tendre et romantique. Elle : "dadoucherie".
+     ============================================================ */
+
+  var LETTRES = [
+    {
+      salut: "Ma dadoucherie,",
+      corps: [
+        "On est encore le 15. Notre jour. Celui que j'ai décidé, il y a longtemps, de ne jamais laisser passer comme un jour ordinaire — parce qu'avec toi, aucun jour n'est ordinaire.",
+        "Ça fait deux mois qu'on ne s'est pas vus, et je ne vais pas te mentir : tu me manques d'une façon que je ne savais même pas possible avant toi. Ta voix, ta façon de rire quand tu essaies de te retenir, ta main que je cherche encore parfois sans réfléchir. Tout ça me manque.",
+        "Mais tu sais quoi ? Même à des kilomètres, tu es la première pensée qui me réveille et la dernière qui m'endort. La distance n'a rien enlevé. Elle a juste rendu chaque petit moment avec toi encore plus précieux.",
+        "Alors aujourd'hui, laisse-moi te le redire, comme si on était l'un contre l'autre : je t'aime. Profondément, calmement, pour de vrai. Et je compte déjà les jours jusqu'à ce que je puisse t'offrir tes fleurs en vrai, et pas seulement à travers un écran."
+      ],
+      sign: "— Mathieu, à toi. 🤍"
+    },
+    {
+      salut: "Toi que j'aime,",
+      corps: [
+        "Joyeux 15, ma dadoucherie. Je me suis assis un moment avant d'écrire ça, juste pour penser à nous. À tout ce chemin.",
+        "Deux inconnus sur Snapchat, il y a des années. Un message, puis un autre. Qui aurait cru que ça deviendrait ça — toi et moi, notre monde, nos projets, nos silences qui ne sont jamais gênants ?",
+        "Je sais que montrer ce qu'on ressent, ce n'est pas toujours facile pour toi. Et je veux que tu saches une chose : tu n'as jamais besoin de forcer quoi que ce soit avec moi. Ta présence me suffit. Un « coucou », un emoji, un rien du tout de ta part vaut plus que de grands discours.",
+        "Tu es aimée exactement comme tu es. Pas la version parfaite de toi — toi. Celle qui doute, celle qui fatigue, celle qui rit trop fort. Toute. Et le 15 prochain, je serai encore là, à te le redire."
+      ],
+      sign: "— Ton Mathieu 🤍"
+    },
+    {
+      salut: "Ma douce dadoucherie,",
+      corps: [
+        "Encore un 15. Encore une occasion de te rappeler que tu comptes, énormément, et pas seulement les jours de fête.",
+        "Je repense souvent à Lyon, ce 1er janvier. La première fois pour de vrai. J'avais le cœur qui cognait comme un idiot. Et à notre nuit du 15 juillet, celle dont on ne parle pas trop fort — notre ciel, rien qu'à nous.",
+        "On a Monaco, Malte, Barcelone dans nos souvenirs, et tellement d'endroits encore à ouvrir ensemble. Chaque voyage avec toi, c'est comme une parenthèse qu'on écrit à deux.",
+        "La distance, en ce moment, c'est dur. Mais elle est temporaire, et nous, on ne l'est pas. Alors tiens bon, ma belle. Je suis là, chaque jour, même quand je ne suis pas là. Bonne fête du 15, mon amour."
+      ],
+      sign: "— Mathieu, pour toujours un peu plus. 🤍"
+    },
+    {
+      salut: "Mon amour,",
+      corps: [
+        "Bonne fête, ma dadoucherie. Aujourd'hui je ne veux pas te parler de la distance, ni de ce qui manque. Je veux te parler de ce qu'on a.",
+        "On a une conversation qui n'a jamais vraiment fini depuis le premier jour. On a des projets, des idées, des marques qu'on construit. On a cette manière de se comprendre sans tout expliquer.",
+        "On a aussi des soirs plus lourds, les tiens et les miens. Et même ceux-là, je les prends avec toi. Parce qu'être avec quelqu'un, ce n'est pas seulement les beaux moments — c'est rester quand c'est moins beau. Et moi, je reste.",
+        "Tu es ma personne. Mon endroit préféré. Le 15, c'est notre petit rituel, mais la vérité c'est que je te choisirais tous les autres jours aussi. Je t'aime."
+      ],
+      sign: "— Ton Mathieu 🤍"
+    },
+    {
+      salut: "Ma dadoucherie à moi,",
+      corps: [
+        "Un 15 de plus, et toujours autant d'envie de te le dire : merci. Merci d'être entrée dans ma vie, merci d'y rester, merci de me supporter aussi.",
+        "Je sais que parfois tu te demandes si tu en fais assez, si tu montres assez ce que tu ressens. Arrête de t'inquiéter pour ça. L'amour, ce n'est pas une performance. Je le vois dans les petites choses : quand tu penses à moi, quand tu m'envoies un truc « parce que ça m'a fait penser à toi ». C'est ça, l'amour. Et tu en donnes plein sans même t'en rendre compte.",
+        "Ce soir, où que tu sois, imagine ma main dans la tienne. Je te serre fort. Vraiment fort. Tu la sens ?",
+        "Bonne fête du 15, ma belle. On se rapproche du jour où je te reprendrai dans mes bras. Et ce jour-là, prépare-toi à beaucoup de fleurs."
+      ],
+      sign: "— Mathieu, qui t'aime. 🤍"
+    },
+    {
+      salut: "Toi, mon 15 préféré,",
+      corps: [
+        "On y est encore. Notre jour. Et à chaque fois, j'ai un peu plus de choses à te dire, parce qu'à chaque fois je t'aime un peu plus.",
+        "Si je pouvais, je téléporterais ces mots directement dans tes bras au lieu d'un écran. Je te ferais un vrai câlin, de ceux qui durent trop longtemps, où on ne veut plus se lâcher.",
+        "En attendant, je fais ce que je peux : je t'écris, je pense à toi, je garde nos souvenirs bien au chaud et je prépare la suite. Parce qu'il y a une suite, ma dadoucherie. Une belle. Je nous la promets.",
+        "Joyeux 15, mon amour. Tu es aimée aujourd'hui, tu l'étais hier, tu le seras demain. Rien de tout ça ne dépend d'un jour du mois — mais aujourd'hui, je te le crie un peu plus fort."
+      ],
+      sign: "— Ton Mathieu, à jamais. 🤍"
+    }
+  ];
+
+  var CADEAUX = [
+    { emoji:"🎟️", titre:"Un bon à échanger", texte:"Ce 15-ci, je t'offre un câlin de 20 minutes non négociable, dès qu'on se revoit. Montre-moi ce message et je m'exécute, sans discuter." },
+    { emoji:"🌙", titre:"Une soirée rien qu'à nous", texte:"Un bon pour une soirée entière où tu choisis tout : le film, la musique, le plat, le silence. Moi je m'occupe juste de te rendre heureuse." },
+    { emoji:"💌", titre:"Une promesse", texte:"Je te promets que la prochaine fois qu'on se voit, tu auras un vrai bouquet dans les bras avant même que j'aie dit bonjour." },
+    { emoji:"🎶", titre:"Ta chanson du mois", texte:"Va voir Nos chansons et mets celle que tu préfères en boucle : ce soir, imagine que je te la dédie, rien qu'à toi." },
+    { emoji:"⭐", titre:"Une étoile à ton nom", texte:"J'ai décidé qu'une étoile de notre univers portait ton nom à partir d'aujourd'hui. Va la chercher dans Nous deux, elle brille pour toi." },
+    { emoji:"🤍", titre:"Un mot secret", texte:"Ouvre bien tes oreilles (façon de parler) : tu es la meilleure chose qui me soit arrivée. Garde ce cadeau-là, il ne s'use jamais." }
+  ];
+
+  // index qui change chaque mois (≈ un an sans répétition)
+  var now = new Date();
+  var idx = (now.getFullYear() * 12 + now.getMonth()) % LETTRES.length;
+  var idxC = (now.getFullYear() * 12 + now.getMonth()) % CADEAUX.length;
+
+  var estLe15 = now.getDate() === 15;
+  // aperçu forcé : ?preview=1
+  if (location.search.indexOf("preview") > -1) estLe15 = true;
+
+  var contenu = document.getElementById("contenu");
+
+  function buzz(m){ try{ if(navigator.vibrate) navigator.vibrate(m||18); }catch(e){} }
+
+  if (estLe15) {
+    var L = LETTRES[idx], C = CADEAUX[idxC];
+    var pars = L.corps.map(function(p){ return '<p>'+p+'</p>'; }).join('');
+    contenu.innerHTML =
+      '<div class="tete"><p class="eyebrow">on est le 15 — notre jour</p><h1>Joyeux 15 🤍</h1></div>' +
+      '<div class="lettre"><p class="salut">'+L.salut+'</p>'+pars+'<p class="sign">'+L.sign+'</p></div>' +
+      '<div class="cadeau-zone">' +
+        '<div class="paquet" id="paquet" role="button" tabindex="0" aria-label="Ouvre ton cadeau">🎁</div>' +
+        '<div class="cadeau-hint" id="hint">touche le cadeau pour l\'ouvrir</div>' +
+        '<div id="cadeauOuvert"><div class="ct">'+C.emoji+' '+C.titre+'</div><p>'+C.texte+'</p></div>' +
+      '</div>' +
+      '<div class="actions">' +
+        '<a class="btn g" href="/nous-deux">Notre monde en 3D</a>' +
+        '<a class="btn g" href="/chansons">Nos chansons</a>' +
+        '<a class="btn p" href="/fleurs">Tes fleurs du jour</a>' +
+      '</div>';
+
+    var paquet = document.getElementById("paquet");
+    var ouvert = document.getElementById("cadeauOuvert");
+    var hint = document.getElementById("hint");
+    var estOuvert = false;
+    function ouvrir(){
+      if (estOuvert) return; estOuvert = true;
+      buzz([20,50,20]);
+      paquet.classList.add("secoue");
+      setTimeout(function(){ paquet.textContent = "🎉"; ouvert.classList.add("on"); hint.textContent = "rien que pour toi."; confetti(); }, 620);
+    }
+    paquet.addEventListener("click", ouvrir);
+    paquet.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" ") ouvrir(); });
+  } else {
+    // pas encore le 15 : page tendre + compteur
+    var j = now.getDate();
+    var reste = (j < 15) ? (15 - j) : (joursDansMois(now) - j + 15);
+    var pensees = [
+      "Ce n'est pas encore notre jour… mais tu sais quoi ? Je pense à toi quand même, comme tous les jours.",
+      "Reviens le 15, j'ai préparé quelque chose. En attendant, sache juste que tu me manques.",
+      "Chaque jour qui passe, c'est un jour de plus vers le moment où je te reprends dans mes bras.",
+      "Tu es aimée aujourd'hui aussi, même si ce n'est pas marqué sur le calendrier."
+    ];
+    var pensee = pensees[now.getDate() % pensees.length];
+    contenu.innerHTML =
+      '<div class="attente">' +
+      '<div class="tete"><p class="eyebrow">notre rendez-vous mensuel</p><h1>Le 15</h1></div>' +
+      '<div class="grand">🌙</div>' +
+      '<p class="compteur">'+(reste===1?"plus qu'un jour":("plus que "+reste+" jours"))+' avant notre 15</p>' +
+      '<p class="pensee">'+pensee+'</p>' +
+      '<div class="actions">' +
+        '<a class="btn g" href="/fleurs">Tes fleurs du jour</a>' +
+        '<a class="btn g" href="/chansons">Nos chansons</a>' +
+        '<a class="btn p" href="/cocon">Un cocon si besoin</a>' +
+      '</div></div>';
+  }
+
+  function joursDansMois(d){ return new Date(d.getFullYear(), d.getMonth()+1, 0).getDate(); }
+
+  /* ---- pétales / confettis violets ---- */
+  var cv = document.getElementById("petals"), x = cv.getContext("2d"), W, H, parts = [];
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var couleurs = ["#C7B2E6","#B49BDA","#E9DEF7","#8E6FBF","#DCC9F5"];
+  function resize(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+  resize(); addEventListener("resize", resize);
+  function petale(x0,y0,burst){
+    return { x:x0, y:y0, r:Math.random()*5+3, c:couleurs[Math.floor(Math.random()*couleurs.length)],
+      vx:(Math.random()-0.5)*(burst?7:1.1), vy:burst?(-Math.random()*7-2):(Math.random()*1.1+0.5),
+      a:Math.random()*Math.PI, va:(Math.random()-0.5)*0.15, life:burst?150:99999 };
+  }
+  // pluie douce de pétales en fond (légère)
+  var ambient = reduce ? 0 : (innerWidth<640?14:26);
+  for (var i=0;i<ambient;i++){ var p=petale(Math.random()*W, Math.random()*H, false); parts.push(p); }
+  function confetti(){
+    if (reduce) return;
+    for (var i=0;i<90;i++){ parts.push(petale(W/2, H*0.4, true)); }
+  }
+  function draw(){
+    x.clearRect(0,0,W,H);
+    for (var i=parts.length-1;i>=0;i--){
+      var p=parts[i];
+      p.x+=p.vx; p.y+=p.vy; p.a+=p.va; if(p.life<90000){ p.vy+=0.12; p.life--; }
+      if (p.life<90000 && (p.life<=0 || p.y>H+20)){ parts.splice(i,1); continue; }
+      if (p.life>90000){ if(p.y>H+10){ p.y=-10; p.x=Math.random()*W; } if(p.x<-10)p.x=W+10; if(p.x>W+10)p.x=-10; }
+      x.save(); x.translate(p.x,p.y); x.rotate(p.a); x.globalAlpha = p.life<90000 ? Math.max(0,Math.min(1,p.life/60)) : 0.55;
+      x.fillStyle=p.c; x.beginPath(); x.ellipse(0,0,p.r,p.r*0.55,0,0,6.28); x.fill(); x.restore();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
