@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0d0b1a" />
+<title>Jeux à deux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -8%, #271f45 0%, transparent 55%),
+      radial-gradient(90% 60% at 88% 108%, #1d2246 0%, transparent 60%),
+      #0d0b1a; overflow-x:hidden; }
+  .wrap{ max-width:600px; margin:0 auto; padding:max(24px,env(safe-area-inset-top)) 22px 90px; }
+  a.retour{ display:inline-block; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; margin-bottom:22px; }
+  a.retour:hover{ color:#fff; }
+  .tete{ text-align:center; margin-bottom:8px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.06rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.8rem); margin:0; color:#FBF4EA; }
+  .intro{ text-align:center; color:#C9C1D8; line-height:1.7; margin:.6rem auto 22px; max-width:460px; }
+
+  .menu{ display:flex; flex-direction:column; gap:14px; }
+  .jeu{ text-align:left; width:100%; cursor:pointer; color:#EDE9F3; background:rgba(255,255,255,.045);
+    border:1px solid rgba(180,155,218,.22); border-radius:20px; padding:20px; display:flex; align-items:center; gap:16px; transition:.25s; }
+  .jeu:hover{ transform:translateY(-2px); background:rgba(255,255,255,.075); border-color:rgba(180,155,218,.45); }
+  .jeu .em{ font-size:1.9rem; }
+  .jeu .tt{ font-family:'Fraunces',serif; font-weight:500; font-size:1.25rem; color:#FBF4EA; }
+  .jeu .ss{ color:#A99CC4; font-size:.9rem; margin-top:2px; }
+
+  .jouer{ display:none; }
+  .jouer.on{ display:block; }
+  .barre{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .barre .rk{ color:#A99CC4; font-size:.9rem; }
+  .lienretour{ cursor:pointer; color:#C7B2E6; font-size:.9rem; background:none; border:none; }
+
+  .qcard{ background:rgba(255,255,255,.05); border:1px solid rgba(180,155,218,.25); border-radius:22px; padding:28px 22px; text-align:center; min-height:150px; display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-weight:500; font-size:1.4rem; line-height:1.4; color:#FBF4EA; }
+  .rep{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:18px; }
+  .btn{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.95rem; border-radius:100px; padding:12px 22px; cursor:pointer; border:1px solid transparent; transition:transform .2s, background .25s; }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.p{ color:#1a1430; background:linear-gradient(180deg,#CBB4EC,#A886DA); box-shadow:0 10px 26px -12px rgba(168,134,218,.8); }
+  .btn.g{ color:#EDE9F3; background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.16); }
+  textarea{ width:100%; background:rgba(255,255,255,.05); color:#F2ECFB; border:1px solid rgba(180,155,218,.3); border-radius:14px; padding:12px 14px; font-family:'Nunito Sans'; font-size:16px; line-height:1.6; min-height:64px; margin-top:12px; resize:vertical; }
+  .fin{ text-align:center; }
+  .fin .big{ font-size:2.6rem; margin:6px 0; }
+  .fin p{ color:#D8CBEF; line-height:1.7; }
+  .toast{ position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); opacity:0; transition:.35s;
+    background:rgba(24,22,46,.95); border:1px solid rgba(199,178,230,.4); color:#EDE9F3; padding:12px 20px; border-radius:100px; font-size:.92rem; z-index:9; pointer-events:none; }
+  .toast.on{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="retour" href="/">⌂ Accueil</a>
+    <div class="tete"><p class="eyebrow">à jouer à deux, même à distance</p><h1>Jeux à deux</h1></div>
+    <p class="intro">Joue, puis envoie tes réponses à Mathieu — il jouera de son côté et vous comparerez. C'est notre façon de jouer ensemble, même loin.</p>
+
+    <div class="menu" id="menu"></div>
+
+    <div class="jouer" id="jouer">
+      <div class="barre">
+        <button class="lienretour" id="retourMenu" type="button">← les jeux</button>
+        <span class="rk" id="rk"></span>
+      </div>
+      <div id="zone"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  function toast(m){ var t=document.getElementById("toast"); t.textContent=m; t.classList.add("on"); setTimeout(function(){ t.classList.remove("on"); },2400); }
+  function buzz(m){ try{ if(navigator.vibrate) navigator.vibrate(m||12); }catch(e){} }
+  function partager(txt){ if(navigator.share){ navigator.share({text:txt}).catch(function(){}); } else if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ toast("Copié 🤍 envoie-le à Mathieu"); }); } else { toast("Copie et envoie à Mathieu"); } }
+
+  var JEUX = [
+    { id:"qui", em:"👀", tt:"Qui de nous deux ?", ss:"Toi ou moi ? Réponds, puis défie-le." },
+    { id:"pref", em:"⚖️", tt:"Tu préfères ?", ss:"Des petits dilemmes de nous." },
+    { id:"quiz", em:"💞", tt:"Le quiz de nous", ss:"Réponds, envoie, il devine." }
+  ];
+  var QUI = [
+    "Qui dit « je t'aime » en premier ?",
+    "Qui s'endort le premier au téléphone ?",
+    "Qui est le plus jaloux ?",
+    "Qui rit le plus fort ?",
+    "Qui craque le premier après une dispute ?",
+    "Qui prend le plus de place dans le lit ?",
+    "Qui est le plus romantique ?",
+    "Qui pense le plus à l'autre dans la journée ?",
+    "Qui gère le mieux la distance ?",
+    "Qui a eu le coup de foudre en premier ?"
+  ];
+  var PREF = [
+    ["Refaire un week-end à Malte", "Découvrir un pays tout neuf"],
+    ["Un appel vidéo de 3h", "100 messages dans la journée"],
+    ["Se réveiller collés", "S'endormir collés"],
+    ["Un dîner aux chandelles", "Un pique-nique sous les étoiles"],
+    ["Que je t'écrive une lettre", "Que je te chante une chanson (faux)"],
+    ["Un câlin de 10 minutes", "10 bisous"],
+    ["Une nuit à parler de tout", "Une journée sans lâcher ta main"]
+  ];
+  var QUIZ = [
+    "Notre premier vrai jour, c'était où ?",
+    "Ta qualité préférée chez moi ?",
+    "Un endroit où tu rêves qu'on aille ?",
+    "Ton souvenir de nous préféré ?",
+    "La première chose qu'on fera à notre prochaine fois ?"
+  ];
+
+  var menu=document.getElementById("menu"), jouer=document.getElementById("jouer"), zone=document.getElementById("zone"), rk=document.getElementById("rk");
+  JEUX.forEach(function(j){
+    var b=document.createElement("button"); b.className="jeu"; b.type="button";
+    b.innerHTML='<span class="em">'+j.em+'</span><span><span class="tt">'+j.tt+'</span><span class="ss">'+j.ss+'</span></span>';
+    b.addEventListener("click", function(){ lancer(j.id); });
+    menu.appendChild(b);
+  });
+  document.getElementById("retourMenu").addEventListener("click", function(){ jouer.classList.remove("on"); menu.style.display="flex"; document.querySelector(".intro").style.display=""; });
+  function ouvrirJeu(){ menu.style.display="none"; document.querySelector(".intro").style.display="none"; jouer.classList.add("on"); window.scrollTo({top:0,behavior:"smooth"}); }
+
+  function lancer(id){
+    ouvrirJeu();
+    if (id==="qui") jeuChoix(QUI, ["Toi 😍","Moi 🙈"], "Qui de nous deux", "Mes réponses au jeu « Qui de nous deux » :");
+    else if (id==="pref") jeuPref();
+    else jeuQuiz();
+  }
+
+  // jeu à choix (toi/moi) — enregistre et partage
+  function jeuChoix(liste, options, titre, entete){
+    var i=0, rep=[];
+    function montre(){
+      if (i>=liste.length){ return finPartage(entete, liste, rep, options); }
+      rk.textContent=(i+1)+" / "+liste.length;
+      zone.innerHTML='<div class="qcard">'+liste[i]+'</div><div class="rep" id="rep"></div>';
+      var r=document.getElementById("rep");
+      options.forEach(function(op){ var b=document.createElement("button"); b.className="btn g"; b.textContent=op;
+        b.addEventListener("click", function(){ rep.push(op); buzz(12); i++; montre(); }); r.appendChild(b); });
+    }
+    montre();
+  }
+  function jeuPref(){
+    var i=0, rep=[];
+    function montre(){
+      if (i>=PREF.length){ return finPartage("Mes « tu préfères » de nous :", PREF.map(function(p){return p[0]+" / "+p[1];}), rep, null); }
+      rk.textContent=(i+1)+" / "+PREF.length;
+      zone.innerHTML='<div class="qcard">Tu préfères…</div><div class="rep" id="rep"></div>';
+      var r=document.getElementById("rep");
+      PREF[i].forEach(function(op){ var b=document.createElement("button"); b.className="btn g"; b.style.flex="1"; b.textContent=op;
+        b.addEventListener("click", function(){ rep.push(op); buzz(12); i++; montre(); }); r.appendChild(b); });
+    }
+    montre();
+  }
+  function finPartage(entete, questions, rep, options){
+    rk.textContent="";
+    var lignes = rep.map(function(r,idx){ return "• "+questions[idx].replace(/ \?$/,"")+" → "+r; }).join("\n");
+    var txt = entete+"\n"+lignes+"\n\nÀ toi de deviner / jouer, mon amour 🤍 — ta dadoucherie";
+    zone.innerHTML='<div class="fin"><div class="big">🤍</div><p>C\'est fini ! Envoie tes réponses à Mathieu : il jouera de son côté et vous comparerez.</p></div><div class="rep"><button class="btn p" id="part" type="button">Envoyer à Mathieu 💌</button><button class="btn g" id="rejouer" type="button">Rejouer</button></div>';
+    document.getElementById("part").addEventListener("click", function(){ partager(txt); });
+    document.getElementById("rejouer").addEventListener("click", function(){ jouer.classList.remove("on"); menu.style.display="flex"; document.querySelector(".intro").style.display=""; });
+  }
+
+  // quiz ouvert — elle répond puis partage
+  function jeuQuiz(){
+    var i=0, rep=[];
+    function montre(){
+      if (i>=QUIZ.length){
+        var txt="Mes réponses au quiz de nous 💞\n"+QUIZ.map(function(q,idx){ return "• "+q+"\n  "+(rep[idx]||"…"); }).join("\n")+"\n\nÀ toi maintenant 🤍 — ta dadoucherie";
+        zone.innerHTML='<div class="fin"><div class="big">💞</div><p>Envoie tes réponses à Mathieu, et demande-lui les siennes !</p></div><div class="rep"><button class="btn p" id="part" type="button">Envoyer à Mathieu 💌</button><button class="btn g" id="rejouer" type="button">Rejouer</button></div>';
+        document.getElementById("part").addEventListener("click", function(){ partager(txt); });
+        document.getElementById("rejouer").addEventListener("click", function(){ jouer.classList.remove("on"); menu.style.display="flex"; document.querySelector(".intro").style.display=""; });
+        rk.textContent=""; return;
+      }
+      rk.textContent=(i+1)+" / "+QUIZ.length;
+      zone.innerHTML='<div class="qcard">'+QUIZ[i]+'</div><textarea id="rep" placeholder="Ta réponse…"></textarea><div class="rep"><button class="btn p" id="suiv" type="button">Suivant →</button></div>';
+      document.getElementById("suiv").addEventListener("click", function(){ rep.push(document.getElementById("rep").value.trim()); buzz(10); i++; montre(); });
+    }
+    montre();
+  }
+})();
+</script>
+</body>
+</html>

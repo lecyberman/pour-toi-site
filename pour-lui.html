@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0d0b1a" />
+<title>Pour lui</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -8%, #271f45 0%, transparent 55%),
+      radial-gradient(90% 60% at 88% 108%, #1d2246 0%, transparent 60%),
+      #0d0b1a; overflow-x:hidden; }
+  .wrap{ max-width:600px; margin:0 auto; padding:max(24px,env(safe-area-inset-top)) 22px 90px; }
+  a.retour{ display:inline-block; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; margin-bottom:22px; }
+  a.retour:hover{ color:#fff; }
+  .tete{ text-align:center; margin-bottom:8px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.06rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.8rem); margin:0; color:#FBF4EA; }
+  .intro{ text-align:center; color:#C9C1D8; line-height:1.75; margin:.6rem auto 24px; max-width:470px; }
+
+  .onglets{ display:flex; gap:8px; margin-bottom:18px; }
+  .onglet{ flex:1; text-align:center; cursor:pointer; font-weight:700; font-size:.9rem; color:#B4A9C8;
+    background:rgba(255,255,255,.045); border:1px solid rgba(180,155,218,.18); border-radius:100px; padding:10px 8px; transition:.2s; }
+  .onglet.on{ color:#1a1430; background:linear-gradient(180deg,#CBB4EC,#A886DA); border-color:transparent; }
+
+  .panneau{ display:none; }
+  .panneau.on{ display:block; animation:fade .4s ease; }
+  @keyframes fade{ from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+
+  .carte{ background:rgba(255,255,255,.045); border:1px solid rgba(180,155,218,.2); border-radius:18px; padding:16px 18px; margin-bottom:12px; }
+  .carte .txt{ color:#E4DEEE; font-size:1.05rem; line-height:1.7; }
+  .choix{ display:flex; flex-wrap:wrap; gap:8px; }
+  .puce{ cursor:pointer; font-size:.92rem; color:#EDE9F3; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);
+    border-radius:100px; padding:9px 15px; transition:.2s; }
+  .puce:hover, .puce.on{ background:rgba(199,178,230,.25); border-color:rgba(199,178,230,.6); }
+
+  label.q{ display:block; color:#C7B2E6; font-family:'Fraunces',serif; font-style:italic; font-size:1.05rem; margin:0 0 8px; }
+  textarea, input.t{ width:100%; background:rgba(255,255,255,.05); color:#F2ECFB; border:1px solid rgba(180,155,218,.3);
+    border-radius:14px; padding:12px 14px; font-family:'Nunito Sans',sans-serif; font-size:16px; line-height:1.6; resize:vertical; }
+  textarea{ min-height:80px; }
+
+  .apercu{ margin-top:14px; background:linear-gradient(180deg, rgba(142,111,191,.16), rgba(142,111,191,.05));
+    border:1px solid rgba(199,178,230,.35); border-radius:16px; padding:14px 16px; color:#E9DEF7; font-size:1.02rem; line-height:1.7; min-height:2em; white-space:pre-wrap; }
+
+  .actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+  .btn{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.95rem; border-radius:100px; padding:12px 20px; cursor:pointer; border:1px solid transparent; transition:transform .2s, background .25s; }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.p{ color:#1a1430; background:linear-gradient(180deg,#CBB4EC,#A886DA); box-shadow:0 10px 26px -12px rgba(168,134,218,.8); }
+  .btn.g{ color:#EDE9F3; background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.16); }
+  .toast{ position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); opacity:0; transition:.35s;
+    background:rgba(24,22,46,.95); border:1px solid rgba(199,178,230,.4); color:#EDE9F3; padding:12px 20px; border-radius:100px; font-size:.92rem; z-index:9; pointer-events:none; }
+  .toast.on{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .note{ text-align:center; color:#8E82A6; font-size:.85rem; line-height:1.6; margin-top:22px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="retour" href="/">⌂ Accueil</a>
+    <div class="tete">
+      <p class="eyebrow">quand tu ne sais pas comment le dire</p>
+      <h1>Pour lui</h1>
+    </div>
+    <p class="intro">Tu n'as pas besoin des mots parfaits, ni de te forcer. Choisis, complète, ou envoie tel quel. Ça lui fera énormément de bien — promis.</p>
+
+    <div class="onglets">
+      <div class="onglet on" data-t="prets">Un mot tout prêt</div>
+      <div class="onglet" data-t="phrase">Complète</div>
+      <div class="onglet" data-t="coupon">Un coupon</div>
+    </div>
+
+    <!-- mots prêts -->
+    <div class="panneau on" id="p-prets">
+      <div class="carte"><div class="txt" id="motPret"></div></div>
+      <div class="actions">
+        <button class="btn g" id="autreMot" type="button">Un autre</button>
+        <button class="btn p" id="envMot" type="button">Envoyer à Mathieu 💌</button>
+      </div>
+    </div>
+
+    <!-- compléter -->
+    <div class="panneau" id="p-phrase">
+      <div class="carte">
+        <div class="choix" id="starters"></div>
+        <div style="margin-top:14px">
+          <label class="q" id="qLabel">Choisis un début, puis complète :</label>
+          <textarea id="phraseTxt" placeholder="…"></textarea>
+        </div>
+        <div class="apercu" id="aperPhrase"></div>
+      </div>
+      <div class="actions">
+        <button class="btn p" id="envPhrase" type="button">Envoyer à Mathieu 💌</button>
+      </div>
+    </div>
+
+    <!-- coupon -->
+    <div class="panneau" id="p-coupon">
+      <div class="carte">
+        <div class="choix" id="coupons"></div>
+        <div class="apercu" id="aperCoupon">Choisis un cadeau à lui offrir 🤍</div>
+      </div>
+      <div class="actions">
+        <button class="btn p" id="envCoupon" type="button">Offrir à Mathieu 💌</button>
+      </div>
+    </div>
+
+    <p class="note">« Envoyer » ouvre ton appli de messages (ou copie le texte) pour que tu l'envoies à Mathieu quand tu veux. Rien n'est publié nulle part.</p>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var SIGN = "\n— ta dadoucherie 🤍";
+
+  var MOTS = [
+    "Je pense à toi, là, maintenant. C'est tout. Je voulais juste que tu le saches.",
+    "Tu me manques. Deux mois c'est long, mais tu en vaux chaque jour d'attente.",
+    "Merci d'être toi, et d'être patient avec moi. Je t'aime, même quand je ne le dis pas assez.",
+    "J'ai repensé à nous aujourd'hui et ça m'a fait sourire toute seule. Je t'aime.",
+    "Si tu étais là, je me collerais contre toi et je ne bougerais plus. Tu me manques fort.",
+    "T'es la meilleure chose qui me soit arrivée. Voilà, je l'ai dit. 🤍",
+    "J'ai hâte de te revoir. De t'entendre, de te sentir, de rester avec toi sans rien dire."
+  ];
+
+  var STARTERS = [
+    "Ce que j'aime le plus chez toi, c'est",
+    "Aujourd'hui tu m'as manqué parce que",
+    "Merci pour",
+    "Le moment de nous auquel je repense souvent, c'est",
+    "Ce que je ressens pour toi mais que je dis mal, c'est",
+    "La première chose que je ferai en te revoyant, c'est"
+  ];
+
+  var COUPONS = [
+    { e:"🤗", t:"un câlin interminable, dès qu'on se revoit" },
+    { e:"🍽️", t:"une soirée où je m'occupe de tout, tu ne fais rien" },
+    { e:"💆", t:"un massage, juste pour toi, sans limite de temps" },
+    { e:"🎬", t:"une soirée film collés l'un à l'autre" },
+    { e:"🌙", t:"une nuit blanche à parler de tout et de rien" },
+    { e:"💋", t:"autant de bisous que tu veux, tu comptes" }
+  ];
+
+  function toast(m){ var t=document.getElementById("toast"); t.textContent=m; t.classList.add("on"); setTimeout(function(){ t.classList.remove("on"); },2200); }
+  function buzz(m){ try{ if(navigator.vibrate) navigator.vibrate(m||14); }catch(e){} }
+
+  function envoyer(texte){
+    buzz([15,40,15]);
+    var msg = texte + SIGN;
+    if (navigator.share) {
+      navigator.share({ text: msg }).catch(function(){});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(msg).then(function(){ toast("Copié 🤍 colle-le dans ton message à Mathieu"); }, function(){ toast(msg); });
+    } else {
+      toast("Copie ce mot et envoie-le à Mathieu 🤍");
+    }
+  }
+
+  // onglets
+  var onglets = document.querySelectorAll(".onglet");
+  onglets.forEach(function(o){ o.addEventListener("click", function(){
+    onglets.forEach(function(x){ x.classList.remove("on"); }); o.classList.add("on");
+    document.querySelectorAll(".panneau").forEach(function(p){ p.classList.remove("on"); });
+    document.getElementById("p-"+o.dataset.t).classList.add("on");
+  }); });
+
+  // mots prets
+  var iMot = Math.floor(Math.random()*MOTS.length);
+  var motPret = document.getElementById("motPret");
+  function afMot(){ motPret.textContent = MOTS[iMot % MOTS.length]; }
+  afMot();
+  document.getElementById("autreMot").addEventListener("click", function(){ iMot++; afMot(); buzz(10); });
+  document.getElementById("envMot").addEventListener("click", function(){ envoyer(MOTS[iMot % MOTS.length]); });
+
+  // completer
+  var starters = document.getElementById("starters"), phraseTxt = document.getElementById("phraseTxt"), aperPhrase = document.getElementById("aperPhrase");
+  var startCourant = STARTERS[0];
+  function majAperPhrase(){ var v=phraseTxt.value.trim(); aperPhrase.textContent = startCourant + (v? (" "+v) : " …"); }
+  STARTERS.forEach(function(s,i){
+    var b=document.createElement("div"); b.className="puce"+(i===0?" on":""); b.textContent=s;
+    b.addEventListener("click", function(){ document.querySelectorAll("#starters .puce").forEach(function(x){x.classList.remove("on");}); b.classList.add("on"); startCourant=s; majAperPhrase(); });
+    starters.appendChild(b);
+  });
+  phraseTxt.addEventListener("input", majAperPhrase); majAperPhrase();
+  document.getElementById("envPhrase").addEventListener("click", function(){ var v=phraseTxt.value.trim(); envoyer(startCourant + (v?(" "+v):"") + "."); });
+
+  // coupons
+  var couponsEl = document.getElementById("coupons"), aperCoupon = document.getElementById("aperCoupon"), couponCourant=null;
+  COUPONS.forEach(function(c){
+    var b=document.createElement("div"); b.className="puce"; b.textContent=c.e+" "+c.t;
+    b.addEventListener("click", function(){ document.querySelectorAll("#coupons .puce").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
+      couponCourant=c; aperCoupon.textContent = "🎟️ Bon pour : "+c.t+".\nÀ échanger quand tu veux, mon amour."; });
+    couponsEl.appendChild(b);
+  });
+  document.getElementById("envCoupon").addEventListener("click", function(){ if(!couponCourant){ toast("Choisis d'abord un coupon 🤍"); return; } envoyer("Je t'offre un bon 🎟️ pour : "+couponCourant.t+". À échanger quand tu veux."); });
+})();
+</script>
+</body>
+</html>
