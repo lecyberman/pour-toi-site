@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0d0b1a" />
+<title>Nous deux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; background:#0d0b1a; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif; overflow:hidden; }
+  #scene{ position:fixed; inset:0; width:100vw; height:100vh; display:block; z-index:0; touch-action:none; cursor:grab; }
+  #scene:active{ cursor:grabbing; }
+
+  .ui{ position:fixed; z-index:2; pointer-events:none; }
+  .tete{ top:max(20px,env(safe-area-inset-top)); left:0; right:0; text-align:center; padding:0 20px; }
+  .tete .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:1.05rem; margin:0 0 .2rem; text-shadow:0 2px 18px rgba(0,0,0,.6); }
+  .tete h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(1.7rem,5.5vw,2.6rem); margin:0; color:#FBF4EA; letter-spacing:-.01em; text-shadow:0 4px 30px rgba(0,0,0,.6); }
+  .indice{ bottom:max(18px,env(safe-area-inset-bottom)); left:0; right:0; text-align:center; font-size:.82rem; color:rgba(237,233,243,.55); padding:0 20px; }
+
+  /* carte (souvenir ou portail) */
+  #carte{ position:fixed; z-index:4; left:50%; top:50%; transform:translate(-50%,-46%) scale(.96); width:min(92vw,440px);
+    background:rgba(24,22,46,.82); border:1px solid rgba(180,155,218,.35); border-radius:20px; padding:26px 24px 22px;
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 30px 80px -30px rgba(0,0,0,.8);
+    opacity:0; visibility:hidden; transition:opacity .45s ease, transform .45s cubic-bezier(.22,.61,.36,1); pointer-events:none; }
+  #carte.on{ opacity:1; visibility:visible; transform:translate(-50%,-50%) scale(1); pointer-events:auto; }
+  #carte .num{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:.85rem; letter-spacing:.08em; }
+  #carte h2{ font-family:'Fraunces',serif; font-weight:500; font-size:1.5rem; margin:.25rem 0 .6rem; color:#FBF4EA; line-height:1.2; }
+  #carte p{ font-size:1rem; line-height:1.7; color:#D8D2E4; margin:0; }
+  #carte .actions{ margin-top:20px; display:flex; gap:10px; flex-wrap:wrap; }
+  #carte button{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.92rem; border-radius:100px; padding:10px 20px; cursor:pointer; transition:background .25s, transform .2s; border:1px solid transparent; }
+  #carte .aller{ color:#1a1430; background:linear-gradient(180deg,#CBB4EC,#A886DA); box-shadow:0 10px 26px -10px rgba(168,134,218,.8); }
+  #carte .aller:hover{ transform:translateY(-1px); }
+  #carte .fermer{ color:#EDE9F3; background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.18); }
+  #carte .fermer:hover{ background:rgba(255,255,255,.16); }
+
+  /* retour accueil */
+  .liens{ position:fixed; z-index:3; top:max(16px,env(safe-area-inset-top)); left:16px; }
+  .liens a{ font-size:.9rem; color:rgba(237,233,243,.7); text-decoration:none; background:rgba(24,22,46,.55); border:1px solid rgba(255,255,255,.12);
+    border-radius:100px; padding:7px 14px; pointer-events:auto; backdrop-filter:blur(8px); }
+  .liens a:hover{ color:#fff; }
+
+  /* liste accessible (clavier / repli) */
+  .sr-list{ position:fixed; z-index:3; right:16px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:6px; max-width:44vw; }
+  .sr-list button{ pointer-events:auto; text-align:right; font-family:'Nunito Sans',sans-serif; font-size:.82rem; color:rgba(237,233,243,.55);
+    background:none; border:none; cursor:pointer; padding:3px 2px; transition:color .2s; }
+  .sr-list button:hover, .sr-list button:focus-visible{ color:#C7B2E6; outline:none; }
+  @media (max-width:640px){ .sr-list{ display:none; } }
+
+  /* repli sans WebGL */
+  #fallback{ position:fixed; inset:0; z-index:5; display:none; overflow:auto; padding:70px 20px 40px;
+    background:radial-gradient(120% 80% at 50% -10%, #241d3f 0%, transparent 55%), #0d0b1a; }
+  #fallback.on{ display:block; }
+  #fallback .in{ max-width:560px; margin:0 auto; }
+  #fallback .f-item{ background:rgba(255,255,255,.05); border-left:3px solid #B49BDA; border-radius:14px; padding:15px 18px; margin-bottom:12px; }
+  #fallback .f-item a{ color:#FBF4EA; text-decoration:none; }
+  #fallback .f-item h3{ font-family:'Fraunces',serif; font-weight:500; margin:0 0 4px; color:#FBF4EA; }
+  #fallback .f-item p{ margin:0; color:#C9C1D8; line-height:1.6; }
+
+  #loader{ position:fixed; inset:0; z-index:6; display:flex; align-items:center; justify-content:center; background:#0d0b1a; transition:opacity .8s ease; }
+  #loader.off{ opacity:0; pointer-events:none; }
+  #loader span{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:1.1rem; }
+
+  @media (prefers-reduced-motion:reduce){ #carte{ transition:opacity .2s ease; } }
+</style>
+</head>
+<body>
+  <canvas id="scene" aria-label="Notre monde en 3D avec nous deux"></canvas>
+
+  <div class="ui tete">
+    <p class="eyebrow">notre monde, rien qu'à nous</p>
+    <h1>Nous deux</h1>
+  </div>
+
+  <nav class="liens"><a href="/">⌂ Accueil</a></nav>
+  <div class="sr-list" id="srList" aria-label="Explorer notre monde"></div>
+
+  <div class="ui indice" id="indice">Fais tourner du doigt · touche une lumière pour l'ouvrir</div>
+
+  <div id="carte" role="dialog" aria-modal="false" aria-labelledby="carteTitre">
+    <div class="num" id="carteNum"></div>
+    <h2 id="carteTitre"></h2>
+    <p id="carteTxt"></p>
+    <div class="actions">
+      <button class="aller" id="carteAller" type="button" style="display:none">Y aller ✧</button>
+      <button class="fermer" id="carteFermer" type="button">Rester ici</button>
+    </div>
+  </div>
+
+  <section id="fallback"><div class="in">
+    <div class="ui tete" style="position:static; margin-bottom:22px;">
+      <p class="eyebrow">notre monde, rien qu'à nous</p>
+      <h1>Nous deux</h1>
+    </div>
+    <div id="fallbackList"></div>
+  </div></section>
+
+  <div id="loader"><span>on allume les étoiles…</span></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ===== Contenu : moments (souvenirs) + portails (sections du site) =====
+  var MOMENTS = [
+    { nom: "Là où tout a commencé", txt: "Un message sur Snapchat, il y a des années. Deux inconnus, et une conversation qui n'a jamais vraiment fini." },
+    { nom: "Notre premier vrai jour", txt: "Lyon, 1er janvier 2020. La première fois pour de vrai. Le début d'une année, et le début de nous." },
+    { nom: "Notre nuit", txt: "15 juillet 2023. Celle dont on ne parle pas trop fort. Notre ciel, rien qu'à nous." },
+    { nom: "Nos ailleurs", txt: "Monaco, Malte, Barcelone… des parenthèses ouvertes juste pour nous deux." },
+    { nom: "La suite", txt: "Une étoile encore un peu floue. Mais elle brille déjà, et je sais qu'on va la rejoindre." }
+  ];
+
+  var PORTAILS = [
+    { nom: "Ta page", txt: "Ton bonjour, ta lettre du jour, ma voix.", url: "/dadoucherie" },
+    { nom: "Notre histoire", txt: "De Snap à nous, en dates et en souvenirs.", url: "/histoire" },
+    { nom: "Notre galerie", txt: "Nos photos, nos instants gardés.", url: "/galerie" },
+    { nom: "Notre nuit", txt: "Notre ciel, notre moment à nous.", url: "/nuit" },
+    { nom: "Nos rêves", txt: "Les voyages et la vie qu'on s'imagine.", url: "/reves" },
+    { nom: "Nos jeux", txt: "Le quiz de nous, la question du dimanche.", url: "/jeux" }
+  ];
+
+  var canvas = document.getElementById("scene");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var small = window.innerWidth < 640;
+
+  function hasWebGL() {
+    try { var c = document.createElement("canvas");
+      return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl")));
+    } catch (e) { return false; }
+  }
+  if (!hasWebGL() || typeof THREE === "undefined") { return showFallback(); }
+
+  function showFallback() {
+    var list = document.getElementById("fallbackList");
+    MOMENTS.forEach(function (m) {
+      var d = document.createElement("div"); d.className = "f-item";
+      var h = document.createElement("h3"); h.textContent = m.nom;
+      var p = document.createElement("p"); p.textContent = m.txt;
+      d.appendChild(h); d.appendChild(p); list.appendChild(d);
+    });
+    PORTAILS.forEach(function (m) {
+      var d = document.createElement("div"); d.className = "f-item";
+      var a = document.createElement("a"); a.href = m.url;
+      var h = document.createElement("h3"); h.textContent = m.nom + " →";
+      var p = document.createElement("p"); p.textContent = m.txt;
+      a.appendChild(h); a.appendChild(p); d.appendChild(a); list.appendChild(d);
+    });
+    document.getElementById("fallback").classList.add("on");
+    canvas.style.display = "none";
+    var ind = document.getElementById("indice"); if (ind) ind.style.display = "none";
+    var ld = document.getElementById("loader"); if (ld) ld.classList.add("off");
+  }
+
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false }); }
+  catch (e) { return showFallback(); }
+  renderer.setClearColor(0x0d0b1a, 1);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+  var scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0d0b1a, 0.006);
+  var CENTER = new THREE.Vector3(0, 8, 0);
+  var camera = new THREE.PerspectiveCamera(55, 1, 0.1, 2000);
+
+  // ---- lumières ----
+  scene.add(new THREE.AmbientLight(0x5a4d80, 0.9));
+  var key = new THREE.PointLight(0xE6D8FF, 1.15, 260); key.position.set(18, 40, 26); scene.add(key);
+  var fill = new THREE.PointLight(0x8E6FBF, 0.75, 240); fill.position.set(-30, 16, -10); scene.add(fill);
+  var rim = new THREE.DirectionalLight(0xBFA8F0, 0.5); rim.position.set(0, 10, -30); scene.add(rim);
+
+  // ---- textures douces ----
+  function dot(hex) {
+    var c = document.createElement("canvas"); c.width = c.height = 64;
+    var x = c.getContext("2d");
+    var g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, hex + "ff"); g.addColorStop(0.25, hex + "cc"); g.addColorStop(1, hex + "00");
+    x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(c);
+  }
+  var texStar = dot("#e9e2f7");
+  var texGlow = dot("#c7b2e6");
+
+  function heartTex() {
+    var c = document.createElement("canvas"); c.width = c.height = 128;
+    var x = c.getContext("2d");
+    var g = x.createRadialGradient(64, 60, 6, 64, 64, 62);
+    g.addColorStop(0, "#ffd9ec"); g.addColorStop(0.35, "#e3b8f0"); g.addColorStop(1, "rgba(199,178,230,0)");
+    x.fillStyle = g;
+    x.beginPath();
+    var s = 42, cx = 64, cy = 52;
+    x.moveTo(cx, cy + s * 0.75);
+    x.bezierCurveTo(cx - s, cy - s * 0.35, cx - s * 0.5, cy - s, cx, cy - s * 0.35);
+    x.bezierCurveTo(cx + s * 0.5, cy - s, cx + s, cy - s * 0.35, cx, cy + s * 0.75);
+    x.closePath(); x.fill();
+    return new THREE.CanvasTexture(c);
+  }
+
+  function labelSprite(txt) {
+    var c = document.createElement("canvas"); c.width = 256; c.height = 64;
+    var x = c.getContext("2d");
+    x.font = "600 30px 'Nunito Sans', sans-serif";
+    x.textAlign = "center"; x.textBaseline = "middle";
+    x.shadowColor = "rgba(0,0,0,.7)"; x.shadowBlur = 8;
+    x.fillStyle = "#F2ECFB"; x.fillText(txt, 128, 34);
+    var t = new THREE.CanvasTexture(c);
+    var m = new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false, depthTest: false });
+    var s = new THREE.Sprite(m); s.scale.set(15, 3.75, 1);
+    return s;
+  }
+
+  // ---- ciel étoilé lointain ----
+  function starField(count, rmin, rmax, size, color, opacity) {
+    var g = new THREE.BufferGeometry(), pos = new Float32Array(count * 3);
+    for (var i = 0; i < count; i++) {
+      var r = rmin + Math.random() * (rmax - rmin);
+      var th = Math.acos(2 * Math.random() - 1), ph = Math.random() * Math.PI * 2;
+      pos[i * 3] = r * Math.sin(th) * Math.cos(ph);
+      pos[i * 3 + 1] = Math.abs(r * Math.cos(th)) * 0.6 + 4;
+      pos[i * 3 + 2] = r * Math.sin(th) * Math.sin(ph);
+    }
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    var m = new THREE.PointsMaterial({ size: size, map: texStar, color: new THREE.Color(color),
+      transparent: true, opacity: opacity, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+    return new THREE.Points(g, m);
+  }
+  scene.add(starField(small ? 700 : 1300, 120, 620, 2.6, 0xcfc6e6, 0.75));
+
+  // ---- nébuleuses douces ----
+  [[0x8E6FBF, 0.20, 190, 8, 60, -40], [0x6E52A8, 0.16, 150, -70, 40, -20], [0xB49BDA, 0.12, 120, 40, 20, -60]]
+  .forEach(function (n) {
+    var m = new THREE.SpriteMaterial({ map: texGlow, color: n[0], transparent: true, opacity: n[1], depthWrite: false, blending: THREE.AdditiveBlending });
+    var s = new THREE.Sprite(m); s.scale.set(n[2], n[2], 1); s.position.set(n[3], n[4], n[5]); scene.add(s);
+  });
+
+  // ---- sol de lumière ----
+  var floorMat = new THREE.MeshBasicMaterial({ map: dot("#7c5fb0"), color: 0x8E6FBF, transparent: true, opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending });
+  var floor = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), floorMat);
+  floor.rotation.x = -Math.PI / 2; floor.position.y = 0.02; scene.add(floor);
+  var ringMat = new THREE.MeshBasicMaterial({ color: 0xC7B2E6, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
+  var ring = new THREE.Mesh(new THREE.RingGeometry(11, 11.6, 64), ringMat);
+  ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05; scene.add(ring);
+
+  // ===== nos deux petits personnages =====
+  var MAT = {
+    peau: new THREE.MeshStandardMaterial({ color: 0xF0C9AC, roughness: 0.85, metalness: 0 }),
+    peauF: new THREE.MeshStandardMaterial({ color: 0xF3CFB4, roughness: 0.85, metalness: 0 }),
+    hautH: new THREE.MeshStandardMaterial({ color: 0x4B3B78, roughness: 0.7 }),
+    basH: new THREE.MeshStandardMaterial({ color: 0x2E2749, roughness: 0.75 }),
+    cheveuxH: new THREE.MeshStandardMaterial({ color: 0x241B2E, roughness: 0.9 }),
+    robe: new THREE.MeshStandardMaterial({ color: 0x9B7BD0, roughness: 0.6 }),
+    cheveuxF: new THREE.MeshStandardMaterial({ color: 0x6E4632, roughness: 0.9 })
+  };
+  function cyl(rt, rb, h, mat) { return new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, 16), mat); }
+  function sph(r, mat) { return new THREE.Mesh(new THREE.SphereGeometry(r, 20, 16), mat); }
+
+  var couple = new THREE.Group(); scene.add(couple);
+
+  // --- Homme (à gauche) ---
+  var homme = new THREE.Group(); homme.position.set(-4.4, 0, 0);
+  var jg = cyl(0.85, 0.85, 4.2, MAT.basH); jg.position.set(-0.95, 2.1, 0); homme.add(jg);
+  var jd = cyl(0.85, 0.85, 4.2, MAT.basH); jd.position.set(0.95, 2.1, 0); homme.add(jd);
+  var torseH = cyl(1.7, 2.15, 5.2, MAT.hautH); torseH.position.set(0, 6.6, 0); homme.add(torseH);
+  var teteH = sph(1.9, MAT.peau); teteH.position.set(0, 10.7, 0); homme.add(teteH);
+  var chH = sph(2.0, MAT.cheveuxH); chH.scale.set(1, 0.72, 1); chH.position.set(0, 11.5, -0.15); homme.add(chH);
+  var brasHg = cyl(0.55, 0.55, 4.6, MAT.hautH); brasHg.position.set(-2.2, 6.7, 0); brasHg.rotation.z = 0.5; homme.add(brasHg);
+  var brasHd = cyl(0.5, 0.5, 4.4, MAT.peau); brasHd.position.set(2.1, 6.2, 0.5); brasHd.rotation.z = -0.75; homme.add(brasHd);
+  couple.add(homme);
+
+  // --- Femme (à droite) ---
+  var femme = new THREE.Group(); femme.position.set(4.4, 0, 0);
+  var robe = cyl(0.6, 3.4, 7.2, MAT.robe); robe.position.set(0, 3.7, 0); femme.add(robe);
+  var bustF = cyl(1.35, 1.5, 2.4, MAT.robe); bustF.position.set(0, 7.6, 0); femme.add(bustF);
+  var teteF = sph(1.8, MAT.peauF); teteF.position.set(0, 10.4, 0); femme.add(teteF);
+  var chF = sph(2.05, MAT.cheveuxF); chF.scale.set(1.05, 1.15, 1.05); chF.position.set(0, 10.9, -0.1); femme.add(chF);
+  var frangeF = sph(1.75, MAT.peauF); frangeF.position.set(0, 10.7, 0.75); frangeF.scale.set(1, 0.9, 0.6); femme.add(frangeF);
+  var brasFd = cyl(0.5, 0.5, 4.4, MAT.robe); brasFd.position.set(2.0, 6.6, 0); brasFd.rotation.z = -0.5; femme.add(brasFd);
+  var brasFg = cyl(0.45, 0.45, 4.2, MAT.peauF); brasFg.position.set(-1.9, 6.0, 0.5); brasFg.rotation.z = 0.78; femme.add(brasFg);
+  couple.add(femme);
+
+  // --- mains jointes au centre ---
+  var mains = sph(0.7, MAT.peau); mains.position.set(0, 4.5, 0.9); couple.add(mains);
+
+  // --- petit cœur qui flotte au-dessus ---
+  var coeurMat = new THREE.SpriteMaterial({ map: heartTex(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.95 });
+  var coeur = new THREE.Sprite(coeurMat); coeur.scale.set(5, 5, 1); coeur.position.set(0, 15.5, 0); scene.add(coeur);
+
+  // ===== cibles interactives (moments + portails) =====
+  var cibles = [];
+
+  // moments : petites étoiles lavande
+  MOMENTS.forEach(function (m, i) {
+    var a = (i / MOMENTS.length) * Math.PI * 2 + 0.4;
+    var mat = new THREE.SpriteMaterial({ map: texGlow, color: 0xDCC9F5, transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending });
+    var s = new THREE.Sprite(mat);
+    s.position.set(Math.cos(a) * 15, 12 + (i % 3) * 3.2, Math.sin(a) * 15);
+    s.scale.set(4.4, 4.4, 1);
+    s.userData = { type: "moment", base: 4.4, nom: m.nom, txt: m.txt, i: i };
+    scene.add(s); cibles.push(s);
+  });
+
+  // portails : anneaux lumineux + label
+  PORTAILS.forEach(function (p, i) {
+    var a = (i / PORTAILS.length) * Math.PI * 2 + 0.15;
+    var g = new THREE.Group();
+    var x = Math.cos(a) * 23, z = Math.sin(a) * 23, y = 7 + (i % 3) * 4.5;
+    g.position.set(x, y, z);
+    var torus = new THREE.Mesh(new THREE.TorusGeometry(2.7, 0.32, 14, 40),
+      new THREE.MeshStandardMaterial({ color: 0xB49BDA, emissive: 0x6E52A8, emissiveIntensity: 0.9, roughness: 0.4 }));
+    g.add(torus);
+    var halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: texGlow, color: 0xC7B2E6, transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending }));
+    halo.scale.set(6.5, 6.5, 1); g.add(halo);
+    var lab = labelSprite(p.nom); lab.position.set(0, 4.4, 0); g.add(lab);
+    g.lookAt(CENTER.x, y, CENTER.z);
+    g.userData = { type: "lien", nom: p.nom, txt: p.txt, url: p.url, spin: (i % 2 ? 1 : -1) };
+    torus.userData = g.userData; halo.userData = g.userData;
+    scene.add(g); cibles.push(torus); cibles.push(halo);
+    g.userData._torus = torus;
+  });
+
+  var raycaster = new THREE.Raycaster();
+  var pointer = new THREE.Vector2();
+
+  // ===== caméra en orbite =====
+  var theta = 0.5, elev = 0.42, RAD = small ? 62 : 52;
+  var targetTheta = 0.5, targetElev = 0.42;
+  var dragging = false, moved = false, lastX = 0, lastY = 0, auto = !reduce, idleT = 0;
+
+  function point(e) { var t = e.touches ? e.touches[0] : e; return { x: t.clientX, y: t.clientY }; }
+  function onDown(e) { dragging = true; moved = false; auto = false; idleT = 0; var p = point(e); lastX = p.x; lastY = p.y; }
+  function onMove(e) {
+    if (!dragging) return;
+    var p = point(e), dx = p.x - lastX, dy = p.y - lastY;
+    if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+    targetTheta -= dx * 0.006; targetElev += dy * 0.005;
+    targetElev = Math.max(0.08, Math.min(1.25, targetElev));
+    lastX = p.x; lastY = p.y;
+  }
+  function onUp(e) { if (dragging && !moved) pick(e); dragging = false; idleT = 0; }
+
+  canvas.addEventListener("mousedown", onDown);
+  window.addEventListener("mousemove", onMove, { passive: true });
+  window.addEventListener("mouseup", onUp);
+  canvas.addEventListener("touchstart", function (e) { onDown(e); }, { passive: true });
+  canvas.addEventListener("touchmove", function (e) { onMove(e); }, { passive: true });
+  canvas.addEventListener("touchend", function (e) { onUp(e.changedTouches ? { clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY } : e); }, { passive: true });
+
+  function pick(e) {
+    var t = e.changedTouches ? e.changedTouches[0] : e;
+    var rect = canvas.getBoundingClientRect();
+    pointer.x = ((t.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((t.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    raycaster.params.Sprite = { threshold: 0 };
+    var hit = raycaster.intersectObjects(cibles, false);
+    if (hit.length) ouvrir(hit[0].object.userData);
+  }
+
+  // ===== carte =====
+  var carte = document.getElementById("carte");
+  var elNum = document.getElementById("carteNum"), elTit = document.getElementById("carteTitre"), elTxt = document.getElementById("carteTxt");
+  var btnAller = document.getElementById("carteAller"), btnFermer = document.getElementById("carteFermer");
+  var urlCourant = null;
+  function ouvrir(d) {
+    if (d.type === "lien") {
+      elNum.textContent = "· un endroit de notre monde ·";
+      btnAller.style.display = ""; urlCourant = d.url;
+      btnFermer.textContent = "Rester ici";
+    } else {
+      elNum.textContent = "· un de nos souvenirs ·";
+      btnAller.style.display = "none"; urlCourant = null;
+      btnFermer.textContent = "Fermer doucement";
+    }
+    elTit.textContent = d.nom; elTxt.textContent = d.txt;
+    carte.classList.add("on");
+  }
+  function fermer() { carte.classList.remove("on"); }
+  btnFermer.addEventListener("click", fermer);
+  btnAller.addEventListener("click", function () { if (urlCourant) window.location.href = urlCourant; });
+  window.addEventListener("keydown", function (e) { if (e.key === "Escape") fermer(); });
+
+  // ===== liste accessible =====
+  var srl = document.getElementById("srList");
+  function addSr(nom, data) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = nom;
+    b.addEventListener("click", function () { ouvrir(data); });
+    srl.appendChild(b);
+  }
+  MOMENTS.forEach(function (m) { addSr("✦ " + m.nom, { type: "moment", nom: m.nom, txt: m.txt }); });
+  PORTAILS.forEach(function (p) { addSr("◍ " + p.nom, { type: "lien", nom: p.nom, txt: p.txt, url: p.url }); });
+
+  // ===== particules magiques qui montent =====
+  var PC = small ? 90 : 170;
+  var pg = new THREE.BufferGeometry(), pp = new Float32Array(PC * 3), psp = new Float32Array(PC);
+  for (var i = 0; i < PC; i++) {
+    pp[i * 3] = (Math.random() - 0.5) * 70;
+    pp[i * 3 + 1] = Math.random() * 40;
+    pp[i * 3 + 2] = (Math.random() - 0.5) * 70;
+    psp[i] = 0.04 + Math.random() * 0.09;
+  }
+  pg.setAttribute("position", new THREE.BufferAttribute(pp, 3));
+  var particles = new THREE.Points(pg, new THREE.PointsMaterial({ size: 1.1, map: texStar, color: 0xE6D8FF,
+    transparent: true, opacity: 0.9, depthWrite: false, blending: THREE.AdditiveBlending }));
+  scene.add(particles);
+
+  // ===== boucle =====
+  function resize() {
+    var w = window.innerWidth, h = window.innerHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize); resize();
+
+  function frame() {
+    theta += (targetTheta - theta) * 0.06;
+    elev += (targetElev - elev) * 0.06;
+    camera.position.set(
+      CENTER.x + RAD * Math.cos(elev) * Math.sin(theta),
+      CENTER.y + RAD * Math.sin(elev),
+      CENTER.z + RAD * Math.cos(elev) * Math.cos(theta)
+    );
+    camera.lookAt(CENTER.x, CENTER.y, CENTER.z);
+  }
+
+  var clock = 0;
+  function loop() {
+    requestAnimationFrame(loop);
+    if (document.hidden) return;
+    clock += 0.016;
+    if (!dragging) { idleT += 0.016; if (idleT > 2.4) auto = !reduce; }
+    if (auto) targetTheta += 0.0016;
+    frame();
+
+    if (!reduce) {
+      couple.position.y = Math.sin(clock * 1.1) * 0.25;
+      coeur.position.y = 15.5 + Math.sin(clock * 1.4) * 0.5;
+      coeur.material.opacity = 0.8 + Math.sin(clock * 2.0) * 0.18;
+      var cs = 5 + Math.sin(clock * 2.0) * 0.5; coeur.scale.set(cs, cs, 1);
+      for (var i = 0; i < cibles.length; i++) {
+        var s = cibles[i];
+        if (s.userData && s.userData.type === "moment") {
+          var k = 1 + Math.sin(clock * 1.5 + i) * 0.14;
+          s.scale.set(s.userData.base * k, s.userData.base * k, 1);
+        }
+      }
+      scene.children.forEach(function (o) {
+        if (o.userData && o.userData._torus) { o.userData._torus.rotation.z += 0.01 * o.userData.spin; }
+      });
+      var pos = particles.geometry.attributes.position.array;
+      for (var j = 0; j < PC; j++) {
+        pos[j * 3 + 1] += psp[j];
+        if (pos[j * 3 + 1] > 42) { pos[j * 3 + 1] = 0; pos[j * 3] = (Math.random() - 0.5) * 70; pos[j * 3 + 2] = (Math.random() - 0.5) * 70; }
+      }
+      particles.geometry.attributes.position.needsUpdate = true;
+      ring.material.opacity = 0.35 + Math.sin(clock * 0.9) * 0.15;
+    }
+    renderer.render(scene, camera);
+  }
+  frame();
+  renderer.render(scene, camera);
+  loop();
+
+  var ld = document.getElementById("loader");
+  setTimeout(function () { if (ld) ld.classList.add("off"); }, 500);
+})();
+</script>
+</body>
+</html>
