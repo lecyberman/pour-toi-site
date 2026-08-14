@@ -302,6 +302,9 @@
   var coeurMat = new THREE.SpriteMaterial({ map: heartTex(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.95 });
   var coeur = new THREE.Sprite(coeurMat); coeur.scale.set(5, 5, 1); coeur.position.set(0, 15.5, 0); scene.add(coeur);
 
+  // cibles interactives (rempli aussi plus bas par moments + portails)
+  var cibles = [];
+
   // --- cadeau à ouvrir (message qui change chaque mois) ---
   var CADEAUX3D = [
     "J'ai laissé ça pour toi, ici, dans notre monde. Ouvre-le : tu es, chaque jour, la plus belle chose de ma vie. 🤍",
@@ -337,8 +340,6 @@
   }
 
   // ===== cibles interactives (moments + portails) =====
-  var cibles = [];
-
   // moments : petites étoiles lavande
   MOMENTS.forEach(function (m, i) {
     var a = (i / MOMENTS.length) * Math.PI * 2 + 0.4;
