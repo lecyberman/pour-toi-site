@@ -1,5 +1,5 @@
 // Service worker "Pour toi" - reseau d'abord pour le contenu, cache pour les medias
-const CACHE = 'pourtoi-v3';
+const CACHE = 'pourtoi-v4';
 const CORE = ['/', '/icon.svg', '/manifest.json'];
 
 self.addEventListener('install', (e) => {
@@ -36,4 +36,31 @@ self.addEventListener('fetch', (e) => {
       }).catch(() => caches.match(req).then((c) => c || caches.match('/')))
     );
   }
+});
+
+// Clic sur une notification -> ouvrir / focus la bonne page
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || '/';
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((cl) => {
+      for (let i = 0; i < cl.length; i++) {
+        if (cl[i].url.indexOf(url) > -1 && 'focus' in cl[i]) return cl[i].focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(url);
+    })
+  );
+});
+
+// Support d'un futur push serveur (optionnel) : affiche la notif recue
+self.addEventListener('push', (e) => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (err) { d = { body: e.data ? e.data.text() : '' }; }
+  const title = d.title || 'Pour toi';
+  e.waitUntil(self.registration.showNotification(title, {
+    body: d.body || '',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    data: { url: d.url || '/' }
+  }));
 });

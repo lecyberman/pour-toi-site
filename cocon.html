@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0d0b1a" />
+<title>Ton cocon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 75% at 50% -5%, #241d3f 0%, transparent 55%),
+      radial-gradient(90% 60% at 85% 110%, #1b2340 0%, transparent 60%),
+      #0d0b1a; overflow-x:hidden; }
+  .stars{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+  .wrap{ position:relative; z-index:1; max-width:600px; margin:0 auto; padding:max(24px,env(safe-area-inset-top)) 20px 90px; }
+
+  a.retour{ display:inline-block; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; margin-bottom:30px; }
+  a.retour:hover{ color:#fff; }
+
+  .tete{ text-align:center; margin-bottom:26px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:1.05rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.9rem); margin:0 0 .5rem; color:#FBF4EA; letter-spacing:-.01em; }
+  .tete p.d{ color:#C9C1D8; line-height:1.7; margin:.4rem auto 0; max-width:440px; }
+
+  /* choix */
+  .choix{ display:flex; flex-direction:column; gap:14px; margin-top:10px; }
+  .carte{ text-align:left; width:100%; cursor:pointer; color:#EDE9F3;
+    background:rgba(255,255,255,.045); border:1px solid rgba(180,155,218,.22); border-radius:20px; padding:20px 20px;
+    display:flex; align-items:center; gap:16px; transition:transform .25s cubic-bezier(.22,.61,.36,1), background .25s, border-color .25s; }
+  .carte:hover{ transform:translateY(-2px); background:rgba(255,255,255,.075); border-color:rgba(180,155,218,.45); }
+  .carte .em{ font-size:1.9rem; line-height:1; filter:drop-shadow(0 3px 10px rgba(0,0,0,.4)); }
+  .carte .tt{ font-family:'Fraunces',serif; font-weight:500; font-size:1.25rem; color:#FBF4EA; }
+  .carte .ss{ color:#A99CC4; font-size:.9rem; margin-top:2px; }
+
+  /* panneau */
+  .panneau{ display:none; }
+  .panneau.on{ display:block; animation:fade .6s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+  .p-tt{ font-family:'Fraunces',serif; font-weight:500; font-size:1.5rem; color:#FBF4EA; text-align:center; margin:6px 0 4px; }
+  .p-mot{ min-height:5.5em; display:flex; align-items:center; justify-content:center; text-align:center;
+    font-size:1.12rem; line-height:1.75; color:#E4DEEE; padding:6px 6px 0; transition:opacity .5s ease; }
+
+  /* respiration */
+  .resp{ display:flex; flex-direction:column; align-items:center; margin:14px 0 6px; }
+  .bulle{ width:150px; height:150px; border-radius:50%; margin:8px 0 10px;
+    background:radial-gradient(circle at 50% 40%, #C7B2E6 0%, #8E6FBF 45%, rgba(142,111,191,0) 72%);
+    box-shadow:0 0 60px -6px rgba(142,111,191,.6); transition:transform 4s cubic-bezier(.4,0,.4,1), opacity 1s; opacity:.92; }
+  .bulle.in{ transform:scale(1.5); }
+  .bulle.out{ transform:scale(1); }
+  .resp .txt{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.15rem; min-height:1.4em; letter-spacing:.02em; }
+
+  .actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:22px; }
+  .btn{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.94rem; border-radius:100px; padding:11px 20px; cursor:pointer; border:1px solid transparent; transition:transform .2s, background .25s; }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.p{ color:#1a1430; background:linear-gradient(180deg,#CBB4EC,#A886DA); box-shadow:0 10px 26px -12px rgba(168,134,218,.8); }
+  .btn.g{ color:#EDE9F3; background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.16); }
+  .btn.g:hover{ background:rgba(255,255,255,.14); }
+
+  /* opt-in notifications */
+  .notif{ margin-top:44px; text-align:center; background:rgba(255,255,255,.035); border:1px solid rgba(180,155,218,.18);
+    border-radius:20px; padding:22px 20px; }
+  .notif h3{ font-family:'Fraunces',serif; font-weight:500; font-size:1.2rem; color:#FBF4EA; margin:0 0 8px; }
+  .notif p{ color:#B4A9C8; font-size:.92rem; line-height:1.6; margin:0 0 14px; }
+  .notif .etat{ font-size:.85rem; color:#8E82A6; margin-top:10px; min-height:1.2em; }
+
+  .lien-bas{ text-align:center; margin-top:34px; }
+  .lien-bas a{ color:#B49BDA; text-decoration:none; font-family:'Fraunces',serif; font-style:italic; font-size:1.02rem; }
+  @media (prefers-reduced-motion:reduce){ .bulle{ transition:opacity 1s; } }
+</style>
+</head>
+<body>
+  <canvas class="stars" id="stars"></canvas>
+  <div class="wrap">
+    <a class="retour" href="/">⌂ Accueil</a>
+
+    <div id="accueilCocon">
+      <div class="tete">
+        <p class="eyebrow">quand la nuit est un peu difficile</p>
+        <h1>Ton cocon</h1>
+        <p class="d">Viens là. Il n'y a rien à faire, rien à réussir. Choisis juste ce que tu ressens, et laisse-moi rester avec toi un moment.</p>
+      </div>
+      <div class="choix" id="choix"></div>
+    </div>
+
+    <div class="panneau" id="panneau">
+      <div class="p-tt" id="pTitre"></div>
+      <div class="resp" id="respZone" style="display:none">
+        <div class="bulle" id="bulle"></div>
+        <div class="txt" id="respTxt">on respire ensemble ?</div>
+      </div>
+      <div class="p-mot" id="pMot"></div>
+      <div class="actions" id="pActions"></div>
+    </div>
+
+    <div class="notif" id="notif" style="display:none">
+      <h3>Mes petits mots</h3>
+      <p>Si tu veux, je peux venir te dire bonjour le matin, bonne nuit le soir, et passer tout doucement plus tard dans la nuit — juste pour savoir si tu vas bien.</p>
+      <button class="btn p" id="btnNotif" type="button">Recevoir mes mots</button>
+      <div class="etat" id="notifEtat"></div>
+    </div>
+
+    <div class="lien-bas"><a href="/chansons">→ Nos chansons, si tu veux de la musique</a></div>
+  </div>
+
+<script src="/rappels.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ---- ciel étoilé doux ---- */
+  (function(){
+    var cv = document.getElementById("stars"), x = cv.getContext("2d"), W, H, stars = [];
+    function init(){ W = cv.width = innerWidth; H = cv.height = innerHeight;
+      stars = []; var n = Math.min(120, Math.floor(W*H/12000));
+      for (var i=0;i<n;i++) stars.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.3+.3, a:Math.random(), s:Math.random()*.02+.004 }); }
+    var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function draw(){ x.clearRect(0,0,W,H);
+      for (var i=0;i<stars.length;i++){ var st=stars[i]; if(!reduce){ st.a+=st.s; if(st.a>1||st.a<0){ st.s=-st.s; } }
+        x.globalAlpha = .25 + Math.abs(st.a)*.6; x.fillStyle = "#cbb9ec";
+        x.beginPath(); x.arc(st.x, st.y, st.r, 0, 6.28); x.fill(); }
+      x.globalAlpha = 1; requestAnimationFrame(draw); }
+    init(); draw(); addEventListener("resize", init);
+  })();
+
+  /* ---- contenu (réconfort, jamais médical) ---- */
+  var CHEMINS = {
+    dormir: {
+      em:"🌙", titre:"Je n'arrive pas à dormir", sous:"On va ralentir, tout doucement.",
+      pTitre:"Ferme un peu les yeux",
+      resp:true,
+      mots:[
+        "Tu n'as rien à faire là, juste être. Le sommeil viendra tout seul, comme la marée.",
+        "Pose ta tête. Imagine que je suis là, contre toi, ma main qui remonte lentement ton dos.",
+        "Laisse tes pensées passer comme des nuages. Tu n'es pas obligée de les retenir.",
+        "Écoute juste ton souffle. Un peu plus lent. Un peu plus lourd. C'est bien.",
+        "Demain peut attendre. Là, tout de suite, il n'y a que toi, la nuit douce, et moi qui pense à toi.",
+        "Tu es en sécurité. Tu peux lâcher. Je veille, même de loin."
+      ],
+      musique:true
+    },
+    mal: {
+      em:"🤍", titre:"J'ai mal", sous:"Je reste avec toi le temps que ça passe.",
+      pTitre:"Je suis là",
+      resp:true,
+      mots:[
+        "Je ne peux pas prendre ta douleur, mais je peux rester, et ne pas te laisser seule avec elle.",
+        "Respire avec moi, tout doucement. On ne combat rien, on laisse juste un peu de place.",
+        "Concentre-toi sur ma voix, sur un souvenir doux : la mer à Malte, ta main dans la mienne.",
+        "Tu es courageuse, même quand tu ne t'en rends pas compte. Surtout quand tu ne t'en rends pas compte.",
+        "Détends une épaule. Puis l'autre. Desserre la mâchoire. Je suis fière de toi de tenir.",
+        "Si c'est trop lourd, appelle-moi, à n'importe quelle heure. Vraiment. Tu n'as jamais à porter ça toute seule."
+      ],
+      musique:true
+    },
+    triste: {
+      em:"💧", titre:"Je me sens triste", sous:"Tu as le droit. Je ne vais nulle part.",
+      pTitre:"Viens là",
+      resp:false,
+      mots:[
+        "Tu as le droit d'être triste. Je ne vais pas essayer de réparer, juste rester près de toi.",
+        "Rappelle-toi : ce que tu ressens est vrai, mais ce n'est pas toute la vérité sur toi.",
+        "Tu es aimée. Beaucoup plus que tu ne le crois, et même les soirs où tu en doutes.",
+        "Pense à un truc de nous qui te fait sourire malgré tout. Moi j'en ai mille.",
+        "Ça va passer. Pas parce que je le dis, mais parce que ça passe toujours, et que je serai là avant, pendant, après.",
+        "Tu comptes. Pour moi, tu es ce qui rend tout le reste plus doux."
+      ],
+      musique:true
+    },
+    douceur: {
+      em:"✨", titre:"J'ai juste besoin de douceur", sous:"Alors en voilà, rien que pour toi.",
+      pTitre:"Rien que pour toi",
+      resp:false,
+      mots:[
+        "Tu es la première chose belle à laquelle je pense le matin.",
+        "Si je pouvais, je te garderais tout contre moi jusqu'à ce que tu ailles mieux.",
+        "Tu es mon endroit préféré, même quand cet endroit est juste un message.",
+        "Merci d'exister, sincèrement. Le monde est plus doux parce que tu es dedans.",
+        "Un jour on repensera à ce soir, blottis quelque part, et on sera bien.",
+        "Tu es aimée, tu es en sécurité, tu es à moi et je suis à toi."
+      ],
+      musique:true
+    }
+  };
+
+  var ordre = ["dormir","mal","triste","douceur"];
+  var choix = document.getElementById("choix");
+  ordre.forEach(function(k){
+    var c = CHEMINS[k];
+    var b = document.createElement("button"); b.className = "carte"; b.type = "button";
+    b.innerHTML = '<span class="em">'+c.em+'</span><span><span class="tt">'+c.titre+'</span><span class="ss">'+c.sous+'</span></span>';
+    b.addEventListener("click", function(){ ouvrir(k); });
+    choix.appendChild(b);
+  });
+
+  var accueilCocon = document.getElementById("accueilCocon");
+  var panneau = document.getElementById("panneau");
+  var pTitre = document.getElementById("pTitre");
+  var pMot = document.getElementById("pMot");
+  var pActions = document.getElementById("pActions");
+  var respZone = document.getElementById("respZone");
+  var notif = document.getElementById("notif");
+
+  var courant = null, idxMot = 0, respTimer = null;
+
+  function buzz(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms||18); }catch(e){} }
+
+  function afficherMot(){
+    var c = CHEMINS[courant];
+    pMot.style.opacity = 0;
+    setTimeout(function(){ pMot.textContent = c.mots[idxMot % c.mots.length]; pMot.style.opacity = 1; }, 260);
+  }
+
+  function ouvrir(k){
+    courant = k; idxMot = 0;
+    var c = CHEMINS[k];
+    accueilCocon.style.display = "none";
+    notif.style.display = "none";
+    panneau.classList.add("on");
+    pTitre.textContent = c.pTitre;
+    respZone.style.display = c.resp ? "flex" : "none";
+    if (c.resp) demarrerResp(); else stopResp();
+    afficherMot();
+    window.scrollTo({ top:0, behavior:"smooth" });
+
+    pActions.innerHTML = "";
+    ajouterBtn("Encore un mot", "g", function(){ idxMot++; afficherMot(); buzz(12); });
+    if (c.musique) ajouterBtn("Mets une chanson", "g", function(){ location.href = "/chansons"; });
+    ajouterBtn("Tiens ma main", "g", function(){ buzz([20,60,20]); pMot.style.opacity=0; setTimeout(function(){ pMot.textContent="Je te serre fort. Là. Tu la sens ?"; pMot.style.opacity=1; },260); });
+    ajouterBtn("Revenir", "p", fermer);
+  }
+  function ajouterBtn(txt, cls, fn){
+    var b = document.createElement("button"); b.className = "btn "+cls; b.type="button"; b.textContent = txt;
+    b.addEventListener("click", fn); pActions.appendChild(b);
+  }
+  function fermer(){
+    panneau.classList.remove("on");
+    stopResp();
+    accueilCocon.style.display = "block";
+    notif.style.display = "";
+    window.scrollTo({ top:0, behavior:"smooth" });
+  }
+
+  /* ---- respiration guidée (4s inspire · 2s pause · 6s souffle) ---- */
+  var bulle = document.getElementById("bulle"), respTxt = document.getElementById("respTxt");
+  function cycle(){
+    respTxt.textContent = "inspire…"; bulle.classList.add("in"); bulle.classList.remove("out");
+    respTimer = setTimeout(function(){
+      respTxt.textContent = "retiens…";
+      respTimer = setTimeout(function(){
+        respTxt.textContent = "souffle…"; bulle.classList.add("out"); bulle.classList.remove("in");
+        respTimer = setTimeout(cycle, 6000);
+      }, 2000);
+    }, 4000);
+  }
+  function demarrerResp(){ stopResp(); cycle(); }
+  function stopResp(){ if (respTimer){ clearTimeout(respTimer); respTimer = null; } bulle.classList.remove("in","out"); respTxt.textContent = "on respire ensemble ?"; }
+
+  /* ---- opt-in notifications (via rappels.js) ---- */
+  var btnNotif = document.getElementById("btnNotif"), notifEtat = document.getElementById("notifEtat");
+  function majEtatNotif(){
+    if (!("Notification" in window)) { notif.style.display="none"; return; }
+    if (Notification.permission === "granted") { btnNotif.textContent = "C'est activé 🤍"; notifEtat.textContent = "Je viendrai te dire bonjour, bonne nuit, et passer le soir."; }
+    else if (Notification.permission === "denied") { notifEtat.textContent = "Les notifications sont bloquées sur ce téléphone. Tu peux les réautoriser dans les réglages."; }
+  }
+  btnNotif.addEventListener("click", function(){
+    if (window.Rappels && Rappels.activer) {
+      Rappels.activer().then(function(ok){
+        majEtatNotif();
+        if (ok) notifEtat.textContent = "C'est bon 🤍 On se retrouve tout à l'heure.";
+        else notifEtat.textContent = "Pas grave, on pourra réessayer plus tard.";
+      });
+    }
+  });
+  majEtatNotif();
+})();
+</script>
+</body>
+</html>

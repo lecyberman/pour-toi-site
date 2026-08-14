@@ -1,6 +1,8 @@
 {
   "rewrites": [
     { "source": "/nous-deux", "destination": "/nous-deux.html" },
+    { "source": "/cocon", "destination": "/cocon.html" },
+    { "source": "/chansons", "destination": "/chansons.html" },
     { "source": "/dadoucherie", "destination": "/pour-dadoucherie.html" },
     { "source": "/histoire", "destination": "/notre-histoire.html" },
     { "source": "/jeux", "destination": "/jeux.html" },
