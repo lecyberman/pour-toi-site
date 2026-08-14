@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#14162E" />
+<title>Nos chansons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -10%, #241d3f 0%, transparent 55%),
+      radial-gradient(90% 60% at 90% 110%, #1E2440 0%, transparent 60%),
+      #14162E; }
+  .wrap{ max-width:620px; margin:0 auto; padding:max(26px,env(safe-area-inset-top)) 20px 80px; }
+  a.retour{ display:inline-block; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; margin-bottom:26px; }
+  a.retour:hover{ color:#fff; }
+  .tete{ text-align:center; margin-bottom:8px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:1.05rem; margin:0 0 .25rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(1.9rem,6vw,2.7rem); margin:0 0 .5rem; color:#FBF4EA; letter-spacing:-.01em; }
+  .sous{ text-align:center; color:#C9C1D8; line-height:1.7; margin:0 auto 30px; max-width:460px; }
+
+  .chanson{ background:rgba(255,255,255,.045); border:1px solid rgba(180,155,218,.20); border-radius:20px;
+    padding:16px 16px 12px; margin-bottom:16px; box-shadow:0 18px 50px -34px rgba(0,0,0,.8); }
+  .chanson .haut{ display:flex; align-items:baseline; gap:10px; margin:2px 4px 12px; }
+  .chanson .num{ font-family:'Fraunces',serif; font-style:italic; color:#8E6FBF; font-size:1.05rem; min-width:1.4em; }
+  .chanson .titre{ font-family:'Fraunces',serif; font-weight:500; font-size:1.15rem; color:#FBF4EA; line-height:1.2; }
+  .chanson .artiste{ color:#A99CC4; font-size:.9rem; margin-left:auto; text-align:right; white-space:nowrap; }
+  .chanson iframe{ display:block; width:100%; height:120px; border:0; border-radius:12px; background:#1b1930; }
+
+  .note{ text-align:center; color:#8E82A6; font-size:.85rem; line-height:1.6; margin-top:26px; }
+  .note a{ color:#B49BDA; }
+  .pied{ text-align:center; margin-top:34px; }
+  .pied a{ color:#C7B2E6; text-decoration:none; font-family:'Fraunces',serif; font-style:italic; font-size:1.05rem; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="retour" href="/">⌂ Accueil</a>
+    <div class="tete">
+      <p class="eyebrow">la bande-son de nous</p>
+      <h1>Nos chansons</h1>
+    </div>
+    <p class="sous">Tes préférées, réunies ici. Mets-les quand tu veux — pour danser, pour pleurer un peu, ou juste pour t'endormir en pensant à nous.</p>
+
+    <div id="liste"></div>
+
+    <p class="note">Les lecteurs sont ceux de Deezer. Connecte-toi à ton compte Deezer pour écouter les titres en entier (sinon, c'est un extrait). Si une version n'est pas la bonne, dis-le-moi et je la remplace.</p>
+    <div class="pied"><a href="/cocon">→ Un cocon si la nuit est difficile</a></div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var CHANSONS = [
+    { t:"It's Not So Bad",        a:"Dybbukk",            id:2141888007 },
+    { t:"500% Gouyad",            a:"Deejay MJ",          id:3565559721 },
+    { t:"In the End",             a:"Linkin Park",        id:676183 },
+    { t:"So Cold",                a:"Breaking Benjamin",  id:13711277 },
+    { t:"Lost in You",            a:"Three Days Grace",   id:15593996 },
+    { t:"Demons",                 a:"Imagine Dragons",    id:63510361 },
+    { t:"Everytime",              a:"Britney Spears",     id:2168030 },
+    { t:"Before You Go",          a:"Lewis Capaldi",      id:807205422 },
+    { t:"Homeless",               a:"Marina Kaye",        id:100816096 },
+    { t:"I'm Not the Only One",   a:"Sam Smith",          id:111780380 }
+  ];
+  var liste = document.getElementById("liste");
+  CHANSONS.forEach(function(c, i){
+    var d = document.createElement("div"); d.className = "chanson";
+    var haut = document.createElement("div"); haut.className = "haut";
+    haut.innerHTML = '<span class="num">'+(i+1)+'</span><span class="titre">'+c.t+'</span><span class="artiste">'+c.a+'</span>';
+    var f = document.createElement("iframe");
+    f.title = "Deezer — " + c.t;
+    f.loading = "lazy";
+    f.setAttribute("allow", "encrypted-media; clipboard-write");
+    f.src = "https://widget.deezer.com/widget/dark/track/" + c.id + "?tracklist=false&radius=true";
+    d.appendChild(haut); d.appendChild(f); liste.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>
