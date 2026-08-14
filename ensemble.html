@@ -72,6 +72,33 @@
   textarea{ width:100%; background:rgba(255,255,255,.05); color:#F2ECFB; border:1px solid rgba(180,155,218,.3); border-radius:14px; padding:12px 14px; font-family:'Nunito Sans'; font-size:16px; line-height:1.6; min-height:70px; resize:vertical; }
 
   .attente{ text-align:center; color:#8E82A6; font-size:.9rem; margin-top:18px; line-height:1.6; }
+
+  /* changer de rôle */
+  .chg{ text-align:center; margin:-6px 0 14px; }
+  .chg button{ background:none; border:none; color:#8E82A6; font-size:.82rem; cursor:pointer; text-decoration:underline; }
+
+  /* envoyer un cœur */
+  #btnCoeur{ position:fixed; right:16px; bottom:calc(18px + env(safe-area-inset-bottom,0px)); z-index:8; width:58px; height:58px; border-radius:50%;
+    border:1px solid rgba(199,178,230,.5); background:rgba(24,22,46,.82); color:#fff; font-size:1.6rem; cursor:pointer; box-shadow:0 10px 30px -10px rgba(0,0,0,.7); backdrop-filter:blur(8px); }
+  #btnCoeur:active{ transform:scale(.92); }
+  .coeurFly{ position:fixed; z-index:9; pointer-events:none; font-size:2rem; animation:fly 2.2s ease-out forwards; }
+  @keyframes fly{ 0%{ transform:translateY(0) scale(.6); opacity:0; } 15%{ opacity:1; } 100%{ transform:translateY(-72vh) scale(1.3) rotate(12deg); opacity:0; } }
+
+  /* dessin partagé */
+  #toile{ width:100%; height:54vh; max-height:420px; background:rgba(255,255,255,.05); border:1px solid rgba(180,155,218,.25); border-radius:16px; touch-action:none; display:block; cursor:crosshair; }
+
+  /* respirer ensemble */
+  .bulle-resp{ width:120px; height:120px; border-radius:50%; margin:34px auto 18px;
+    background:radial-gradient(circle at 50% 40%, #C7B2E6, #8E6FBF 60%, rgba(142,111,191,0) 75%); box-shadow:0 0 50px -6px rgba(142,111,191,.6); transition:transform .12s linear; }
+  .txt-resp{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.2rem; min-height:1.4em; text-align:center; }
+
+  /* boîte à mots partagée */
+  .boite-liste{ display:flex; flex-direction:column; gap:8px; max-height:50vh; overflow:auto; margin-bottom:14px; }
+  .mot-item{ background:rgba(255,255,255,.05); border:1px solid rgba(180,155,218,.2); border-radius:14px; padding:10px 14px; color:#E4DEEE; line-height:1.5; }
+  .mot-item.mine{ background:rgba(142,111,191,.16); border-color:rgba(199,178,230,.35); }
+  .mot-auteur{ display:block; color:#A99CC4; font-size:.78rem; margin-bottom:2px; }
+  .boite-form{ display:flex; gap:8px; }
+  input.t{ flex:1; background:rgba(255,255,255,.05); color:#F2ECFB; border:1px solid rgba(180,155,218,.3); border-radius:100px; padding:11px 16px; font-family:'Nunito Sans',sans-serif; font-size:16px; }
 </style>
 </head>
 <body>
@@ -122,6 +149,12 @@
 
   function demarrer(){
     appli.style.display="block";
+    if(!document.getElementById("btnCoeur")){ var bc=document.createElement("button"); bc.id="btnCoeur"; bc.type="button"; bc.setAttribute("aria-label","Envoie-lui un cœur"); bc.textContent="💗";
+      bc.addEventListener("click", function(){ popCoeur(); buzz(15); envoyer({ game:"coeur" }); }); document.body.appendChild(bc); }
+    var presEl=document.getElementById("presence");
+    if(presEl && !document.getElementById("chgRole")){ var chg=document.createElement("div"); chg.className="chg"; chg.innerHTML='<button type="button" id="chgRole">changer de rôle</button>';
+      presEl.insertAdjacentElement("afterend", chg);
+      document.getElementById("chgRole").addEventListener("click", function(){ try{localStorage.removeItem("moi_role");}catch(e){} location.reload(); }); }
     client = window.supabase.createClient(URL, ANON, { realtime:{ params:{ eventsPerSecond: 20 } } });
     canal = client.channel("nous-deux-live", { config:{ presence:{ key: role }, broadcast:{ self:false } } });
 
@@ -148,12 +181,17 @@
 
   function envoyer(p){ p.from=role; canal.send({ type:"broadcast", event:"jeu", payload:p }); }
   var handler=null;
-  function recevoir(p){ if(p.from===role) return; if(typeof handler==="function") handler(p); }
+  function recevoir(p){ if(p.from===role) return; if(p.game==="coeur"){ popCoeur(); return; } if(typeof handler==="function") handler(p); }
+  function popCoeur(){ var h=document.createElement("span"); h.className="coeurFly"; h.textContent=["💗","💖","🤍","💜","❤️"][Math.floor(Math.random()*5)];
+    h.style.left=(8+Math.random()*84)+"vw"; h.style.bottom="10vh"; document.body.appendChild(h); setTimeout(function(){ h.remove(); }, 2300); }
 
   // ===== menu =====
   var JEUX=[
+    { id:"boite", em:"💌", tt:"Notre boîte à mots", ss:"Déposez des petits mots : ils restent, pour toujours." },
     { id:"morpion", em:"❤️✦", tt:"Morpion à deux", ss:"Toi les cœurs, lui les étoiles. En direct." },
+    { id:"dessin", em:"🎨", tt:"Dessinez ensemble", ss:"Un tableau partagé, vos traits en direct." },
     { id:"main", em:"🤝", tt:"Main dans la main", ss:"Tenez-vous la main en même temps." },
+    { id:"respire", em:"🫧", tt:"Respirez ensemble", ss:"Une bulle synchronisée, rien qu'à vous." },
     { id:"mot", em:"✍️", tt:"Un mot en direct", ss:"Écris-lui, il te voit taper en vrai." }
   ];
   var menu=document.getElementById("menu"), vue=document.getElementById("vue"), zone=document.getElementById("zone"), info=document.getElementById("info");
@@ -166,7 +204,7 @@
   }
   document.getElementById("retourMenu").addEventListener("click", function(){ vue.classList.remove("on"); menu.style.display="flex"; document.getElementById("presence").style.display=""; handler=null; onPresence=null; rejouer.style.display="none"; });
   function ouvrirJeu(id){ menu.style.display="none"; document.getElementById("presence").style.display=""; vue.classList.add("on"); rejouer.style.display="none"; window.scrollTo({top:0,behavior:"smooth"});
-    if(id==="morpion") jeuMorpion(); else if(id==="main") jeuMain(); else jeuMot();
+    if(id==="boite") jeuBoite(); else if(id==="morpion") jeuMorpion(); else if(id==="main") jeuMain(); else if(id==="dessin") jeuDessin(); else if(id==="respire") jeuRespire(); else jeuMot();
   }
 
   // ===== Morpion =====
@@ -229,6 +267,64 @@
     var t=null;
     monTxt.addEventListener("input", function(){ clearTimeout(t); t=setTimeout(function(){ envoyer({ game:"mot", texte:monTxt.value }); }, 90); });
     handler=function(p){ if(p.game==="mot"){ saTxt.textContent = p.texte||"…"; } };
+  }
+
+  // ===== Notre boîte à mots (persistante via Supabase + refresh live) =====
+  function echapMot(s){ return String(s||"").replace(/[<>&]/g,function(c){return {"<":"&lt;",">":"&gt;","&":"&amp;"}[c];}); }
+  function jeuBoite(){
+    zone.innerHTML='<div id="boiteListe" class="boite-liste"><p class="attente">chargement…</p></div>'
+      +'<div class="boite-form"><input class="t" id="boiteTxt" maxlength="500" placeholder="Un petit mot à déposer…" />'
+      +'<button class="btn p" id="boiteAdd" type="button">Déposer 🤍</button></div>';
+    info.textContent="Chacun dépose des mots quand il veut. Ils restent, et apparaissent chez l'autre en direct.";
+    var liste=document.getElementById("boiteListe"), champ=document.getElementById("boiteTxt");
+    function charger(){
+      client.from("boite").select("auteur,texte,created_at").order("created_at",{ascending:false}).limit(60)
+        .then(function(res){
+          var rows=(res&&res.data)||[];
+          if(!rows.length){ liste.innerHTML='<p class="attente">Aucun mot pour l\'instant. Dépose le premier 🤍</p>'; return; }
+          liste.innerHTML=rows.map(function(r){ var mine=r.auteur===NOMS[role];
+            return '<div class="mot-item '+(mine?"mine":"")+'"><span class="mot-auteur">'+echapMot(r.auteur)+'</span>'+echapMot(r.texte)+'</div>'; }).join("");
+        }, function(){ liste.innerHTML='<p class="attente">Impossible de charger les mots. Réessaie plus tard.</p>'; });
+    }
+    function deposer(){ var v=(champ.value||"").trim(); if(!v) return; champ.value=""; buzz(12);
+      client.from("boite").insert({ auteur:NOMS[role], texte:v }).then(function(){ charger(); envoyer({ game:"boite" }); }, function(){ charger(); }); }
+    document.getElementById("boiteAdd").addEventListener("click", deposer);
+    champ.addEventListener("keydown", function(e){ if(e.key==="Enter") deposer(); });
+    handler=function(p){ if(p.game==="boite"){ charger(); } };
+    charger();
+  }
+
+  // ===== Dessinez ensemble =====
+  function jeuDessin(){
+    var COL={ elle:"#E9DEF7", lui:"#9fd0ff" };
+    zone.innerHTML='<canvas id="toile"></canvas><div class="rep" style="margin-top:12px"><button class="btn g" id="effacer" type="button">Tout effacer</button></div>';
+    info.textContent="Dessinez ensemble : tes traits apparaissent chez l'autre, en direct.";
+    var cv=document.getElementById("toile"), cx=cv.getContext("2d");
+    (function fit(){ var r=cv.getBoundingClientRect(); cv.width=r.width; cv.height=r.height; })();
+    var drawing=false, last=null;
+    function pt(e){ var r=cv.getBoundingClientRect(); var tt=e.touches?e.touches[0]:e; return { x:(tt.clientX-r.left)/r.width, y:(tt.clientY-r.top)/r.height }; }
+    function trait(a,b,col){ cx.strokeStyle=col; cx.lineWidth=3; cx.lineCap="round"; cx.beginPath(); cx.moveTo(a.x*cv.width,a.y*cv.height); cx.lineTo(b.x*cv.width,b.y*cv.height); cx.stroke(); }
+    cv.addEventListener("pointerdown", function(e){ e.preventDefault(); drawing=true; last=pt(e); });
+    cv.addEventListener("pointermove", function(e){ if(!drawing)return; var p=pt(e); trait(last,p,COL[role]); envoyer({ game:"dessin", a:last, b:p, col:COL[role] }); last=p; });
+    ["pointerup","pointercancel","pointerleave"].forEach(function(ev){ cv.addEventListener(ev, function(){ drawing=false; }); });
+    document.getElementById("effacer").addEventListener("click", function(){ cx.clearRect(0,0,cv.width,cv.height); envoyer({ game:"dessin", clear:true }); });
+    handler=function(p){ if(p.game==="dessin"){ if(p.clear){ cx.clearRect(0,0,cv.width,cv.height); } else if(p.a&&p.b){ trait(p.a,p.b,p.col||"#fff"); } } };
+  }
+
+  // ===== Respirez ensemble (synchronisé par l'horloge, sans message) =====
+  function jeuRespire(){
+    zone.innerHTML='<div class="main-zone"><div class="bulle-resp" id="br"></div><div class="txt-resp" id="tr">respirez…</div><p class="attente">Même bulle, même rythme — vous respirez en même temps, où que vous soyez.</p></div>';
+    info.textContent = autrePresent ? "Vous respirez ensemble 🤍" : "Respire… "+NOMS[role==="elle"?"lui":"elle"]+" te rejoindra.";
+    var br=document.getElementById("br"), tr=document.getElementById("tr"), CYCLE=11000;
+    var timer=setInterval(function(){
+      var t=Date.now()%CYCLE, s, txt;
+      if(t<4000){ s=1+(t/4000)*0.6; txt="inspire…"; }
+      else if(t<6000){ s=1.6; txt="retiens…"; }
+      else { s=1.6-((t-6000)/5000)*0.6; txt="souffle…"; }
+      br.style.transform="scale("+s.toFixed(3)+")"; tr.textContent=txt;
+    }, 60);
+    onPresence=function(){ info.textContent = autrePresent ? "Vous respirez ensemble 🤍" : "Respire… "+NOMS[role==="elle"?"lui":"elle"]+" te rejoindra."; };
+    var obs=setInterval(function(){ if(!vue.classList.contains("on")){ clearInterval(timer); clearInterval(obs); } }, 500);
   }
 
   // ===== démarrage : rôle puis connexion (après que tout soit défini) =====
