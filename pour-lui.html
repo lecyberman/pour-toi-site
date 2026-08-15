@@ -114,6 +114,7 @@
   </div>
   <div class="toast" id="toast"></div>
 
+<script src="/db.js"></script>
 <script>
 (function(){
   "use strict";
@@ -153,12 +154,15 @@
   function envoyer(texte){
     buzz([15,40,15]);
     var msg = texte + SIGN;
+    // On garde une trace pour Mathieu : il la retrouve dans son courrier (colonne "message")
+    if (window.DB) { try { DB.insert("dadoucherie_mots", { message: texte }); } catch(e){} }
     if (navigator.share) {
       navigator.share({ text: msg }).catch(function(){});
+      toast("Envoyé à Mathieu 🤍");
     } else if (navigator.clipboard) {
-      navigator.clipboard.writeText(msg).then(function(){ toast("Copié 🤍 colle-le dans ton message à Mathieu"); }, function(){ toast(msg); });
+      navigator.clipboard.writeText(msg).then(function(){ toast("Copié 🤍 il le retrouvera aussi dans son courrier"); }, function(){ toast("Envoyé 🤍 il le retrouvera dans son courrier"); });
     } else {
-      toast("Copie ce mot et envoie-le à Mathieu 🤍");
+      toast("Envoyé 🤍 il le retrouvera dans son courrier");
     }
   }
 

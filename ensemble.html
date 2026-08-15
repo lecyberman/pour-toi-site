@@ -99,6 +99,12 @@
   .mot-auteur{ display:block; color:#A99CC4; font-size:.78rem; margin-bottom:2px; }
   .boite-form{ display:flex; gap:8px; }
   input.t{ flex:1; background:rgba(255,255,255,.05); color:#F2ECFB; border:1px solid rgba(180,155,218,.3); border-radius:100px; padding:11px 16px; font-family:'Nunito Sans',sans-serif; font-size:16px; }
+
+  /* battement de cœur partagé */
+  .bat-zone{ text-align:center; padding-top:26px; }
+  .coeur-bat{ font-size:5.6rem; line-height:1; cursor:pointer; user-select:none; -webkit-user-select:none; display:inline-block; transition:transform .12s cubic-bezier(.3,0,.3,1); filter:drop-shadow(0 0 26px rgba(214,90,120,.55)); }
+  .coeur-bat.pulse{ transform:scale(1.32); }
+  .bat-msg{ color:#B4A9C8; margin-top:18px; line-height:1.7; max-width:420px; margin-left:auto; margin-right:auto; }
 </style>
 </head>
 <body>
@@ -188,6 +194,7 @@
   // ===== menu =====
   var JEUX=[
     { id:"boite", em:"💌", tt:"Notre boîte à mots", ss:"Déposez des petits mots : ils restent, pour toujours." },
+    { id:"battement", em:"💓", tt:"Ton cœur, chez moi", ss:"Tape un rythme du doigt : son téléphone le ressent." },
     { id:"morpion", em:"❤️✦", tt:"Morpion à deux", ss:"Toi les cœurs, lui les étoiles. En direct." },
     { id:"dessin", em:"🎨", tt:"Dessinez ensemble", ss:"Un tableau partagé, vos traits en direct." },
     { id:"main", em:"🤝", tt:"Main dans la main", ss:"Tenez-vous la main en même temps." },
@@ -204,7 +211,7 @@
   }
   document.getElementById("retourMenu").addEventListener("click", function(){ vue.classList.remove("on"); menu.style.display="flex"; document.getElementById("presence").style.display=""; handler=null; onPresence=null; rejouer.style.display="none"; });
   function ouvrirJeu(id){ menu.style.display="none"; document.getElementById("presence").style.display=""; vue.classList.add("on"); rejouer.style.display="none"; window.scrollTo({top:0,behavior:"smooth"});
-    if(id==="boite") jeuBoite(); else if(id==="morpion") jeuMorpion(); else if(id==="main") jeuMain(); else if(id==="dessin") jeuDessin(); else if(id==="respire") jeuRespire(); else jeuMot();
+    if(id==="boite") jeuBoite(); else if(id==="battement") jeuBattement(); else if(id==="morpion") jeuMorpion(); else if(id==="main") jeuMain(); else if(id==="dessin") jeuDessin(); else if(id==="respire") jeuRespire(); else jeuMot();
   }
 
   // ===== Morpion =====
@@ -267,6 +274,22 @@
     var t=null;
     monTxt.addEventListener("input", function(){ clearTimeout(t); t=setTimeout(function(){ envoyer({ game:"mot", texte:monTxt.value }); }, 90); });
     handler=function(p){ if(p.game==="mot"){ saTxt.textContent = p.texte||"…"; } };
+  }
+
+  // ===== Ton cœur, chez moi (battement partagé, haptique + visuel, temps réel) =====
+  function jeuBattement(){
+    var autreNom = NOMS[role==="elle"?"lui":"elle"];
+    zone.innerHTML='<div class="bat-zone"><div class="coeur-bat" id="cbat" role="button" tabindex="0" aria-label="Tape ton rythme">💓</div>'
+      +'<p class="bat-msg">Appuie à ton rythme, du bout du doigt. '+autreNom+' le ressent dans sa main, en direct — comme ton cœur contre le sien.</p></div>';
+    function majInfo(){ info.textContent = autrePresent ? ("Ton cœur bat chez "+autreNom+" 🤍") : ("Dès que "+autreNom+" est là, il/elle sentira ton rythme."); }
+    majInfo();
+    var cbat=document.getElementById("cbat");
+    function pulse(vibrer){ cbat.classList.add("pulse"); setTimeout(function(){ cbat.classList.remove("pulse"); }, 130); if(vibrer){ try{ if(navigator.vibrate) navigator.vibrate(45); }catch(e){} } }
+    function battre(){ pulse(false); try{ if(navigator.vibrate) navigator.vibrate(22); }catch(e){} envoyer({ game:"battement" }); }
+    cbat.addEventListener("pointerdown", function(e){ e.preventDefault(); battre(); });
+    cbat.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); battre(); } });
+    handler=function(p){ if(p.game==="battement"){ pulse(true); } };
+    onPresence=majInfo;
   }
 
   // ===== Notre boîte à mots (persistante via Supabase + refresh live) =====
