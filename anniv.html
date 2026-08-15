@@ -168,11 +168,14 @@
 
   function buzz(m){ try{ if(navigator.vibrate) navigator.vibrate(m||18); }catch(e){} }
 
+  var joursEns = Math.floor((Date.now() - new Date(2020,0,1).getTime()) / 86400000);
+
   if (estLe15) {
     var L = LETTRES[idx], C = CADEAUX[idxC];
     var pars = L.corps.map(function(p){ return '<p>'+p+'</p>'; }).join('');
     contenu.innerHTML =
       '<div class="tete"><p class="eyebrow">on est le 15 — notre jour</p><h1>Joyeux 15 🤍</h1></div>' +
+      '<p class="compteur">Notre premier vrai jour, c\'était il y a '+joursEns+' jours 🤍</p>' +
       '<div class="lettre"><p class="salut">'+L.salut+'</p>'+pars+'<p class="sign">'+L.sign+'</p></div>' +
       '<div class="cadeau-zone">' +
         '<div class="paquet" id="paquet" role="button" tabindex="0" aria-label="Ouvre ton cadeau">🎁</div>' +
@@ -214,6 +217,7 @@
       '<div class="grand">🌙</div>' +
       '<p class="compteur">'+(reste===1?"plus qu'un jour":("plus que "+reste+" jours"))+' avant notre 15</p>' +
       '<p class="pensee">'+pensee+'</p>' +
+      '<p class="pensee" style="font-size:.96rem;color:#B49BDA">Et ça fait déjà '+joursEns+' jours qu\'on s\'aime.</p>' +
       '<div class="actions">' +
         '<a class="btn g" href="/fleurs">Tes fleurs du jour</a>' +
         '<a class="btn g" href="/chansons">Nos chansons</a>' +
@@ -256,5 +260,6 @@
   draw();
 })();
 </script>
+<script src="/presence.js" defer></script>
 </body>
 </html>

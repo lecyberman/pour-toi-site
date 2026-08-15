@@ -185,10 +185,28 @@
         "Tu es aimée, tu es en sécurité, tu es à moi et je suis à toi."
       ],
       musique:true
+    },
+    aime: {
+      em:"💗", titre:"Rappelle-moi pourquoi tu m'aimes", sous:"Autant de fois que tu veux.",
+      pTitre:"Pourquoi je t'aime",
+      resp:false,
+      mots:[
+        "Parce que tu ris à tes propres blagues avant même de les finir, et que je trouve ça adorable.",
+        "Parce que tu es douce, même quand la vie ne l'est pas avec toi.",
+        "Parce que tu me comprends sans que j'aie besoin de tout expliquer.",
+        "Parce que ta présence, même à travers un écran, rend tout plus léger.",
+        "Parce que tu es courageuse, tellement plus que tu ne le crois.",
+        "Parce que tu es belle, dedans comme dehors, et que tu ne t'en rends même pas compte.",
+        "Parce qu'avec toi, même les silences sont bien.",
+        "Parce que tu es ma maison, où que je sois.",
+        "Parce que tu m'as choisi, moi — et je n'oublie jamais la chance que c'est.",
+        "Parce que je t'aime pour mille raisons, et pour aucune : je t'aime, c'est tout."
+      ],
+      musique:false
     }
   };
 
-  var ordre = ["dormir","mal","triste","douceur"];
+  var ordre = ["dormir","mal","triste","douceur","aime"];
   var choix = document.getElementById("choix");
   ordre.forEach(function(k){
     var c = CHEMINS[k];
@@ -280,5 +298,6 @@
   majEtatNotif();
 })();
 </script>
+<script src="/presence.js" defer></script>
 </body>
 </html>
