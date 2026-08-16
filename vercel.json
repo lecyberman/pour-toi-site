@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/nous-deux", "destination": "/nous-deux.html" },
+    { "source": "/mer", "destination": "/mer.html" },
     { "source": "/cocon", "destination": "/cocon.html" },
     { "source": "/chansons", "destination": "/chansons.html" },
     { "source": "/le-15", "destination": "/anniv.html" },

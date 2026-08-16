@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0a1026" />
+<title>Bord de mer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EAF0FA; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 70% at 50% -6%, #2a2450 0%, transparent 52%),
+      radial-gradient(90% 60% at 82% 8%, #23325e 0%, transparent 55%),
+      linear-gradient(180deg, #0d1230 0%, #0a1026 55%, #0a1a30 100%); overflow-x:hidden; }
+  #mer{ position:fixed; left:0; right:0; bottom:0; height:42vh; z-index:0; pointer-events:none; }
+  #ciel{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+  .wrap{ position:relative; z-index:1; max-width:600px; margin:0 auto; padding:max(24px,env(safe-area-inset-top)) 22px 70px; }
+
+  a.retour{ display:inline-block; font-size:.9rem; color:rgba(234,240,250,.75); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:100px; padding:7px 14px; margin-bottom:20px; }
+  a.retour:hover{ color:#fff; }
+
+  .tete{ text-align:center; margin-bottom:6px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#AEC7F5; font-size:1.08rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.9rem); margin:0; color:#F3F7FF; letter-spacing:-.01em; }
+
+  /* compte à rebours */
+  .cr{ text-align:center; margin:26px 0 10px; }
+  .cr .horloge{ display:flex; gap:10px; justify-content:center; margin:14px 0 10px; }
+  .cr .bloc{ min-width:66px; background:rgba(255,255,255,.06); border:1px solid rgba(174,199,245,.28); border-radius:16px; padding:12px 8px; box-shadow:0 14px 40px -26px rgba(0,0,0,.8); }
+  .cr .n{ font-family:'Fraunces',serif; font-weight:500; font-size:2rem; color:#F3F7FF; line-height:1; }
+  .cr .u{ font-size:.72rem; color:#9FB4DA; text-transform:uppercase; letter-spacing:.08em; margin-top:6px; }
+  .cr .quand{ color:#C7D4EC; font-size:1rem; line-height:1.7; max-width:440px; margin:6px auto 0; }
+  .cr .grand{ font-size:3rem; margin:6px 0; }
+
+  .section{ margin-top:40px; background:rgba(255,255,255,.04); border:1px solid rgba(174,199,245,.18); border-radius:20px; padding:22px 20px; text-align:center; }
+  .section h2{ font-family:'Fraunces',serif; font-weight:500; font-size:1.35rem; color:#F3F7FF; margin:0 0 6px; }
+  .section p{ color:#C7D4EC; line-height:1.7; margin:.3rem auto 0; max-width:440px; }
+
+  .lune{ font-size:3.4rem; line-height:1; margin:6px 0 4px; }
+  .lune-nom{ font-family:'Fraunces',serif; font-style:italic; color:#AEC7F5; }
+
+  .bouteille{ font-size:3.6rem; cursor:pointer; display:inline-block; transition:transform .3s; filter:drop-shadow(0 8px 20px rgba(120,160,230,.4)); }
+  .bouteille:hover{ transform:translateY(-3px) rotate(-6deg); }
+  .bouteille.secoue{ animation:tangue 1s ease; }
+  @keyframes tangue{ 0%,100%{transform:rotate(0)} 25%{transform:rotate(-10deg)} 50%{transform:rotate(8deg)} 75%{transform:rotate(-5deg)} }
+  #mot-bouteille{ opacity:0; visibility:hidden; transition:opacity .6s ease, transform .6s cubic-bezier(.22,.61,.36,1); transform:translateY(8px);
+    margin-top:16px; background:linear-gradient(180deg, rgba(174,199,245,.14), rgba(174,199,245,.05)); border:1px solid rgba(174,199,245,.35);
+    border-radius:16px; padding:16px 18px; color:#EAF0FA; font-size:1.05rem; line-height:1.8; }
+  #mot-bouteille.on{ opacity:1; visibility:visible; transform:none; }
+
+  .actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:22px; }
+  .btn{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.95rem; border-radius:100px; padding:11px 20px; cursor:pointer; border:1px solid transparent; text-decoration:none; transition:transform .2s, background .25s; }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.p{ color:#0d1230; background:linear-gradient(180deg,#CFE0FF,#9DBBF0); box-shadow:0 10px 26px -12px rgba(120,160,230,.8); }
+  .btn.g{ color:#EAF0FA; background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.16); }
+  @media (prefers-reduced-motion:reduce){ .bouteille.secoue{ animation:none; } }
+</style>
+</head>
+<body>
+  <canvas id="ciel"></canvas>
+  <canvas id="mer"></canvas>
+  <div class="wrap">
+    <a class="retour" href="/">⌂ Accueil</a>
+    <div class="tete">
+      <p class="eyebrow" id="eyebrow">on se retrouve</p>
+      <h1 id="titre">Bientôt, toi et moi</h1>
+    </div>
+
+    <div class="cr" id="cr"></div>
+
+    <div class="section">
+      <h2>La même lune, ce soir 🌙</h2>
+      <div class="lune" id="luneEmoji">🌙</div>
+      <div class="lune-nom" id="luneNom">—</div>
+      <p>Où que tu sois quand on n'est pas ensemble, lève les yeux : c'est la même lune au-dessus de vous deux. On ne regarde jamais seuls.</p>
+    </div>
+
+    <div class="section">
+      <h2>Une bouteille à la mer 🌊</h2>
+      <div class="bouteille" id="bouteille" role="button" tabindex="0" aria-label="Ouvre la bouteille">🍾</div>
+      <p id="hintB">touche la bouteille — la mer t'a apporté un mot</p>
+      <div id="mot-bouteille"></div>
+    </div>
+
+    <div class="actions">
+      <a class="btn g" href="/ocean">La lettre de la mer</a>
+      <a class="btn g" href="/chansons">Nos chansons</a>
+      <a class="btn p" href="/ensemble">Ensemble, en direct</a>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ===== compte à rebours jusqu'au train (aujourd'hui 20h53, Paris) ===== */
+  var CIBLE = new Date("2026-08-16T20:53:00+02:00").getTime();
+  var cr = document.getElementById("cr");
+  var titre = document.getElementById("titre"), eyebrow = document.getElementById("eyebrow");
+  function deux(n){ return (n<10?"0":"")+n; }
+  function bloc(n,u){ return '<div class="bloc"><div class="n">'+n+'</div><div class="u">'+u+'</div></div>'; }
+  function rendreCR(){
+    var d = CIBLE - Date.now();
+    if (d > 0) {
+      var s=Math.floor(d/1000), j=Math.floor(s/86400); s-=j*86400;
+      var h=Math.floor(s/3600); s-=h*3600; var m=Math.floor(s/60); s-=m*60;
+      var horloge = '<div class="horloge">'+(j>0?bloc(j,"jours"):"")+bloc(deux(h),"heures")+bloc(deux(m),"min")+bloc(deux(s),"sec")+'</div>';
+      var mot;
+      if (d < 60*60*1000) { mot = "Plus qu'une poignée de minutes… j'ai le cœur qui s'emballe."; }
+      else if (d < 3*60*60*1000) { mot = "Ça approche. Prépare-toi à la reprendre dans tes bras."; }
+      else { mot = "Son train arrive à 20h53. Après deux mois, elle sera enfin là, contre toi."; }
+      cr.innerHTML = horloge + '<p class="quand">'+mot+'</p>';
+      titre.textContent = "Bientôt, toi et moi";
+      eyebrow.textContent = "on se retrouve aujourd'hui";
+    } else if (d > -3*60*60*1000) {
+      cr.innerHTML = '<div class="grand">🚆</div><p class="quand">C\'est l\'heure 🤍 Son train arrive. Va la guetter sur le quai — et si le train a un peu de retard, respire : elle arrive, c\'est sûr.</p>';
+      titre.textContent = "Elle arrive"; eyebrow.textContent = "enfin";
+    } else {
+      cr.innerHTML = '<div class="grand">🤍</div><p class="quand">Vous êtes ensemble. Profite de chaque seconde — vous l\'avez tellement mérité.</p>';
+      titre.textContent = "Vous y êtes"; eyebrow.textContent = "toi et elle, enfin réunis";
+    }
+  }
+  rendreCR(); setInterval(rendreCR, 1000);
+
+  /* ===== phase de la lune (approx.) ===== */
+  (function(){
+    var lp = 2551442.8; // période synodique (s)
+    var ref = Date.UTC(2000,0,6,18,14,0)/1000; // nouvelle lune de référence
+    var age = (((Date.now()/1000 - ref) % lp) + lp) % lp;
+    var f = age/lp; // 0..1
+    var idx = Math.floor(f*8 + 0.5) % 8;
+    var EM = ["🌑","🌒","🌓","🌔","🌕","🌖","🌗","🌘"];
+    var NOM = ["nouvelle lune","premier croissant","premier quartier","lune gibbeuse croissante","pleine lune","lune gibbeuse décroissante","dernier quartier","dernier croissant"];
+    document.getElementById("luneEmoji").textContent = EM[idx];
+    document.getElementById("luneNom").textContent = NOM[idx];
+  })();
+
+  /* ===== bouteille à la mer ===== */
+  var MOTS_MER = [
+    "La mer t'a apporté ça : où que tu ailles, tu me ramènes toujours à toi.",
+    "Un jour, on marchera pieds nus au bord de l'eau, ta main dans la mienne, sans compter les heures.",
+    "Tu es comme la mer : douce, immense, et je pourrais te regarder pendant des heures.",
+    "Cette bouteille a voyagé loin pour te dire une chose toute simple : je t'aime.",
+    "Ferme les yeux, écoute les vagues. C'est le bruit de moi qui pense à toi.",
+    "Promis : bientôt, la mer, le sel, le soleil — et nous deux, juste nous deux.",
+    "Même les océans ne sont pas assez grands pour tout ce que je ressens pour toi."
+  ];
+  var bouteille = document.getElementById("bouteille"), motB = document.getElementById("mot-bouteille"), hintB = document.getElementById("hintB");
+  var iB = Math.floor(Math.random()*MOTS_MER.length), ouvB=false;
+  function ouvrirB(){
+    try{ if(navigator.vibrate) navigator.vibrate([15,40,15]); }catch(e){}
+    if(!reduce) bouteille.classList.add("secoue");
+    setTimeout(function(){
+      motB.textContent = MOTS_MER[iB % MOTS_MER.length]; motB.classList.add("on");
+      hintB.textContent = "encore un mot ?"; ouvB=true; bouteille.classList.remove("secoue");
+    }, reduce?0:700);
+  }
+  bouteille.addEventListener("click", function(){ if(!ouvB){ ouvrirB(); } else { iB++; motB.classList.remove("on"); setTimeout(function(){ motB.textContent=MOTS_MER[iB%MOTS_MER.length]; motB.classList.add("on"); },250); } });
+  bouteille.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); bouteille.click(); } });
+
+  /* ===== ciel étoilé + lune dessinée ===== */
+  (function(){
+    var cv=document.getElementById("ciel"), x=cv.getContext("2d"), W,H,stars=[];
+    function init(){ W=cv.width=innerWidth; H=cv.height=innerHeight; stars=[]; var n=Math.min(90,Math.floor(W*H/16000));
+      for(var i=0;i<n;i++) stars.push({x:Math.random()*W,y:Math.random()*H*0.6,r:Math.random()*1.2+.3,a:Math.random(),s:Math.random()*.02+.004}); }
+    function draw(){ x.clearRect(0,0,W,H);
+      for(var i=0;i<stars.length;i++){ var st=stars[i]; if(!reduce){ st.a+=st.s; if(st.a>1||st.a<0)st.s=-st.s; }
+        x.globalAlpha=.25+Math.abs(st.a)*.6; x.fillStyle="#cfe0ff"; x.beginPath(); x.arc(st.x,st.y,st.r,0,6.28); x.fill(); }
+      x.globalAlpha=1; requestAnimationFrame(draw); }
+    init(); draw(); addEventListener("resize", init);
+  })();
+
+  /* ===== vagues animées ===== */
+  (function(){
+    var cv=document.getElementById("mer"), x=cv.getContext("2d"), W,H,t=0;
+    function fit(){ W=cv.width=innerWidth; H=cv.height=Math.round(innerHeight*0.42); }
+    fit(); addEventListener("resize", fit);
+    var couches=[ {amp:14,len:0.012,sp:0.02,col:"rgba(120,150,220,.20)",y:0.45},
+                  {amp:20,len:0.009,sp:0.015,col:"rgba(100,130,210,.28)",y:0.62},
+                  {amp:26,len:0.007,sp:0.010,col:"rgba(80,110,190,.40)",y:0.80} ];
+    function draw(){ x.clearRect(0,0,W,H); if(!reduce) t+=1;
+      couches.forEach(function(c){ x.beginPath(); x.moveTo(0,H);
+        for(var i=0;i<=W;i+=6){ var y=H*c.y + Math.sin(i*c.len + t*c.sp)*c.amp + Math.sin(i*c.len*0.5 - t*c.sp*0.7)*c.amp*0.4; x.lineTo(i,y); }
+        x.lineTo(W,H); x.closePath(); x.fillStyle=c.col; x.fill(); });
+      requestAnimationFrame(draw); }
+    draw();
+  })();
+})();
+</script>
+<script src="/presence.js" defer></script>
+</body>
+</html>
