@@ -33,6 +33,8 @@
     { "source": "/creations", "destination": "/creations.html" },
     { "source": "/dramas", "destination": "/dramas.html" },
     { "source": "/humeurs", "destination": "/humeurs.html" },
+    { "source": "/voyages", "destination": "/index.html" },
+    { "source": "/moi", "destination": "/moi.html" },
     { "source": "/secret-juillet", "destination": "/index.html" }
   ],
   "headers": [

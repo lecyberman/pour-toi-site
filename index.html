@@ -108,6 +108,8 @@
     #monde .notif-btn.g{ color:#EDE9F3; background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.2); }
     #monde .notif-doux.ok{ border-color:rgba(142,231,160,.4); background:linear-gradient(180deg, rgba(142,231,160,.1), rgba(142,231,160,.03)); }
     #monde .notif-note{ display:block; text-align:center; margin-top:8px; font-family:'Nunito Sans',sans-serif; font-size:.78rem; color:rgba(201,193,216,.7); }
+    #monde .kase-courrier{ background:linear-gradient(180deg, rgba(199,178,230,.18), rgba(199,178,230,.06)); border-color:rgba(199,178,230,.5); }
+    #monde .kase-courrier .t{ color:#E9DEF7; }
     html[data-theme="clair"] #monde .notif-doux{ background:#fff; border-color:rgba(142,111,191,.25); }
     html[data-theme="clair"] #monde .notif-doux.ok{ background:#f3fbf4; border-color:rgba(96,168,110,.35); }
     html[data-theme="clair"] #monde .notif-doux .notif-t{ color:#3E3446; }
@@ -213,6 +215,7 @@
         <p>Tout ici a été pensé pour toi. Prends ton temps, ouvre ce qui t'appelle. Rien ne presse.</p>
       </div>
       <div class="grille">
+        <a class="kase kase-courrier" href="/courrier" id="carte-courrier" hidden><div class="ic">💌</div><div class="t">Mon courrier</div><div class="d">Les mots qu'elle t'a laissés, rien que pour toi.</div></a>
         <a class="kase" href="/mer"><div class="ic">🌊</div><div class="t">Bord de mer</div><div class="d">Le compte à rebours, la lune, une bouteille à la mer.</div></a>
         <a class="kase" href="/dadoucherie"><div class="ic">💌</div><div class="t">Ta page</div><div class="d">Ton bonjour, ta lettre du jour, ma voix.</div></a>
         <a class="kase" href="/histoire"><div class="ic">✨</div><div class="t">Notre histoire</div><div class="d">De Snap à nous, en dates et en souvenirs.</div></a>
@@ -952,20 +955,38 @@
     requestAnimationFrame(frame);
   })();
 
-  // Passage discret du facteur : trois appuis rapides sur ⌂ OU sur le point en bas à droite ouvrent le courrier.
+  // Courrier de Mathieu : si ce téléphone est le sien (moi_role = lui), on révèle sa carte
+  // dans le menu et le point discret ouvre le courrier en un seul appui.
   (function(){
-    function surveiller(selecteurTest){
-      var clics = [];
-      document.addEventListener('click', function(e){
-        if(!selecteurTest(e.target)) return;
-        var t = Date.now();
-        clics = clics.filter(function(x){ return t - x < 1600; });
-        clics.push(t);
-        if(clics.length >= 3){ location.href = '/courrier'; }
-      });
+    function estMathieu(){ try{ return localStorage.getItem('moi_role') === 'lui'; }catch(e){ return false; } }
+
+    function reveler(){
+      var lui = estMathieu();
+      var carte = document.getElementById('carte-courrier');
+      if(carte) carte.hidden = !lui;
+      var pt = document.getElementById('facteur');
+      if(pt && lui){
+        pt.style.cursor = 'pointer';
+        pt.title = 'Ton courrier';
+        pt.setAttribute('role','link');
+      }
     }
-    surveiller(function(el){ return el.closest && el.closest('.btn-retour'); });
-    surveiller(function(el){ return el.id === 'facteur'; });
+    document.addEventListener('DOMContentLoaded', reveler);
+    reveler();
+
+    // Point discret : 1 appui si c'est Mathieu, sinon repli 3 appuis rapides (pour elle, invisible).
+    var clics = [];
+    document.addEventListener('click', function(e){
+      var el = e.target;
+      var surFacteur = el && el.id === 'facteur';
+      var surAccueil = el && el.closest && el.closest('.btn-retour');
+      if(!surFacteur && !surAccueil) return;
+      if(surFacteur && estMathieu()){ location.href = '/courrier'; return; }
+      var t = Date.now();
+      clics = clics.filter(function(x){ return t - x < 1600; });
+      clics.push(t);
+      if(clics.length >= 3){ location.href = '/courrier'; }
+    });
   })();
   </script>
   <script>

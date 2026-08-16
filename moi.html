@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0d0b1a" />
+<title>C'est moi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -8%, #271f45 0%, transparent 55%),
+      radial-gradient(90% 60% at 12% 108%, #1d2246 0%, transparent 60%),
+      #0d0b1a; }
+  .wrap{ max-width:460px; margin:0 auto; padding:max(40px,env(safe-area-inset-top)) 24px 90px; text-align:center; }
+  .ic{ font-size:2.6rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:1.9rem; color:#FBF4EA; margin:14px 0 6px; }
+  p.sous{ color:#C9C1D8; line-height:1.6; margin:0 auto 26px; max-width:34ch; }
+  .btn{ display:block; width:100%; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:1rem;
+    border-radius:100px; padding:15px 22px; cursor:pointer; border:1px solid transparent; text-decoration:none; margin:10px 0; transition:transform .2s; }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.p{ color:#1a1430; background:linear-gradient(135deg,#C7B2E6,#8E6FBF); box-shadow:0 12px 28px -14px rgba(124,82,168,.8); }
+  .btn.g{ color:#EDE9F3; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16); }
+  .etat{ margin-top:22px; font-size:.9rem; color:#A99CC4; min-height:1.2em; }
+  .petit{ display:inline-block; margin-top:18px; font-size:.85rem; color:rgba(201,193,216,.7); text-decoration:none; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="ic">🤍</div>
+    <h1>C'est toi, Mathieu ?</h1>
+    <p class="sous">Touche « Oui, c'est moi » une seule fois sur ce téléphone. Ton courrier apparaîtra ensuite tout seul dans le menu, rien que pour toi.</p>
+
+    <a href="/courrier" class="btn p" id="oui">Oui, c'est moi 🤍</a>
+    <a href="/" class="btn g">Retour à l'accueil</a>
+
+    <p class="etat" id="etat"></p>
+    <a href="#" class="petit" id="oublier">Ce n'est pas mon téléphone, oublie-moi</a>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var etat = document.getElementById("etat");
+  var oui = document.getElementById("oui");
+  function estMoi(){ try{ return localStorage.getItem("moi_role") === "lui"; }catch(e){ return false; } }
+  function afficher(){
+    if(estMoi()){ etat.textContent = "Ce téléphone est reconnu comme le tien. La carte « Mon courrier » est dans ton menu."; }
+    else { etat.textContent = ""; }
+  }
+  if(oui) oui.addEventListener("click", function(){
+    try{ localStorage.setItem("moi_role","lui"); }catch(e){}
+    // on laisse le lien ouvrir /courrier
+  });
+  var oublier = document.getElementById("oublier");
+  if(oublier) oublier.addEventListener("click", function(e){
+    e.preventDefault();
+    try{ localStorage.removeItem("moi_role"); }catch(e2){}
+    afficher();
+    etat.textContent = "C'est oublié. Ce téléphone ne verra plus ton courrier.";
+  });
+  afficher();
+})();
+</script>
+</body>
+</html>

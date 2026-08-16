@@ -3324,5 +3324,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (location.pathname.includes("secret-juillet") || location.hash === "#secret-juillet") {
       if (typeof naviguer === "function") naviguer("capsules");
     }
+    if (location.pathname.includes("voyages") || location.hash === "#voyages") {
+      if (typeof naviguer === "function") naviguer("voyages");
+    }
   }, 1500);
 });
