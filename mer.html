@@ -76,14 +76,14 @@
     <div class="section">
       <h2>La même lune, ce soir 🌙</h2>
       <div class="lune" id="luneEmoji">🌙</div>
-      <div class="lune-nom" id="luneNom">—</div>
+      <div class="lune-nom" id="luneNom">…</div>
       <p>Où que tu sois quand on n'est pas ensemble, lève les yeux : c'est la même lune au-dessus de vous deux. On ne regarde jamais seuls.</p>
     </div>
 
     <div class="section">
       <h2>Une bouteille à la mer 🌊</h2>
       <div class="bouteille" id="bouteille" role="button" tabindex="0" aria-label="Ouvre la bouteille">🍾</div>
-      <p id="hintB">touche la bouteille — la mer t'a apporté un mot</p>
+      <p id="hintB">touche la bouteille, la mer t'a apporté un mot</p>
       <div id="mot-bouteille"></div>
     </div>
 
@@ -119,10 +119,10 @@
       titre.textContent = "Bientôt, toi et moi";
       eyebrow.textContent = "on se retrouve aujourd'hui";
     } else if (d > -3*60*60*1000) {
-      cr.innerHTML = '<div class="grand">🚆</div><p class="quand">C\'est l\'heure 🤍 Son train arrive. Va la guetter sur le quai — et si le train a un peu de retard, respire : elle arrive, c\'est sûr.</p>';
+      cr.innerHTML = '<div class="grand">🚆</div><p class="quand">C\'est l\'heure 🤍 Son train arrive. Va la guetter sur le quai, et si le train a un peu de retard, respire : elle arrive, c\'est sûr.</p>';
       titre.textContent = "Elle arrive"; eyebrow.textContent = "enfin";
     } else {
-      cr.innerHTML = '<div class="grand">🤍</div><p class="quand">Vous êtes ensemble. Profite de chaque seconde — vous l\'avez tellement mérité.</p>';
+      cr.innerHTML = '<div class="grand">🤍</div><p class="quand">Vous êtes ensemble. Profite de chaque seconde, vous l\'avez tellement mérité.</p>';
       titre.textContent = "Vous y êtes"; eyebrow.textContent = "toi et elle, enfin réunis";
     }
   }
@@ -148,7 +148,7 @@
     "Tu es comme la mer : douce, immense, et je pourrais te regarder pendant des heures.",
     "Cette bouteille a voyagé loin pour te dire une chose toute simple : je t'aime.",
     "Ferme les yeux, écoute les vagues. C'est le bruit de moi qui pense à toi.",
-    "Promis : bientôt, la mer, le sel, le soleil — et nous deux, juste nous deux.",
+    "Promis : bientôt, la mer, le sel, le soleil, et nous deux, juste nous deux.",
     "Même les océans ne sont pas assez grands pour tout ce que je ressens pour toi."
   ];
   var bouteille = document.getElementById("bouteille"), motB = document.getElementById("mot-bouteille"), hintB = document.getElementById("hintB");

@@ -1,4 +1,4 @@
-/* rappels.js — petits mots doux : bonjour, bonne nuit, et un check tout doux le soir.
+/* rappels.js, petits mots doux : bonjour, bonne nuit, et un check tout doux le soir.
    Fonctionne au mieux avec l'app installée. Utilise les "Notification Triggers"
    (programmation même app fermée) si le navigateur les gère, sinon un repli
    qui vérifie l'heure quand l'app est ouverte. Aucune donnée n'est envoyée ailleurs. */
@@ -25,7 +25,7 @@
       "La journée est finie, tu as le droit de te reposer. Bonne nuit, toi."
     ],
     check: [
-      "Tu dors ? 🌙 Si tu as mal ou du mal à dormir, viens — j'ai un cocon doux pour toi.",
+      "Tu dors ? 🌙 Si tu as mal ou du mal à dormir, viens, j'ai un cocon doux pour toi.",
       "Petit coucou de la nuit 🤍 Si tu ne dors pas, on peut respirer ensemble un moment.",
       "J'espère que tu dors bien. Sinon je suis là, à un geste : viens dans le cocon."
     ]
@@ -78,7 +78,7 @@
     };
   }
 
-  // Programme 5 jours à l'avance via TimestampTrigger (si dispo) — marche app fermée.
+  // Programme 5 jours à l'avance via TimestampTrigger (si dispo), marche app fermée.
   function planifierTrigger(reg) {
     if (typeof window.TimestampTrigger === "undefined") return false;
     Object.keys(HEURES).forEach(function (slot) {

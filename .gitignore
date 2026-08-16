@@ -1,0 +1,20 @@
+# Secrets : jamais dans le dépôt
+.env
+.env.local
+.env.*.local
+
+# Clone dupliqué accidentel (même dépôt cloné à l'intérieur de lui-même)
+/pour-toi-site/
+
+# Vercel
+.vercel/
+
+# Système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Éditeurs
+.vscode/
+.idea/
+*.swp

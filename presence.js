@@ -1,4 +1,4 @@
-/* presence.js — un badge discret quand l'autre est sur le site en ce moment.
+/* presence.js, un badge discret quand l'autre est sur le site en ce moment.
    Utilise Supabase Realtime presence (canal partagé "nous-deux-live").
    Sûr : si hors-ligne ou lib absente, il ne se passe rien. Aucune donnée envoyée ailleurs.
    Ne pas charger sur /ensemble (qui gère déjà sa propre présence). */

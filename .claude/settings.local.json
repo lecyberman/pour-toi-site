@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C pour-toi-site log --oneline -3)",
+      "mcp__15e387a0-060f-4564-9bb3-bdb61dd2396f__list_projects",
+      "mcp__15e387a0-060f-4564-9bb3-bdb61dd2396f__list_tables",
+      "mcp__15e387a0-060f-4564-9bb3-bdb61dd2396f__get_advisors",
+      "mcp__15e387a0-060f-4564-9bb3-bdb61dd2396f__execute_sql",
+      "Bash(node --check app.js)",
+      "Bash(node -e ' *)",
+      "mcp__15e387a0-060f-4564-9bb3-bdb61dd2396f__apply_migration",
+      "Bash(python -)"
+    ]
+  }
+}

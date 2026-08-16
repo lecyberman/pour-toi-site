@@ -46,7 +46,7 @@
       <p class="eyebrow">la bande-son de nous</p>
       <h1>Nos chansons</h1>
     </div>
-    <p class="sous">Tes préférées, réunies ici. Mets-les quand tu veux — pour danser, pour pleurer un peu, ou juste pour t'endormir en pensant à nous.</p>
+    <p class="sous">Tes préférées, réunies ici. Mets-les quand tu veux, pour danser, pour pleurer un peu, ou juste pour t'endormir en pensant à nous.</p>
 
     <div id="liste"></div>
 
@@ -75,7 +75,7 @@
     var haut = document.createElement("div"); haut.className = "haut";
     haut.innerHTML = '<span class="num">'+(i+1)+'</span><span class="titre">'+c.t+'</span><span class="artiste">'+c.a+'</span>';
     var f = document.createElement("iframe");
-    f.title = "Deezer — " + c.t;
+    f.title = "Deezer, " + c.t;
     f.loading = "lazy";
     f.setAttribute("allow", "encrypted-media; clipboard-write");
     f.src = "https://widget.deezer.com/widget/dark/track/" + c.id + "?tracklist=false&radius=true";

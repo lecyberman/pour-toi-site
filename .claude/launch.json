@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "pour-toi",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["dev-server.py", "4321"],
+      "port": 4321
+    }
+  ]
+}

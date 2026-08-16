@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Notre carnet</title>
+<meta name="theme-color" content="#14162E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/theme.css" />
+<style>
+  body{ padding:76px 18px 90px; }
+  .wrap{ max-width:760px; margin:0 auto; position:relative; z-index:2; }
+
+  /* ---- Filtres ---- */
+  .filtres{ margin:0 0 var(--sp-6); }
+  .filtres .ligne{ margin-bottom:var(--sp-3); }
+  .filtres .intitule{
+    font-size:var(--fs-xs); letter-spacing:.14em; text-transform:uppercase;
+    color:var(--c-encre-douce); margin-bottom:var(--sp-2);
+  }
+
+  /* ---- Année ---- */
+  .annee{
+    font-family:var(--font-display); font-style:italic; font-size:1.35rem;
+    color:var(--c-corail); margin:var(--sp-6) 0 var(--sp-4);
+  }
+  .annee:first-of-type{ margin-top:0; }
+
+  /* ---- Carte souvenir ---- */
+  .souv{
+    display:grid; grid-template-columns:auto 1fr; gap:var(--sp-4);
+    align-items:start; width:100%; text-align:left;
+    background:var(--surface); border:1px solid var(--bordure);
+    border-radius:var(--r-md); padding:var(--sp-4); cursor:pointer;
+    font-family:var(--font-body); color:inherit;
+    transition:transform var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease), border-color var(--t-med);
+  }
+  .souv:hover, .souv:focus-visible{
+    transform:translateY(-3px); box-shadow:var(--sh-3);
+    border-color:rgba(var(--rgb-accent),.4);
+  }
+  .souv .vignette{
+    width:74px; height:74px; border-radius:var(--r-sm); object-fit:cover;
+    background:linear-gradient(140deg, rgba(var(--rgb-accent),.28), rgba(var(--rgb-or),.18));
+    display:flex; align-items:center; justify-content:center; font-size:1.6rem;
+    flex:none;
+  }
+  .souv .titre{ font-family:var(--font-display); font-weight:500; font-size:1.15rem; line-height:1.25; }
+  .souv .meta{ font-size:var(--fs-xs); color:var(--c-encre-douce); margin-top:3px; }
+  .souv .extrait{ font-size:var(--fs-sm); color:var(--c-encre-douce); margin-top:6px; line-height:1.55; }
+  .souv .emo{
+    display:inline-block; margin-top:8px; font-size:var(--fs-xs); font-weight:600;
+    color:var(--c-corail); background:rgba(var(--rgb-accent),.12);
+    border-radius:var(--r-pill); padding:.22em .8em;
+  }
+  /* un souvenir marqué important respire un peu plus */
+  .souv.fort{ border-color:rgba(var(--rgb-or),.35); }
+  .souv.fort .titre{ font-size:1.28rem; }
+
+  /* ---- Modale ---- */
+  .m-image{ width:100%; border-radius:var(--r-sm); margin-bottom:var(--sp-4); display:block; }
+  .m-titre{ font-family:var(--font-display); font-weight:500; font-size:1.5rem; line-height:1.2; padding-right:34px; }
+  .m-meta{ font-size:var(--fs-sm); color:var(--c-encre-douce); margin-top:var(--sp-2); }
+  .m-texte{ margin-top:var(--sp-4); line-height:var(--lh-body); white-space:pre-wrap; }
+  .m-cache{ margin-top:var(--sp-5); }
+  .m-cache .revele{
+    margin-top:var(--sp-3); font-family:var(--font-display); font-style:italic;
+    line-height:1.6; color:var(--c-corail);
+    border-left:2px solid rgba(var(--rgb-accent),.4); padding-left:var(--sp-4);
+  }
+
+  /* ---- État vide ---- */
+  .vide{ text-align:center; padding:var(--sp-7) var(--sp-4); }
+  .vide .signe{ font-size:2.2rem; opacity:.5; }
+  .vide p{ color:var(--c-encre-douce); max-width:38ch; margin:var(--sp-4) auto 0; }
+
+  @media (max-width:520px){
+    body{ padding-top:70px; }
+    /* Une vraie photo mérite la largeur. Un souvenir sans photo garde sa
+       petite vignette : un grand aplat vide alourdit la page pour rien. */
+    .souv:has(img.vignette){ grid-template-columns:1fr; }
+    .souv img.vignette{ width:100%; height:170px; }
+    .souv div.vignette{ width:60px; height:60px; font-size:1.3rem; }
+  }
+  /* Repli pour les navigateurs sans :has() : on garde tout côte à côte,
+     ce qui reste lisible, plutôt que de casser la mise en page. */
+  @supports not selector(:has(img)){
+    @media (max-width:520px){ .souv{ grid-template-columns:auto 1fr; } }
+  }
+</style>
+</head>
+<body class="u-theme u-grain u-ambient">
+
+<a class="u-retour" href="/">⌂ notre monde</a>
+
+<div class="wrap">
+  <div class="u-tete">
+    <p class="u-eyebrow">notre carnet</p>
+    <h1 class="u-display">Ce qu'on garde</h1>
+    <p>Pas une liste, pas un album. Juste les moments que je n'ai pas voulu laisser filer. Ouvre celui que tu veux, certains cachent encore quelque chose.</p>
+  </div>
+
+  <div class="filtres" id="filtres" hidden>
+    <div class="ligne">
+      <div class="intitule">ce qu'on ressentait</div>
+      <div class="u-chips" id="f-emotion"></div>
+    </div>
+    <div class="ligne">
+      <div class="intitule">le genre de moment</div>
+      <div class="u-chips" id="f-categorie"></div>
+    </div>
+  </div>
+
+  <div id="liste" aria-live="polite"></div>
+
+  <p class="u-mot" id="note" hidden style="margin-top:var(--sp-6)">
+    Pour Mathieu : chaque souvenir est une ligne de la table <b>souvenirs</b> dans Supabase.
+    Colonnes utiles : <code>titre</code>, <code>date_texte</code> (« un mardi de novembre » marche très bien),
+    <code>date_reelle</code> (pour le tri), <code>lieu</code>, <code>description</code>, <code>image</code> (URL),
+    <code>emotion</code>, <code>categorie</code>, <code>importance</code> (1 à 3) et <code>message_cache</code>.
+    Tu peux aussi les ajouter depuis <a href="/admin">l'admin</a>.
+  </p>
+
+  <p class="u-liens">
+    <a href="/galerie">notre galerie</a> · <a href="/histoire">notre histoire</a> · <a href="/univers">notre univers</a>
+  </p>
+</div>
+
+<!-- Modale d'un souvenir -->
+<div class="u-modal" id="modale">
+  <div class="u-modal__boite">
+    <button class="u-modal__fermer" aria-label="Fermer">✕</button>
+    <div id="m-contenu"></div>
+  </div>
+</div>
+
+<script src="/db.js"></script>
+<script src="/app.js"></script>
+<script>
+(function(){
+  var liste    = document.getElementById('liste');
+  var zoneNote = document.getElementById('note');
+  var boiteF   = document.getElementById('filtres');
+  var modale   = App.modal(document.getElementById('modale'));
+  var contenuM = document.getElementById('m-contenu');
+  var esc      = App.esc;
+
+  var tous = [];
+  var filtre = { emotion:null, categorie:null };
+
+  /* --- Squelette de chargement : jamais de page blanche --- */
+  function squelette(){
+    var h = '';
+    for (var i = 0; i < 3; i++){
+      h += '<div class="souv" style="cursor:default">' +
+             '<div class="u-skel" style="width:74px;height:74px;border-radius:12px"></div>' +
+             '<div style="flex:1">' +
+               '<div class="u-skel" style="height:17px;width:58%"></div>' +
+               '<div class="u-skel" style="height:11px;width:34%;margin-top:9px"></div>' +
+               '<div class="u-skel" style="height:11px;width:88%;margin-top:11px"></div>' +
+             '</div>' +
+           '</div>';
+    }
+    liste.innerHTML = '<div style="display:grid;gap:12px">' + h + '</div>';
+  }
+
+  /* --- Tri : la date réelle d'abord, sinon l'ordre d'ajout --- */
+  function quand(s){
+    if (s.date_reelle) return new Date(s.date_reelle).getTime();
+    return s.created_at ? new Date(s.created_at).getTime() : 0;
+  }
+  function annee(s){
+    if (s.date_reelle) return String(new Date(s.date_reelle).getFullYear());
+    return null;
+  }
+
+  function chips(zone, valeurs, cle){
+    if (!valeurs.length) { zone.parentNode.hidden = true; return; }
+    zone.innerHTML = '';
+    var tout = document.createElement('button');
+    tout.className = 'u-chip is-on'; tout.type = 'button';
+    tout.textContent = 'tout'; tout.setAttribute('aria-pressed','true');
+    zone.appendChild(tout);
+
+    valeurs.forEach(function(v){
+      var b = document.createElement('button');
+      b.className = 'u-chip'; b.type = 'button';
+      b.textContent = v; b.setAttribute('aria-pressed','false');
+      b.addEventListener('click', function(){
+        filtre[cle] = (filtre[cle] === v) ? null : v;
+        majChips(zone, cle); rendre();
+      });
+      zone.appendChild(b);
+    });
+    tout.addEventListener('click', function(){ filtre[cle] = null; majChips(zone, cle); rendre(); });
+  }
+  function majChips(zone, cle){
+    [].forEach.call(zone.children, function(b, i){
+      var actif = (i === 0) ? (filtre[cle] === null) : (b.textContent === filtre[cle]);
+      b.classList.toggle('is-on', actif);
+      b.setAttribute('aria-pressed', actif ? 'true' : 'false');
+    });
+  }
+
+  function ouvrir(s){
+    var h = '';
+    if (s.image) h += '<img class="m-image" src="' + esc(s.image) + '" alt="' + esc(s.titre) + '">';
+    h += '<h2 class="m-titre">' + esc(s.titre) + '</h2>';
+
+    var meta = [];
+    if (s.date_texte) meta.push(esc(s.date_texte));
+    else if (s.date_reelle) meta.push(dateLisible(s.date_reelle));
+    if (s.lieu) meta.push(esc(s.lieu));
+    if (meta.length) h += '<p class="m-meta">' + meta.join(' · ') + '</p>';
+
+    if (s.description) h += '<div class="m-texte">' + esc(s.description) + '</div>';
+
+    if (s.message_cache){
+      h += '<div class="m-cache">' +
+             '<button class="u-btn u-btn--ghost u-btn--sm" id="btn-cache">il y a autre chose</button>' +
+             '<div class="revele" id="revele" hidden></div>' +
+           '</div>';
+    }
+    contenuM.innerHTML = h;
+
+    if (s.message_cache){
+      document.getElementById('btn-cache').addEventListener('click', function(){
+        var d = document.getElementById('revele');
+        d.textContent = s.message_cache;
+        d.hidden = false;
+        this.remove();
+      });
+    }
+    modale.ouvrir();
+  }
+
+  function dateLisible(d){
+    try {
+      return new Date(d).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+    } catch(e){ return d; }
+  }
+
+  function rendre(){
+    var vus = tous.filter(function(s){
+      if (filtre.emotion   && s.emotion   !== filtre.emotion)   return false;
+      if (filtre.categorie && s.categorie !== filtre.categorie) return false;
+      return true;
+    });
+
+    if (!vus.length){
+      liste.innerHTML = '<div class="vide"><div class="signe">✧</div>' +
+        '<p>Rien sous ce filtre. Retire-le, il y a autre chose à voir.</p></div>';
+      return;
+    }
+
+    var h = '', anneeCourante = null;
+    vus.forEach(function(s){
+      var a = annee(s);
+      if (a && a !== anneeCourante){ anneeCourante = a; h += '<div class="annee">' + a + '</div>'; }
+
+      var meta = [];
+      if (s.date_texte) meta.push(esc(s.date_texte));
+      else if (s.date_reelle) meta.push(dateLisible(s.date_reelle));
+      if (s.lieu) meta.push(esc(s.lieu));
+
+      var vignette = s.image
+        ? '<img class="vignette" loading="lazy" decoding="async" src="' + esc(s.image) + '" alt="">'
+        : '<div class="vignette" aria-hidden="true">' + (s.message_cache ? '✦' : '✧') + '</div>';
+
+      var extrait = s.description
+        ? '<div class="extrait">' + esc(s.description.slice(0, 110)) + (s.description.length > 110 ? '…' : '') + '</div>'
+        : '';
+
+      h += '<button class="souv' + (s.importance === 3 ? ' fort' : '') + '" data-id="' + esc(s.id) + '" type="button">' +
+             vignette +
+             '<div>' +
+               '<div class="titre">' + esc(s.titre) + '</div>' +
+               (meta.length ? '<div class="meta">' + meta.join(' · ') + '</div>' : '') +
+               extrait +
+               (s.emotion ? '<span class="emo">' + esc(s.emotion) + '</span>' : '') +
+             '</div>' +
+           '</button>';
+    });
+
+    liste.innerHTML = '<div style="display:grid;gap:12px">' + h + '</div>';
+    [].forEach.call(liste.querySelectorAll('.souv'), function(b){
+      b.addEventListener('click', function(){
+        var s = tous.filter(function(x){ return String(x.id) === b.dataset.id; })[0];
+        if (s) ouvrir(s);
+      });
+    });
+  }
+
+  /* --- Chargement --- */
+  squelette();
+  DB.select('souvenirs', 'select=*').then(function(rows){
+    tous = (rows || []).sort(function(a,b){ return quand(b) - quand(a); });
+
+    if (!tous.length){
+      liste.innerHTML =
+        '<div class="vide"><div class="signe">✧</div>' +
+        '<p>Le carnet est encore vide. Il se remplira doucement, un moment à la fois. ' +
+        'Reviens, il y aura quelque chose.</p></div>';
+      zoneNote.hidden = false;
+      return;
+    }
+
+    var emotions   = uniques(tous, 'emotion');
+    var categories = uniques(tous, 'categorie');
+    if (emotions.length > 1 || categories.length > 1) boiteF.hidden = false;
+    chips(document.getElementById('f-emotion'),   emotions,   'emotion');
+    chips(document.getElementById('f-categorie'), categories, 'categorie');
+
+    rendre();
+  });
+
+  function uniques(arr, cle){
+    var vus = {}, out = [];
+    arr.forEach(function(o){ var v = o[cle]; if (v && !vus[v]){ vus[v] = 1; out.push(v); } });
+    return out;
+  }
+})();
+</script>
+<script src="/ambiance.js"></script>
+</body>
+</html>

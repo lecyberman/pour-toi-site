@@ -194,8 +194,8 @@
     var en=rolesEnLigne(); autrePresent = en.indexOf(role==="elle"?"lui":"elle")>-1;
     var pres=document.getElementById("presence");
     var moiNom=NOMS[role], autreNom=NOMS[role==="elle"?"lui":"elle"];
-    if (autrePresent){ pres.innerHTML='<span class="dot" style="background:#8ee6a0"></span> Vous êtes <span class="on2">tous les deux là</span> 🤍 — jouez en direct !'; }
-    else { pres.innerHTML='<span class="dot" style="background:#e6c98e"></span> Toi ('+moiNom+') es là. '+autreNom+' n\'est pas encore connecté·e — dès qu\'il/elle ouvre cette page, vous y serez ensemble.'; }
+    if (autrePresent){ pres.innerHTML='<span class="dot" style="background:#8ee6a0"></span> Vous êtes <span class="on2">tous les deux là</span> 🤍, jouez en direct !'; }
+    else { pres.innerHTML='<span class="dot" style="background:#e6c98e"></span> Toi ('+moiNom+') es là. '+autreNom+' n\'est pas encore connecté·e, dès qu\'il/elle ouvre cette page, vous y serez ensemble.'; }
     if (typeof onPresence==="function") onPresence();
   }
   var onPresence=null;
@@ -325,7 +325,7 @@
       client.from("meteo_humeur").select("role,emoji,mot").then(function(res){
         var rows=(res&&res.data)||[], map={}; rows.forEach(function(r){ map[r.role]=r; });
         var autre=role==="elle"?"lui":"elle";
-        function bloc(who,r){ return '<div class="meteo-bloc"><div class="meteo-e">'+((r&&r.emoji)||"·")+'</div><div class="meteo-l">'+NOMS[who]+'</div><div class="meteo-m">'+((r&&r.mot)||"— pas encore dit")+'</div></div>'; }
+        function bloc(who,r){ return '<div class="meteo-bloc"><div class="meteo-e">'+((r&&r.emoji)||"·")+'</div><div class="meteo-l">'+NOMS[who]+'</div><div class="meteo-m">'+((r&&r.mot)||"pas encore dit")+'</div></div>'; }
         deux.innerHTML = bloc(role, map[role]) + bloc(autre, map[autre]);
       }, function(){ deux.innerHTML='<p class="attente">Connexion en cours…</p>'; });
     }
@@ -337,20 +337,20 @@
   function jeuSnap(){
     zone.innerHTML='<textarea id="snapTxt" maxlength="300" placeholder="Un secret, une bêtise, un je t\'aime… il/elle ne le verra qu\'une seule fois."></textarea>'
       +'<div class="rep" style="margin-top:12px"><button class="btn p" id="snapSend" type="button">Envoyer le snap 👻</button></div>';
-    info.textContent = autrePresent ? "Ça s'affiche une seule fois chez l'autre, puis ça disparaît. Comme au début, sur Snap." : "Attends qu'il/elle soit là — un snap ne s'envoie qu'en direct.";
+    info.textContent = autrePresent ? "Ça s'affiche une seule fois chez l'autre, puis ça disparaît. Comme au début, sur Snap." : "Attends qu'il/elle soit là, un snap ne s'envoie qu'en direct.";
     document.getElementById("snapSend").addEventListener("click", function(){
       var ta=document.getElementById("snapTxt"), v=(ta.value||"").trim(); if(!v) return;
       if(!autrePresent){ toast("Il faut être tous les deux là pour un snap 🙂"); return; }
       ta.value=""; buzz(15); envoyer({ game:"snap", texte:v }); toast("Snap envoyé 👻");
     });
-    onPresence=function(){ info.textContent = autrePresent ? "Ça s'affiche une seule fois chez l'autre, puis ça disparaît." : "Attends qu'il/elle soit là — un snap ne s'envoie qu'en direct."; };
+    onPresence=function(){ info.textContent = autrePresent ? "Ça s'affiche une seule fois chez l'autre, puis ça disparaît." : "Attends qu'il/elle soit là, un snap ne s'envoie qu'en direct."; };
   }
 
   // ===== Ton cœur, chez moi (battement partagé, haptique + visuel, temps réel) =====
   function jeuBattement(){
     var autreNom = NOMS[role==="elle"?"lui":"elle"];
     zone.innerHTML='<div class="bat-zone"><div class="coeur-bat" id="cbat" role="button" tabindex="0" aria-label="Tape ton rythme">💓</div>'
-      +'<p class="bat-msg">Appuie à ton rythme, du bout du doigt. '+autreNom+' le ressent dans sa main, en direct — comme ton cœur contre le sien.</p></div>';
+      +'<p class="bat-msg">Appuie à ton rythme, du bout du doigt. '+autreNom+' le ressent dans sa main, en direct, comme ton cœur contre le sien.</p></div>';
     function majInfo(){ info.textContent = autrePresent ? ("Ton cœur bat chez "+autreNom+" 🤍") : ("Dès que "+autreNom+" est là, il/elle sentira ton rythme."); }
     majInfo();
     var cbat=document.getElementById("cbat");
@@ -406,7 +406,7 @@
 
   // ===== Respirez ensemble (synchronisé par l'horloge, sans message) =====
   function jeuRespire(){
-    zone.innerHTML='<div class="main-zone"><div class="bulle-resp" id="br"></div><div class="txt-resp" id="tr">respirez…</div><p class="attente">Même bulle, même rythme — vous respirez en même temps, où que vous soyez.</p></div>';
+    zone.innerHTML='<div class="main-zone"><div class="bulle-resp" id="br"></div><div class="txt-resp" id="tr">respirez…</div><p class="attente">Même bulle, même rythme, vous respirez en même temps, où que vous soyez.</p></div>';
     info.textContent = autrePresent ? "Vous respirez ensemble 🤍" : "Respire… "+NOMS[role==="elle"?"lui":"elle"]+" te rejoindra.";
     var br=document.getElementById("br"), tr=document.getElementById("tr"), CYCLE=11000;
     var timer=setInterval(function(){

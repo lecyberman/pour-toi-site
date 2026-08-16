@@ -95,6 +95,25 @@
     #monde .kase .d{ font-family:'Nunito Sans',sans-serif; font-size:.86rem; color:#B4AAC8; margin-top:3px; line-height:1.45; }
     #monde .monde-sign{ text-align:center; margin-top:36px; font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; }
 
+    /* ===== Encart notifications douces ===== */
+    #monde .notif-doux{ display:flex; flex-wrap:wrap; align-items:center; gap:14px; justify-content:space-between;
+      margin:28px auto 0; max-width:660px; background:linear-gradient(180deg, rgba(180,155,218,.15), rgba(180,155,218,.05));
+      border:1px solid rgba(180,155,218,.34); border-radius:18px; padding:18px 20px; }
+    #monde .notif-doux .notif-t{ font-family:'Fraunces',serif; font-weight:500; color:#FBF4EA; font-size:1.08rem; }
+    #monde .notif-doux .notif-d{ font-family:'Nunito Sans',sans-serif; color:#C9C1D8; font-size:.88rem; margin-top:4px; line-height:1.55; max-width:46ch; }
+    #monde .notif-doux .notif-actions{ display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; }
+    #monde .notif-btn{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.9rem; border-radius:100px; padding:11px 20px; cursor:pointer; border:1px solid transparent; transition:transform .2s ease, background .25s; }
+    #monde .notif-btn:hover{ transform:translateY(-1px); }
+    #monde .notif-btn.p{ color:#1a1430; background:linear-gradient(135deg,#C7B2E6,#8E6FBF); box-shadow:0 12px 28px -14px rgba(124,82,168,.8); }
+    #monde .notif-btn.g{ color:#EDE9F3; background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.2); }
+    #monde .notif-doux.ok{ border-color:rgba(142,231,160,.4); background:linear-gradient(180deg, rgba(142,231,160,.1), rgba(142,231,160,.03)); }
+    #monde .notif-note{ display:block; text-align:center; margin-top:8px; font-family:'Nunito Sans',sans-serif; font-size:.78rem; color:rgba(201,193,216,.7); }
+    html[data-theme="clair"] #monde .notif-doux{ background:#fff; border-color:rgba(142,111,191,.25); }
+    html[data-theme="clair"] #monde .notif-doux.ok{ background:#f3fbf4; border-color:rgba(96,168,110,.35); }
+    html[data-theme="clair"] #monde .notif-doux .notif-t{ color:#3E3446; }
+    html[data-theme="clair"] #monde .notif-doux .notif-d{ color:#6b6175; }
+    html[data-theme="clair"] #monde .notif-btn.g{ color:#3E3446; background:rgba(62,52,70,.06); border-color:rgba(62,52,70,.16); }
+
     /* ===== Harmonisation des sections internes gardées ===== */
     #comprendre, #dessin, #oeuvre, #emotions{ background:#14162E !important; color:#EDE9F3; }
     #comprendre .section-inner, #dessin .section-inner, #oeuvre .section-inner, #emotions .section-inner{ max-width:840px; margin:0 auto; padding:64px 20px 90px; }
@@ -220,6 +239,29 @@
         <a class="kase" onclick="naviguer('dessin')"><div class="ic">🎨</div><div class="t">Ton espace de dessin</div><div class="d">Dessine, je serai là après.</div></a>
         <a class="kase" onclick="naviguer('oeuvre')"><div class="ic">✍️</div><div class="t">Notre œuvre</div><div class="d">Un dessin, quelques mots, gardés.</div></a>
       </div>
+
+      <!-- Notifications douces : activer / tester / couper -->
+      <div id="notif-doux" class="notif-doux" hidden>
+        <div class="notif-txt">
+          <div class="notif-t">🔔 Mes petits mots, même quand tu ne regardes pas</div>
+          <div class="notif-d">Active les rappels sur ton téléphone : un bonjour le matin, une bonne nuit le soir, et un mot doux si la nuit est longue.</div>
+        </div>
+        <div class="notif-actions">
+          <button type="button" id="notif-on" class="notif-btn p">Activer 🤍</button>
+        </div>
+      </div>
+      <div id="notif-ok" class="notif-doux ok" hidden>
+        <div class="notif-txt">
+          <div class="notif-t">🔔 Rappels activés 🤍</div>
+          <div class="notif-d">Je viendrai te dire bonjour, bonne nuit, et passer le soir. Tu peux les couper quand tu veux.</div>
+        </div>
+        <div class="notif-actions">
+          <button type="button" id="notif-test" class="notif-btn g">Voir un exemple</button>
+          <button type="button" id="notif-off" class="notif-btn g">Couper</button>
+        </div>
+      </div>
+      <span id="notif-note" class="notif-note" hidden>Pour les recevoir même l'application fermée, ajoute le site à ton écran d'accueil.</span>
+
       <p class="monde-sign">tout ça, parce que c'est toi</p>
     </div>
   </section>
@@ -924,6 +966,49 @@
     }
     surveiller(function(el){ return el.closest && el.closest('.btn-retour'); });
     surveiller(function(el){ return el.id === 'facteur'; });
+  })();
+  </script>
+  <script>
+  /* ===== Encart notifications douces : activer / tester / couper ===== */
+  (function(){
+    var boxOn = document.getElementById("notif-doux");
+    var boxOk = document.getElementById("notif-ok");
+    var note  = document.getElementById("notif-note");
+    if(!boxOn || !boxOk) return;
+    var supporte = ("Notification" in window);
+
+    function estActive(){
+      try{ return supporte && Notification.permission === "granted" && window.Rappels && Rappels.config && Rappels.config().enabled; }
+      catch(e){ return false; }
+    }
+    function refresh(){
+      if(!supporte){ boxOn.hidden = true; boxOk.hidden = true; if(note) note.hidden = true; return; }
+      var on = estActive();
+      boxOn.hidden = on;
+      boxOk.hidden = !on;
+      if(note) note.hidden = false;
+    }
+
+    var bOn = document.getElementById("notif-on");
+    var bTest = document.getElementById("notif-test");
+    var bOff = document.getElementById("notif-off");
+    if(bOn) bOn.addEventListener("click", function(){
+      if(!window.Rappels){ return; }
+      bOn.disabled = true; bOn.textContent = "…";
+      Rappels.activer().then(function(ok){
+        bOn.disabled = false; bOn.textContent = "Activer 🤍";
+        if(!ok && supporte && Notification.permission === "denied"){
+          boxOn.querySelector(".notif-d").textContent = "Les notifications sont bloquées dans les réglages du téléphone. Autorise-les pour ce site, puis reviens toucher Activer.";
+        }
+        refresh();
+      });
+    });
+    if(bTest) bTest.addEventListener("click", function(){ if(window.Rappels) Rappels.tester(); });
+    if(bOff) bOff.addEventListener("click", function(){ if(window.Rappels){ Rappels.desactiver(); refresh(); } });
+
+    // rappels.js est en defer : on attend qu'il soit prêt
+    var essais = 0;
+    (function attendre(){ if(window.Rappels || essais > 25){ refresh(); } else { essais++; setTimeout(attendre, 150); } })();
   })();
   </script>
   <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}</script>

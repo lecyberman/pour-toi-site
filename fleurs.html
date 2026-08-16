@@ -145,7 +145,7 @@
   var revele=false;
   function reveler(){
     revele=true;
-    nomEl.textContent=fleur.nom; sensEl.textContent="— "+fleur.sens;
+    nomEl.textContent=fleur.nom; sensEl.textContent=""+fleur.sens;
     motEl.style.opacity=0; setTimeout(function(){ motEl.textContent=mot; motEl.style.opacity=1; },250);
     eclore();
     try{ if(navigator.vibrate) navigator.vibrate([15,40,15]); }catch(e){}
