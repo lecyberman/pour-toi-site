@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0b0a16" />
+<title>Ton journal du soir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -10%, #241d40 0%, transparent 55%),
+      radial-gradient(90% 70% at 50% 112%, #17152f 0%, transparent 60%),
+      #0b0a16; overflow-x:hidden; }
+  .wrap{ max-width:600px; margin:0 auto; padding:max(22px,env(safe-area-inset-top)) 20px 90px; }
+  a.retour{ display:inline-block; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; margin-bottom:18px; }
+  a.retour:hover{ color:#fff; }
+  .tete{ text-align:center; margin-bottom:14px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.05rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.6rem); margin:0; color:#FBF4EA; }
+  .invite{ text-align:center; color:#B7ACCB; font-family:'Fraunces',serif; font-style:italic; font-size:1.05rem; margin:14px auto 4px; max-width:36ch; min-height:2.6em; transition:opacity .6s; }
+
+  .zone{ position:relative; margin-top:10px; }
+  textarea{ width:100%; min-height:44vh; resize:vertical; background:rgba(255,255,255,.045);
+    border:1px solid rgba(180,155,218,.22); border-radius:18px; color:#F1ECF8; padding:18px 18px;
+    font-family:'Fraunces',Georgia,serif; font-size:1.12rem; line-height:1.8; }
+  textarea:focus{ outline:2px solid rgba(168,134,218,.55); }
+  textarea::placeholder{ color:#7d7397; font-style:italic; }
+
+  /* calque de dissolution */
+  #dissout{ position:absolute; inset:0; padding:18px; font-family:'Fraunces',Georgia,serif; font-size:1.12rem; line-height:1.8;
+    color:#F1ECF8; pointer-events:none; display:none; flex-wrap:wrap; align-content:flex-start; gap:0 .32em; overflow:hidden; }
+  #dissout.on{ display:flex; }
+  #dissout span{ display:inline-block; opacity:1; }
+  @keyframes envol{ to{ opacity:0; transform:translateY(-40px) translateX(var(--dx,0)) rotate(var(--r,0deg)); filter:blur(4px); } }
+
+  .actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:18px; }
+  .btn{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.95rem; border-radius:100px; padding:13px 22px; cursor:pointer; border:1px solid transparent; }
+  .btn.p{ color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); box-shadow:0 12px 28px -14px rgba(168,134,218,.8); }
+  .btn.g{ color:#EDE9F3; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.18); }
+  .btn:disabled{ opacity:.5; cursor:default; }
+
+  .confid{ margin-top:20px; text-align:center; color:rgba(201,193,216,.75); font-size:.85rem; line-height:1.6; }
+  .confid b{ color:#C7B2E6; font-weight:700; }
+  #retour-msg{ text-align:center; margin-top:14px; color:#C7B2E6; font-family:'Fraunces',serif; font-style:italic; min-height:1.3em; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="retour" href="/">⌂ Accueil</a>
+    <div class="tete">
+      <p class="eyebrow">rien que pour toi, personne d'autre</p>
+      <h1>Ton journal du soir</h1>
+    </div>
+    <p class="invite" id="invite">Vide ce qui pèse ce soir. Écris sans te relire, sans te juger.</p>
+
+    <div class="zone">
+      <textarea id="texte" placeholder="Écris ici… ça reste entre toi et cette page."></textarea>
+      <div id="dissout" aria-hidden="true"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn p" id="partir">Laisser partir</button>
+      <button class="btn g" id="garder">Garder juste cette nuit</button>
+    </div>
+    <p id="retour-msg"></p>
+
+    <p class="confid">
+      <b>Rien n'est enregistré, rien n'est envoyé.</b> Ce que tu écris ne quitte pas ton téléphone.
+      « Laisser partir » efface tout, comme un souffle. « Garder cette nuit » le garde pour toi seule,
+      et ça s'efface tout seul au lever du jour.
+    </p>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var texte = document.getElementById("texte");
+  var dissout = document.getElementById("dissout");
+  var msg = document.getElementById("retour-msg");
+  var CLE = "journal_nuit_v1";
+  var auj = new Date().toISOString().slice(0,10);
+
+  // Invitations qui tournent doucement
+  var INVITES = [
+    "Vide ce qui pèse ce soir. Écris sans te relire, sans te juger.",
+    "Qu'est-ce qui t'empêche de dormir, là, maintenant ?",
+    "Dis-le ici. La page ne répète rien, ne garde rien.",
+    "Ce qui est trop lourd à porter, pose-le là un moment.",
+    "Écris comme si personne ne devait jamais lire. Parce que personne ne lira."
+  ];
+  var iv = 0;
+  setInterval(function(){
+    var el = document.getElementById("invite");
+    if(document.activeElement === texte) return;
+    el.style.opacity = 0;
+    setTimeout(function(){ iv=(iv+1)%INVITES.length; el.textContent = INVITES[iv]; el.style.opacity = .9; }, 600);
+  }, 9000);
+
+  // Reprise éventuelle de la nuit
+  try{
+    var brut = localStorage.getItem(CLE);
+    if(brut){
+      var o = JSON.parse(brut);
+      if(o && o.date === auj && o.texte){ texte.value = o.texte; msg.textContent = "Repris là où tu t'étais arrêtée cette nuit."; }
+      else { localStorage.removeItem(CLE); } // d'un autre jour : effacé
+    }
+  }catch(e){}
+
+  document.getElementById("garder").addEventListener("click", function(){
+    var t = texte.value;
+    if(!t.trim()){ msg.textContent = "Écris d'abord quelque chose, puis je le garderai pour cette nuit."; return; }
+    try{ localStorage.setItem(CLE, JSON.stringify({date:auj, texte:t})); }catch(e){}
+    msg.textContent = "Gardé pour cette nuit, juste pour toi. Ça s'effacera au matin. 🤍";
+  });
+
+  document.getElementById("partir").addEventListener("click", function(){
+    var t = texte.value;
+    if(!t.trim()){ msg.textContent = "Il n'y a rien à laisser partir pour l'instant."; return; }
+    try{ localStorage.removeItem(CLE); }catch(e){}
+    envoler(t);
+  });
+
+  function envoler(t){
+    // fabrique les mots, puis les fait s'envoler un à un
+    var mots = t.split(/(\s+)/);
+    dissout.innerHTML = "";
+    mots.forEach(function(m){
+      if(m === "") return;
+      if(/^\s+$/.test(m)){ dissout.appendChild(document.createTextNode(m.replace(/\n/g,' '))); return; }
+      var s = document.createElement("span"); s.textContent = m; dissout.appendChild(s);
+    });
+    // aligne le calque sur le contenu et masque le textarea
+    dissout.classList.add("on");
+    texte.style.visibility = "hidden";
+    var spans = dissout.querySelectorAll("span");
+    var total = spans.length;
+    spans.forEach(function(s, i){
+      var delai = (i / Math.max(1,total)) * 1400 + Math.random()*300;
+      s.style.setProperty("--dx", (Math.random()*40-20)+"px");
+      s.style.setProperty("--r", (Math.random()*24-12)+"deg");
+      s.style.animation = "envol 1.8s ease-in forwards";
+      s.style.animationDelay = delai + "ms";
+    });
+    var duree = 1400 + 1800 + 300;
+    msg.textContent = "";
+    setTimeout(function(){
+      dissout.classList.remove("on"); dissout.innerHTML="";
+      texte.value = ""; texte.style.visibility="visible";
+      msg.textContent = "C'est parti avec le vent. Tu peux respirer. 🤍";
+    }, duree);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0b0a16" />
+<title>Pour t'endormir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -10%, #241d40 0%, transparent 55%),
+      radial-gradient(90% 70% at 50% 112%, #16203f 0%, transparent 60%),
+      #0b0a16; overflow-x:hidden; }
+  .wrap{ max-width:600px; margin:0 auto; padding:max(22px,env(safe-area-inset-top)) 20px 90px; }
+  a.retour{ display:inline-block; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; margin-bottom:18px; }
+  a.retour:hover{ color:#fff; }
+  .tete{ text-align:center; margin-bottom:16px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.05rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.7rem); margin:0; color:#FBF4EA; }
+  .sous{ color:#A99CC4; font-size:.95rem; margin:.5rem 0 0; }
+
+  .master{ text-align:center; margin:20px 0 8px; }
+  #play{ width:96px; height:96px; border-radius:50%; border:none; cursor:pointer;
+    color:#1a1430; background:radial-gradient(circle at 40% 35%, #E9DEF7, #A886DA);
+    font-size:2rem; box-shadow:0 18px 40px -14px rgba(168,134,218,.8);
+    transition:transform .2s; }
+  #play.on{ animation:pulse 3.4s ease-in-out infinite; }
+  #play:active{ transform:scale(.96); }
+  @keyframes pulse{ 0%,100%{ box-shadow:0 18px 40px -14px rgba(168,134,218,.7), 0 0 0 0 rgba(180,155,218,.4);} 50%{ box-shadow:0 18px 44px -14px rgba(168,134,218,.85), 0 0 0 16px rgba(180,155,218,0);} }
+  .hint{ color:rgba(201,193,216,.7); font-size:.85rem; margin-top:10px; min-height:1.2em; }
+
+  .grille{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-top:18px; }
+  .amb{ background:rgba(252,248,250,.05); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:14px; }
+  .amb.actif{ border-color:rgba(180,155,218,.6); background:rgba(180,155,218,.12); }
+  .amb .ligne{ display:flex; align-items:center; gap:10px; cursor:pointer; }
+  .amb .ic{ font-size:1.5rem; }
+  .amb .nom{ font-family:'Fraunces',serif; font-size:1.05rem; color:#FBF4EA; }
+  .amb input[type=range]{ width:100%; margin-top:10px; accent-color:#A886DA; display:none; }
+  .amb.actif input[type=range]{ display:block; }
+
+  .minuteur{ margin-top:24px; text-align:center; }
+  .minuteur h2{ font-family:'Fraunces',serif; font-weight:500; font-size:1.2rem; color:#FBF4EA; margin:0 0 4px; }
+  .minuteur .note{ color:#A99CC4; font-size:.85rem; margin:0 0 12px; }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  .chip{ font-family:inherit; font-weight:700; font-size:.9rem; color:#EDE9F3; background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.16); border-radius:100px; padding:9px 16px; cursor:pointer; }
+  .chip.actif{ color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border-color:transparent; }
+  #minInfo{ margin-top:12px; color:#C7B2E6; font-family:'Fraunces',serif; font-style:italic; min-height:1.3em; }
+
+  .ecoutes{ margin-top:34px; background:rgba(255,255,255,.035); border:1px solid rgba(180,155,218,.18); border-radius:18px; padding:18px 16px; }
+  .ecoutes h2{ font-family:'Fraunces',serif; font-weight:500; font-size:1.2rem; color:#FBF4EA; margin:0 0 4px; text-align:center; }
+  .ecoutes .note{ color:#A99CC4; font-size:.82rem; text-align:center; margin:0 0 14px; line-height:1.5; }
+  .ec-form{ display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+  .ec-form input{ background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.16); border-radius:12px; color:#EDE9F3; padding:11px 13px; font-family:inherit; font-size:.95rem; }
+  .ec-form input:focus{ outline:2px solid #A886DA; }
+  .ec-form button{ align-self:flex-start; font-family:inherit; font-weight:700; font-size:.9rem; color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border:none; border-radius:100px; padding:10px 18px; cursor:pointer; }
+  #ecListe{ display:flex; flex-direction:column; gap:8px; }
+  .ec{ display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:10px 12px; }
+  .ec a{ flex:1; color:#E9DEF7; text-decoration:none; font-weight:600; font-size:.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ec a:hover{ color:#fff; }
+  .ec .x{ background:transparent; border:1px solid rgba(255,255,255,.18); color:#C9C1D8; border-radius:100px; padding:5px 11px; font-size:.8rem; cursor:pointer; }
+  .ec-vide{ color:#8E82A6; font-style:italic; font-size:.88rem; text-align:center; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="retour" href="/">⌂ Accueil</a>
+    <div class="tete">
+      <p class="eyebrow">quand le sommeil ne vient pas</p>
+      <h1>Pour t'endormir</h1>
+      <p class="sous">Choisis tes sons, pose un minuteur, et laisse-toi couler doucement.</p>
+    </div>
+
+    <div class="master">
+      <button id="play" aria-label="Lancer les sons">▶</button>
+      <p class="hint" id="hint">Touche pour lancer. Mélange ce que tu veux.</p>
+    </div>
+
+    <div class="grille" id="grille"></div>
+
+    <div class="minuteur">
+      <h2>Minuteur de sommeil</h2>
+      <p class="note">Le son s'éteindra tout seul, en fondu. Pas besoin d'y penser.</p>
+      <div class="chips" id="chips"></div>
+      <div id="minInfo"></div>
+    </div>
+
+    <div class="ecoutes">
+      <h2>Tes écoutes du soir</h2>
+      <p class="note">Range ici tes liens (podcasts, documentaires, pluie sur YouTube…). Un seul appui pour les rouvrir le soir.</p>
+      <div class="ec-form">
+        <input type="text" id="ecTitre" placeholder="Nom (ex : mon podcast true crime)" />
+        <input type="text" id="ecUrl" placeholder="Colle le lien ici (https://…)" inputmode="url" />
+        <button id="ecAdd">Ranger ce lien</button>
+      </div>
+      <div id="ecListe"><p class="ec-vide">Rien encore. Ajoute ta première écoute du soir.</p></div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Moteur audio (Web Audio, sons synthétisés, aucun fichier) ----------
+  var AC = window.AudioContext || window.webkitAudioContext;
+  var ctx = null, master = null, bruit = null;
+  var actifs = {}; // id -> {gain, nodes[], setVol, stop}
+
+  function initCtx(){
+    if(ctx) return;
+    ctx = new AC();
+    master = ctx.createGain(); master.gain.value = 0.9; master.connect(ctx.destination);
+    // buffer de bruit blanc réutilisable (2s)
+    var n = ctx.sampleRate * 2; bruit = ctx.createBuffer(1, n, ctx.sampleRate);
+    var d = bruit.getChannelData(0);
+    for(var i=0;i<n;i++) d[i] = Math.random()*2-1;
+  }
+  function source(){ var s = ctx.createBufferSource(); s.buffer = bruit; s.loop = true; s.start(0); return s; }
+  function gain(v){ var g = ctx.createGain(); g.gain.value = v; return g; }
+  function lfo(freq, min, max, cible, param){
+    var o = ctx.createOscillator(); o.frequency.value = freq;
+    var g = ctx.createGain(); g.gain.value = (max-min)/2;
+    o.connect(g); g.connect(cible[param]);
+    cible[param].value = (max+min)/2;
+    o.start(0); return o;
+  }
+
+  // Constructeurs d'ambiances : renvoient {out, extra:[nodes], setVol, stop}
+  function bPluie(){
+    var s = source();
+    var hp = ctx.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=500;
+    var lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=6500;
+    var g = gain(0.5);
+    s.connect(hp); hp.connect(lp); lp.connect(g);
+    var mod = lfo(0.15, 0.4, 0.6, g.gain ? g : g, "gain"); // léger battement
+    return { out:g, extra:[s,mod], base:0.5 };
+  }
+  function bOcean(){
+    var s = source();
+    var lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=500;
+    var g = gain(0.0001);
+    s.connect(lp); lp.connect(g);
+    // vagues : LFO lent sur le volume (montée/descente ~ 9s)
+    var o = ctx.createOscillator(); o.frequency.value = 0.11;
+    var og = ctx.createGain(); og.gain.value = 0.32;
+    o.connect(og); og.connect(g.gain); g.gain.value = 0.34; o.start(0);
+    return { out:g, extra:[s,o], base:0.7 };
+  }
+  function bOrage(){
+    // pluie de fond + coups de tonnerre aléatoires
+    var s = source();
+    var hp = ctx.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=420;
+    var lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=6000;
+    var g = gain(0.45);
+    s.connect(hp); hp.connect(lp); lp.connect(g);
+    var vivant = true;
+    function tonnerre(){
+      if(!vivant) return;
+      var ts = source();
+      var tl = ctx.createBiquadFilter(); tl.type="lowpass"; tl.frequency.value=180;
+      var tg = ctx.createGain(); tg.gain.value=0.0001;
+      ts.connect(tl); tl.connect(tg); tg.connect(g);
+      var t = ctx.currentTime;
+      tg.gain.setValueAtTime(0.0001,t);
+      tg.gain.exponentialRampToValueAtTime(0.9, t+0.08);
+      tg.gain.exponentialRampToValueAtTime(0.0002, t+1.6+Math.random());
+      ts.stop(t+3);
+      setTimeout(tonnerre, 9000 + Math.random()*16000);
+    }
+    setTimeout(tonnerre, 4000 + Math.random()*6000);
+    return { out:g, extra:[s], base:0.5, arret:function(){ vivant=false; } };
+  }
+  function bVent(){
+    var s = source();
+    var bp = ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=500; bp.Q.value=0.7;
+    var g = gain(0.4);
+    s.connect(bp); bp.connect(g);
+    var o = ctx.createOscillator(); o.frequency.value=0.08;
+    var og = ctx.createGain(); og.gain.value=280;
+    o.connect(og); og.connect(bp.frequency); o.start(0);
+    return { out:g, extra:[s,o], base:0.45 };
+  }
+  function bFeu(){
+    var s = source();
+    var lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=430;
+    var g = gain(0.4);
+    s.connect(lp); lp.connect(g);
+    var vivant = true;
+    function crepite(){
+      if(!vivant) return;
+      var cs = source();
+      var chp = ctx.createBiquadFilter(); chp.type="highpass"; chp.frequency.value=1500;
+      var cg = ctx.createGain(); cg.gain.value=0.0001;
+      cs.connect(chp); chp.connect(cg); cg.connect(g);
+      var t = ctx.currentTime;
+      cg.gain.setValueAtTime(0.0001,t);
+      cg.gain.exponentialRampToValueAtTime(0.25+Math.random()*0.3, t+0.01);
+      cg.gain.exponentialRampToValueAtTime(0.0001, t+0.06+Math.random()*0.08);
+      cs.stop(t+0.3);
+      setTimeout(crepite, 120 + Math.random()*400);
+    }
+    setTimeout(crepite, 300);
+    return { out:g, extra:[s], base:0.5, arret:function(){ vivant=false; } };
+  }
+  function bNuit(){
+    // lit de nuit + grillons pulsés
+    var s = source();
+    var lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=350;
+    var g = gain(0.18);
+    s.connect(lp); lp.connect(g);
+    var o = ctx.createOscillator(); o.type="triangle"; o.frequency.value=4600;
+    var og = ctx.createGain(); og.gain.value=0.0001; o.connect(og); og.connect(g); o.start(0);
+    var lo = ctx.createOscillator(); lo.type="square"; lo.frequency.value=8; // pulsation grillon
+    var log = ctx.createGain(); log.gain.value=0.06;
+    lo.connect(log); log.connect(og.gain); og.gain.value=0.06; lo.start(0);
+    return { out:g, extra:[s,o,lo], base:0.5 };
+  }
+
+  var BUILDERS = {
+    pluie:bPluie, orage:bOrage, ocean:bOcean, vent:bVent, feu:bFeu, nuit:bNuit
+  };
+  var AMBIANCES = [
+    {id:"pluie", ic:"🌧️", nom:"Pluie douce"},
+    {id:"orage", ic:"⛈️", nom:"Orage"},
+    {id:"ocean", ic:"🌊", nom:"Océan"},
+    {id:"vent",  ic:"🍃", nom:"Vent"},
+    {id:"feu",   ic:"🔥", nom:"Feu de bois"},
+    {id:"nuit",  ic:"🌙", nom:"Nuit d'été"}
+  ];
+
+  function activer(id, vol){
+    if(actifs[id]) return;
+    var b = BUILDERS[id]();
+    var vg = ctx.createGain(); vg.gain.value = (vol!=null?vol:0.7);
+    b.out.connect(vg); vg.connect(master);
+    actifs[id] = { vg:vg, b:b };
+  }
+  function desactiver(id){
+    var a = actifs[id]; if(!a) return;
+    try{ if(a.b.arret) a.b.arret(); }catch(e){}
+    try{ a.b.out.disconnect(); }catch(e){}
+    (a.b.extra||[]).forEach(function(n){ try{ n.stop&&n.stop(); }catch(e){} try{ n.disconnect&&n.disconnect(); }catch(e){} });
+    try{ a.vg.disconnect(); }catch(e){}
+    delete actifs[id];
+  }
+  function setVol(id, v){ if(actifs[id]) actifs[id].vg.gain.value = v; }
+
+  // ---------- UI ambiances ----------
+  var enLecture = false;
+  var grille = document.getElementById("grille");
+  var choisis = {}; // id -> volume (mémoire des sélections)
+  try{ choisis = JSON.parse(localStorage.getItem("dormir_choix")||"{}") || {}; }catch(e){ choisis={}; }
+
+  function sauverChoix(){ try{ localStorage.setItem("dormir_choix", JSON.stringify(choisis)); }catch(e){} }
+
+  AMBIANCES.forEach(function(a){
+    var card = document.createElement("div"); card.className="amb"; card.dataset.id=a.id;
+    card.innerHTML = '<div class="ligne"><span class="ic">'+a.ic+'</span><span class="nom">'+a.nom+'</span></div>' +
+      '<input type="range" min="0" max="1" step="0.01" value="'+(choisis[a.id]!=null?choisis[a.id]:0.7)+'" aria-label="Volume '+a.nom+'" />';
+    var range = card.querySelector("input");
+    card.querySelector(".ligne").addEventListener("click", function(){
+      var on = card.classList.toggle("actif");
+      if(on){
+        choisis[a.id] = parseFloat(range.value);
+        if(enLecture) activer(a.id, choisis[a.id]);
+      } else {
+        delete choisis[a.id];
+        desactiver(a.id);
+      }
+      sauverChoix();
+      majHint();
+    });
+    range.addEventListener("input", function(){
+      choisis[a.id] = parseFloat(range.value);
+      setVol(a.id, choisis[a.id]);
+      sauverChoix();
+    });
+    if(choisis[a.id]!=null) card.classList.add("actif");
+    grille.appendChild(card);
+  });
+
+  function majHint(){
+    var h = document.getElementById("hint");
+    var n = Object.keys(choisis).length;
+    if(!enLecture){ h.textContent = n? "Touche ▶ pour lancer ta nuit." : "Choisis un ou plusieurs sons, puis touche ▶."; }
+    else { h.textContent = n? "Bonne nuit, toi. 🤍" : "Choisis un son ci-dessous."; }
+  }
+
+  var play = document.getElementById("play");
+  play.addEventListener("click", function(){
+    initCtx();
+    if(!enLecture){
+      if(ctx.state==="suspended") ctx.resume();
+      enLecture = true; play.textContent="❚❚"; play.classList.add("on");
+      Object.keys(choisis).forEach(function(id){ activer(id, choisis[id]); });
+      if(Object.keys(choisis).length===0){ // rien de choisi : on met la pluie par défaut
+        var d = grille.querySelector('[data-id="pluie"]'); d.classList.add("actif"); choisis.pluie=0.7; activer("pluie",0.7); sauverChoix();
+      }
+    } else {
+      enLecture = false; play.textContent="▶"; play.classList.remove("on");
+      Object.keys(actifs).slice().forEach(desactiver);
+      if(ctx) ctx.suspend();
+      annulerMinuteur();
+    }
+    majHint();
+  });
+
+  // ---------- Minuteur ----------
+  var TEMPS = [15,30,45,60,90];
+  var chips = document.getElementById("chips");
+  var minuteurId=null, fondu=null, finPrevue=null, tick=null;
+  TEMPS.forEach(function(m){
+    var c = document.createElement("button"); c.className="chip"; c.textContent=m+" min"; c.dataset.min=m;
+    c.addEventListener("click", function(){ poserMinuteur(m, c); });
+    chips.appendChild(c);
+  });
+  var cInf = document.createElement("button"); cInf.className="chip"; cInf.textContent="∞ sans fin"; cInf.dataset.min="0";
+  cInf.addEventListener("click", function(){ annulerMinuteur(); marquer(cInf); document.getElementById("minInfo").textContent="Aucun minuteur. Les sons tourneront tant que tu veux."; });
+  chips.appendChild(cInf);
+
+  function marquer(el){ Array.prototype.forEach.call(chips.children, function(c){ c.classList.remove("actif"); }); if(el) el.classList.add("actif"); }
+  function annulerMinuteur(){ clearTimeout(minuteurId); clearTimeout(fondu); clearInterval(tick); minuteurId=fondu=tick=finPrevue=null; }
+
+  function poserMinuteur(min, el){
+    marquer(el);
+    if(!enLecture){ play.click(); }
+    annulerMinuteur();
+    finPrevue = Date.now() + min*60000;
+    var info = document.getElementById("minInfo");
+    tick = setInterval(function(){
+      if(!finPrevue){ clearInterval(tick); return; }
+      var reste = Math.max(0, finPrevue - Date.now());
+      var mm = Math.floor(reste/60000), ss = Math.floor((reste%60000)/1000);
+      info.textContent = "Extinction dans " + mm + " min " + (ss<10?"0":"") + ss + " s 🌙";
+    }, 1000);
+    // fondu de sortie 30s avant la fin
+    var avant = Math.max(0, min*60000 - 30000);
+    fondu = setTimeout(function(){
+      if(master){ try{ master.gain.setTargetAtTime(0.0001, ctx.currentTime, 8); }catch(e){} }
+    }, avant);
+    minuteurId = setTimeout(function(){
+      Object.keys(actifs).slice().forEach(desactiver);
+      if(ctx){ ctx.suspend(); if(master) master.gain.value=0.9; }
+      enLecture=false; play.textContent="▶"; play.classList.remove("on");
+      annulerMinuteur(); marquer(null);
+      info.textContent = "C'est éteint. Dors bien, toi. 🤍";
+      majHint();
+    }, min*60000);
+  }
+
+  // ---------- Écoutes du soir (Supabase) ----------
+  var URL_SB="https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  var sb=null; try{ if(window.supabase&&window.supabase.createClient) sb=window.supabase.createClient(URL_SB,ANON); }catch(e){}
+  var liste=document.getElementById("ecListe");
+
+  function normUrl(u){ u=(u||"").trim(); if(!u) return ""; if(!/^https?:\/\//i.test(u)) u="https://"+u; return u; }
+  function chargerEc(){
+    if(!sb){ liste.innerHTML='<p class="ec-vide">Connexion indisponible pour le moment.</p>'; return; }
+    sb.from("ecoutes").select("*").order("created_at",{ascending:false}).then(function(r){
+      var rows=r.data||[];
+      if(!rows.length){ liste.innerHTML='<p class="ec-vide">Rien encore. Ajoute ta première écoute du soir.</p>'; return; }
+      liste.innerHTML="";
+      rows.forEach(function(e){
+        var d=document.createElement("div"); d.className="ec";
+        var a=document.createElement("a"); a.textContent="🎧 "+e.titre; a.href=e.url; a.target="_blank"; a.rel="noopener noreferrer";
+        var x=document.createElement("button"); x.className="x"; x.textContent="retirer";
+        x.addEventListener("click", function(){ sb.from("ecoutes").delete().eq("id",e.id).then(function(){ d.remove(); if(!liste.children.length) chargerEc(); }); });
+        d.appendChild(a); d.appendChild(x); liste.appendChild(d);
+      });
+    });
+  }
+  document.getElementById("ecAdd").addEventListener("click", function(){
+    var t=document.getElementById("ecTitre").value.trim();
+    var u=normUrl(document.getElementById("ecUrl").value);
+    if(!t||!u) return;
+    if(!sb) return;
+    sb.from("ecoutes").insert({titre:t,url:u}).then(function(){
+      document.getElementById("ecTitre").value=""; document.getElementById("ecUrl").value="";
+      chargerEc();
+    });
+  });
+  chargerEc();
+  majHint();
+})();
+</script>
+</body>
+</html>
