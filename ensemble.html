@@ -105,6 +105,21 @@
   .coeur-bat{ font-size:5.6rem; line-height:1; cursor:pointer; user-select:none; -webkit-user-select:none; display:inline-block; transition:transform .12s cubic-bezier(.3,0,.3,1); filter:drop-shadow(0 0 26px rgba(214,90,120,.55)); }
   .coeur-bat.pulse{ transform:scale(1.32); }
   .bat-msg{ color:#B4A9C8; margin-top:18px; line-height:1.7; max-width:420px; margin-left:auto; margin-right:auto; }
+
+  /* météo de nous */
+  .meteo-deux{ display:flex; gap:12px; justify-content:center; margin-bottom:12px; }
+  .meteo-bloc{ flex:1; max-width:180px; background:rgba(255,255,255,.05); border:1px solid rgba(180,155,218,.2); border-radius:16px; padding:14px; text-align:center; }
+  .meteo-e{ font-size:2.4rem; line-height:1; }
+  .meteo-l{ font-family:'Fraunces',serif; color:#C7B2E6; margin-top:6px; }
+  .meteo-m{ color:#A99CC4; font-size:.85rem; margin-top:2px; }
+
+  /* snap éphémère */
+  .snap-ov{ position:fixed; inset:0; z-index:70; background:rgba(10,8,20,.88); display:flex; align-items:center; justify-content:center; padding:24px; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+  .snap-card{ max-width:420px; width:100%; background:rgba(24,22,46,.96); border:1px solid rgba(199,178,230,.4); border-radius:20px; padding:24px; text-align:center; cursor:pointer; }
+  .snap-hd{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; margin-bottom:12px; }
+  .snap-body{ color:#F2ECFB; font-size:1.2rem; line-height:1.7; min-height:3em; display:flex; align-items:center; justify-content:center; }
+  .snap-bar{ height:4px; background:rgba(255,255,255,.1); border-radius:100px; margin-top:16px; overflow:hidden; }
+  .snap-bar>div{ height:100%; width:100%; background:linear-gradient(90deg,#8E6FBF,#E9DEF7); }
 </style>
 </head>
 <body>
@@ -187,7 +202,19 @@
 
   function envoyer(p){ p.from=role; canal.send({ type:"broadcast", event:"jeu", payload:p }); }
   var handler=null;
-  function recevoir(p){ if(p.from===role) return; if(p.game==="coeur"){ popCoeur(); return; } if(typeof handler==="function") handler(p); }
+  function recevoir(p){ if(p.from===role) return; if(p.game==="coeur"){ popCoeur(); return; } if(p.game==="snap"){ montrerSnap(p.texte); return; } if(typeof handler==="function") handler(p); }
+  function montrerSnap(texte){
+    var ov=document.createElement("div"); ov.className="snap-ov";
+    ov.innerHTML='<div class="snap-card"><div class="snap-hd">Un snap de '+NOMS[role==="elle"?"lui":"elle"]+' 👻</div><div class="snap-body" id="snapBody">appuie pour lire…</div><div class="snap-bar"><div id="snapBarIn"></div></div></div>';
+    document.body.appendChild(ov);
+    var lu=false;
+    ov.addEventListener("click", function(){
+      if(!lu){ lu=true; document.getElementById("snapBody").textContent=texte; try{if(navigator.vibrate)navigator.vibrate(20);}catch(e){}
+        var bar=document.getElementById("snapBarIn"); bar.style.transition="width 6s linear"; requestAnimationFrame(function(){ bar.style.width="0%"; });
+        setTimeout(function(){ if(ov.parentNode) ov.remove(); }, 6100);
+      } else { ov.remove(); }
+    });
+  }
   function popCoeur(){ var h=document.createElement("span"); h.className="coeurFly"; h.textContent=["💗","💖","🤍","💜","❤️"][Math.floor(Math.random()*5)];
     h.style.left=(8+Math.random()*84)+"vw"; h.style.bottom="10vh"; document.body.appendChild(h); setTimeout(function(){ h.remove(); }, 2300); }
 
@@ -195,6 +222,8 @@
   var JEUX=[
     { id:"boite", em:"💌", tt:"Notre boîte à mots", ss:"Déposez des petits mots : ils restent, pour toujours." },
     { id:"battement", em:"💓", tt:"Ton cœur, chez moi", ss:"Tape un rythme du doigt : son téléphone le ressent." },
+    { id:"meteo", em:"⛅", tt:"La météo de nous", ss:"Ton humeur du moment ; l'autre la voit." },
+    { id:"snap", em:"👻", tt:"Un snap", ss:"Un message qui s'affiche une fois, puis s'efface." },
     { id:"morpion", em:"❤️✦", tt:"Morpion à deux", ss:"Toi les cœurs, lui les étoiles. En direct." },
     { id:"dessin", em:"🎨", tt:"Dessinez ensemble", ss:"Un tableau partagé, vos traits en direct." },
     { id:"main", em:"🤝", tt:"Main dans la main", ss:"Tenez-vous la main en même temps." },
@@ -211,7 +240,7 @@
   }
   document.getElementById("retourMenu").addEventListener("click", function(){ vue.classList.remove("on"); menu.style.display="flex"; document.getElementById("presence").style.display=""; handler=null; onPresence=null; rejouer.style.display="none"; });
   function ouvrirJeu(id){ menu.style.display="none"; document.getElementById("presence").style.display=""; vue.classList.add("on"); rejouer.style.display="none"; window.scrollTo({top:0,behavior:"smooth"});
-    if(id==="boite") jeuBoite(); else if(id==="battement") jeuBattement(); else if(id==="morpion") jeuMorpion(); else if(id==="main") jeuMain(); else if(id==="dessin") jeuDessin(); else if(id==="respire") jeuRespire(); else jeuMot();
+    if(id==="boite") jeuBoite(); else if(id==="battement") jeuBattement(); else if(id==="meteo") jeuMeteo(); else if(id==="snap") jeuSnap(); else if(id==="morpion") jeuMorpion(); else if(id==="main") jeuMain(); else if(id==="dessin") jeuDessin(); else if(id==="respire") jeuRespire(); else jeuMot();
   }
 
   // ===== Morpion =====
@@ -274,6 +303,47 @@
     var t=null;
     monTxt.addEventListener("input", function(){ clearTimeout(t); t=setTimeout(function(){ envoyer({ game:"mot", texte:monTxt.value }); }, 90); });
     handler=function(p){ if(p.game==="mot"){ saTxt.textContent = p.texte||"…"; } };
+  }
+
+  // ===== La météo de nous (humeur du moment, mémorisée + live) =====
+  var HUMEURS = [
+    {e:"☀️",m:"au beau fixe"},{e:"⛅",m:"douce"},{e:"🌈",m:"pleine d'espoir"},
+    {e:"🌧️",m:"un peu grise"},{e:"⛈️",m:"orageuse"},{e:"🌙",m:"calme, un peu fatiguée"},
+    {e:"🥰",m:"amoureuse"},{e:"🔥",m:"pleine d'énergie"},{e:"🫧",m:"besoin de douceur"}
+  ];
+  function jeuMeteo(){
+    zone.innerHTML='<div class="meteo-deux" id="meteoDeux"><p class="attente">chargement…</p></div>'
+      +'<p class="attente" style="margin:2px 0 10px">Choisis ton ciel du moment :</p>'
+      +'<div class="choix" id="meteoChoix" style="justify-content:center"></div>';
+    info.textContent="Ton humeur en un emoji. "+NOMS[role==="elle"?"lui":"elle"]+" la voit, et toi la sienne.";
+    var deux=document.getElementById("meteoDeux"), ch=document.getElementById("meteoChoix");
+    HUMEURS.forEach(function(h){ var b=document.createElement("div"); b.className="puce"; b.textContent=h.e+" "+h.m;
+      b.addEventListener("click", function(){ poser(h); }); ch.appendChild(b); });
+    function poser(h){ buzz(12);
+      client.from("meteo_humeur").upsert({ role:role, emoji:h.e, mot:h.m, updated_at:new Date().toISOString() }, { onConflict:"role" }).then(function(){ charger(); envoyer({game:"meteo"}); }, function(){ charger(); }); }
+    function charger(){
+      client.from("meteo_humeur").select("role,emoji,mot").then(function(res){
+        var rows=(res&&res.data)||[], map={}; rows.forEach(function(r){ map[r.role]=r; });
+        var autre=role==="elle"?"lui":"elle";
+        function bloc(who,r){ return '<div class="meteo-bloc"><div class="meteo-e">'+((r&&r.emoji)||"·")+'</div><div class="meteo-l">'+NOMS[who]+'</div><div class="meteo-m">'+((r&&r.mot)||"— pas encore dit")+'</div></div>'; }
+        deux.innerHTML = bloc(role, map[role]) + bloc(autre, map[autre]);
+      }, function(){ deux.innerHTML='<p class="attente">Connexion en cours…</p>'; });
+    }
+    handler=function(p){ if(p.game==="meteo"){ charger(); } };
+    charger();
+  }
+
+  // ===== Un snap (message éphémère, vu une seule fois) =====
+  function jeuSnap(){
+    zone.innerHTML='<textarea id="snapTxt" maxlength="300" placeholder="Un secret, une bêtise, un je t\'aime… il/elle ne le verra qu\'une seule fois."></textarea>'
+      +'<div class="rep" style="margin-top:12px"><button class="btn p" id="snapSend" type="button">Envoyer le snap 👻</button></div>';
+    info.textContent = autrePresent ? "Ça s'affiche une seule fois chez l'autre, puis ça disparaît. Comme au début, sur Snap." : "Attends qu'il/elle soit là — un snap ne s'envoie qu'en direct.";
+    document.getElementById("snapSend").addEventListener("click", function(){
+      var ta=document.getElementById("snapTxt"), v=(ta.value||"").trim(); if(!v) return;
+      if(!autrePresent){ toast("Il faut être tous les deux là pour un snap 🙂"); return; }
+      ta.value=""; buzz(15); envoyer({ game:"snap", texte:v }); toast("Snap envoyé 👻");
+    });
+    onPresence=function(){ info.textContent = autrePresent ? "Ça s'affiche une seule fois chez l'autre, puis ça disparaît." : "Attends qu'il/elle soit là — un snap ne s'envoie qu'en direct."; };
   }
 
   // ===== Ton cœur, chez moi (battement partagé, haptique + visuel, temps réel) =====
