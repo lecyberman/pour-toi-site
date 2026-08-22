@@ -989,28 +989,35 @@
   (function(){
     function estMathieu(){ try{ return localStorage.getItem('moi_role') === 'lui'; }catch(e){ return false; } }
 
+    // Accès privés (courrier + admin) : visibles UNIQUEMENT quand tu es Mathieu.
+    // Pour "dadoucherie" ou tant qu'aucune identité n'est choisie, tout est caché.
     function reveler(){
       var lui = estMathieu();
       var carte = document.getElementById('carte-courrier');
       if(carte) carte.hidden = !lui;
       var pt = document.getElementById('facteur');
-      if(pt && lui){
-        pt.style.cursor = 'pointer';
-        pt.title = 'Ton courrier';
-        pt.setAttribute('role','link');
+      if(pt){
+        pt.style.display = lui ? '' : 'none';
+        if(lui){ pt.style.cursor = 'pointer'; pt.title = 'Ton courrier'; pt.setAttribute('role','link'); }
       }
+      var cle = document.querySelector('.footer-cle');
+      if(cle) cle.style.display = lui ? '' : 'none';
     }
     document.addEventListener('DOMContentLoaded', reveler);
     reveler();
+    // au cas où l'identité change dans le même onglet (badge présence)
+    window.addEventListener('storage', function(e){ if(e.key === 'moi_role') reveler(); });
+    setInterval(reveler, 2000);
 
-    // Point discret : 1 appui si c'est Mathieu, sinon repli 3 appuis rapides (pour elle, invisible).
+    // Ouverture du courrier : réservée à Mathieu (1 appui sur le point, ou 3 appuis sur ⌂).
     var clics = [];
     document.addEventListener('click', function(e){
+      if(!estMathieu()) return;
       var el = e.target;
       var surFacteur = el && el.id === 'facteur';
       var surAccueil = el && el.closest && el.closest('.btn-retour');
       if(!surFacteur && !surAccueil) return;
-      if(surFacteur && estMathieu()){ location.href = '/courrier'; return; }
+      if(surFacteur){ location.href = '/courrier'; return; }
       var t = Date.now();
       clics = clics.filter(function(x){ return t - x < 1600; });
       clics.push(t);
