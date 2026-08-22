@@ -1,0 +1,141 @@
+/* ============================================================
+   Dossier couple — tokens.css
+   Source unique de vérité du design system.
+   Formalise l'existant (mêmes couleurs, mêmes valeurs) — n'invente pas.
+   Adoption progressive : lier ce fichier AVANT les styles de page.
+   Thème sombre par défaut ; variante claire via [data-theme="clair"].
+   ============================================================ */
+
+:root {
+  /* ---- Violet / lavande : couleurs principales (inchangées) ---- */
+  --violet-profond: #7E52A8;
+  --violet:         #8E6FBF;
+  --violet-clair:   #B49BDA;
+  --lavande:        #C7B2E6;
+  --lavande-claire: #CBB4EC;
+  --lavande-pale:   #E9DEF7;
+  /* Alias de compatibilité (noms historiques, mêmes couleurs) */
+  --c-corail:      var(--violet);
+  --c-corail-clr:  var(--lavande);
+  --c-or:          var(--violet-profond);
+  --c-or-clr:      var(--violet-clair);
+
+  /* ---- Accents contextuels (une page précise, pas diffusés) ---- */
+  --accent-corail:      #E1806F; /* /courrier (back-office) */
+  --accent-corail-clr:  #F0AFA1;
+  --accent-or:          #E4B266; /* /le-15 (la fête) */
+  --accent-or-clr:      #E8B45C;
+  --presence:           #8EE6A0; /* seul usage du vert : statut "en ligne" */
+
+  /* ---- Fonds ---- */
+  --bg-profond:   #0D0B1A;
+  --bg:           #14162E;
+  --bg-nuit:      #171028;
+  --surface:        rgba(255,255,255,.055);
+  --surface-solide: #1E2036;
+
+  /* ---- Texte ---- */
+  --tx-titre:  #FBF4EA;
+  --tx:        #EDE9F3;
+  --tx-2:      #C9C1D8;
+  --tx-3:      #A99CC4;
+  --tx-4:      #8E82A6;
+  --tx-accent: #C7B2E6;
+
+  /* ---- Bordures & voiles ---- */
+  --bordure:        rgba(255,255,255,.10);
+  --bordure-forte:  rgba(255,255,255,.18);
+  --bordure-accent: rgba(180,155,218,.45);
+  --voile:          rgba(16,14,32,.62);
+
+  /* ---- Dégradés ---- */
+  --grad-primaire: linear-gradient(135deg, #C7B2E6, #8E6FBF);
+  --grad-primaire-2: linear-gradient(135deg, #CBB4EC, #A886DA);
+  --grad-or:       linear-gradient(135deg, #B49BDA, #7E52A8);
+
+  /* ---- Ombres ---- */
+  --sh-1: 0 2px 8px -4px rgba(20,16,34,.35);
+  --sh-2: 0 12px 30px -18px rgba(0,0,0,.55);
+  --sh-3: 0 24px 60px -34px rgba(0,0,0,.65);
+  --sh-btn: 0 12px 28px -14px rgba(124,82,168,.8);
+  --sh-glow: 0 0 40px -8px rgba(199,178,230,.35);
+
+  /* ---- Glow (lavande uniquement) ---- */
+  --glow-color: #C7B2E6;
+  --glow-op-min: .3;
+  --glow-op-max: .6;
+
+  /* ---- Verre / flou ---- */
+  --verre-blur: 8px;
+  --verre-blur-fort: 14px;
+
+  /* ---- Typographies ---- */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body:    'Nunito Sans', system-ui, -apple-system, sans-serif;
+  /* héritage (pages anciennes, à migrer sans urgence) */
+  --font-titre:  'Cormorant Garamond', Georgia, serif;
+  --font-corps:  'Lato', 'Helvetica Neue', sans-serif;
+
+  /* ---- Tailles ---- */
+  --fs-xs:  .8rem;
+  --fs-sm:  .92rem;
+  --fs-md:  1.05rem;
+  --fs-lg:  1.25rem;
+  --fs-xl:  clamp(1.5rem, 5vw, 2rem);
+  --fs-2xl: clamp(1.9rem, 7vw, 2.7rem);
+  --fs-3xl: clamp(2.4rem, 9vw, 3.8rem);
+  --lh-tight: 1.15;
+  --lh-body:  1.68;
+
+  /* ---- Rayons ---- */
+  --r-sm:   12px;
+  --r-md:   18px;
+  --r-lg:   24px;
+  --r-pill: 100px;
+
+  /* ---- Espacement ---- */
+  --sp-1: .25rem;  --sp-2: .5rem;  --sp-3: .75rem; --sp-4: 1rem;
+  --sp-5: 1.5rem;  --sp-6: 2rem;   --sp-7: 3rem;   --sp-8: 4.5rem;
+
+  /* ---- Mouvement ---- */
+  --ease:      cubic-bezier(.22,.61,.36,1);
+  --ease-soft: cubic-bezier(.4,0,.2,1);
+  --t-fast:  .18s;
+  --t-hover: .25s;
+  --t-entree: .8s;
+}
+
+/* ============================================================
+   Thème clair — mêmes rôles, valeurs claires (validées)
+   ============================================================ */
+:root[data-theme="clair"] {
+  --bg-profond:   #FBF6F1;
+  --bg:           #FBF6F1;
+  --bg-nuit:      #F4EEF3;
+  --surface:        rgba(252,248,250,.82);
+  --surface-solide: #FCF8FA;
+
+  --tx-titre:  #3E3446;
+  --tx:        #3E3446;
+  --tx-2:      #6B6175;
+  --tx-3:      #8E82A6;
+  --tx-4:      rgba(62,52,70,.5);
+  --tx-accent: #8E6FBF;
+
+  --bordure:        rgba(62,52,70,.08);
+  --bordure-forte:  rgba(62,52,70,.14);
+  --bordure-accent: rgba(142,111,191,.4);
+  --voile:          rgba(251,246,241,.66);
+
+  --sh-1: 0 2px 8px -4px rgba(40,32,50,.25);
+  --sh-2: 0 12px 30px -18px rgba(40,32,50,.45);
+  --sh-3: 0 24px 60px -34px rgba(40,32,50,.55);
+}
+
+/* ============================================================
+   Utilitaires de base optionnels (non imposés)
+   ============================================================ */
+.ds-focus:focus-visible { outline: 2px solid var(--violet-clair); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
