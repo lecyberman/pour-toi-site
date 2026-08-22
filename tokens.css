@@ -135,7 +135,8 @@
 /* ============================================================
    Utilitaires de base optionnels (non imposés)
    ============================================================ */
-.ds-focus:focus-visible { outline: 2px solid var(--violet-clair); outline-offset: 2px; }
+/* focus clavier visible et homogène (n'apparaît qu'au clavier) */
+:focus-visible { outline: 2px solid var(--violet-clair); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
