@@ -33,6 +33,7 @@
     { "source": "/creations", "destination": "/creations.html" },
     { "source": "/dramas", "destination": "/dramas.html" },
     { "source": "/humeurs", "destination": "/humeurs.html" },
+    { "source": "/etoile", "destination": "/etoile.html" },
     { "source": "/dormir", "destination": "/dormir.html" },
     { "source": "/journal", "destination": "/journal.html" },
     { "source": "/bibliotheque", "destination": "/bibliotheque.html" },

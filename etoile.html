@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0b0a16" />
+<title>Notre étoile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 90% at 50% -10%, #1c1740 0%, transparent 55%),
+      radial-gradient(90% 70% at 50% 115%, #14173a 0%, transparent 60%),
+      #0b0a16; overflow:hidden; }
+  #ciel{ position:fixed; inset:0; z-index:0; }
+  .wrap{ position:relative; z-index:1; max-width:520px; margin:0 auto; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    padding:max(24px,env(safe-area-inset-top)) 22px calc(30px + env(safe-area-inset-bottom)); }
+  a.retour{ position:fixed; top:calc(12px + env(safe-area-inset-top)); left:14px; z-index:3; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; }
+  a.retour:hover{ color:#fff; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.08rem; margin:0 0 .4rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.7rem); margin:0 0 .2rem; color:#FBF4EA; }
+
+  .etoile{ position:relative; width:170px; height:170px; margin:26px auto 8px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .etoile .halo{ position:absolute; inset:-40%; border-radius:50%;
+    background:radial-gradient(circle, rgba(199,178,230,.55), rgba(180,155,218,.16) 45%, transparent 70%);
+    animation:respire 4s ease-in-out infinite; }
+  .etoile .coeur{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:5rem;
+    filter:drop-shadow(0 0 18px rgba(199,178,230,.8)); animation:respire 4s ease-in-out infinite; }
+  .etoile.on .halo{ background:radial-gradient(circle, rgba(142,231,160,.5), rgba(199,178,230,.2) 45%, transparent 70%); }
+  @keyframes respire{ 0%,100%{ transform:scale(1); opacity:.92; } 50%{ transform:scale(1.06); opacity:1; } }
+
+  .msg{ font-family:'Fraunces',serif; font-style:italic; color:#E9DEF7; font-size:1.12rem; line-height:1.6; margin:10px auto 0; max-width:30ch; min-height:3.4em; transition:opacity .5s; }
+  .btn{ margin-top:20px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:1rem; border-radius:100px; padding:14px 26px; cursor:pointer; border:1px solid transparent;
+    color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); box-shadow:0 14px 32px -14px rgba(168,134,218,.8); }
+  .btn:disabled{ opacity:.6; cursor:default; }
+  .sous{ margin-top:14px; color:rgba(201,193,216,.7); font-size:.82rem; }
+  .chooser{ margin-top:16px; display:flex; gap:10px; justify-content:center; }
+  .chooser button{ font-family:inherit; font-weight:700; font-size:.95rem; border-radius:100px; padding:11px 18px; cursor:pointer; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#EDE9F3; }
+  .chooser button.p{ color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border-color:transparent; }
+  .changer{ display:inline-block; margin-top:16px; font-size:.82rem; color:#B49BDA; text-decoration:none; opacity:.75; }
+</style>
+</head>
+<body>
+  <canvas id="ciel"></canvas>
+  <a class="retour" href="/">⌂ Accueil</a>
+  <div class="wrap">
+    <p class="eyebrow">chaque soir, une étoile à nous</p>
+    <h1>Notre étoile</h1>
+
+    <div class="etoile" id="etoile" role="button" aria-label="Regarder notre étoile">
+      <div class="halo"></div>
+      <div class="coeur">✦</div>
+    </div>
+
+    <p class="msg" id="msg">Ce soir, cette étoile est la nôtre.</p>
+
+    <div id="zone-action">
+      <button class="btn" id="regarder">La regarder ce soir</button>
+    </div>
+
+    <div class="chooser" id="chooser" hidden style="display:none">
+      <button class="p" data-r="lui">Je suis Mathieu</button>
+      <button data-r="elle">Je suis dadoucherie</button>
+    </div>
+
+    <a href="#" class="changer" id="changer" hidden style="display:none">ce n'est pas toi ? changer</a>
+    <p class="sous">Quand vous l'avez regardée tous les deux le même soir, elle brille pour vous deux.</p>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var URL_SB = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  var NOMS = { elle:"dadoucherie", lui:"Mathieu" };
+  function hdrs(extra){ var h={ "apikey":ANON, "Authorization":"Bearer "+ANON, "Content-Type":"application/json" }; for(var k in (extra||{})) h[k]=extra[k]; return h; }
+  function auj(){ var d=new Date(), m=d.getMonth()+1, j=d.getDate(); return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(j<10?"0":"")+j; }
+  function role(){ try{ var r=localStorage.getItem("moi_role"); return (r==="elle"||r==="lui")?r:null; }catch(e){ return null; } }
+
+  function lire(){ return fetch(URL_SB+"/rest/v1/etoile?jour=eq."+auj()+"&select=role", { headers:hdrs() }).then(function(r){ return r.json(); }).catch(function(){ return []; }); }
+  function toucher(r){ return fetch(URL_SB+"/rest/v1/etoile?on_conflict=jour,role", { method:"POST", headers:hdrs({ "Prefer":"resolution=ignore-duplicates,return=minimal" }), body:JSON.stringify({ jour:auj(), role:r }) }).catch(function(){}); }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var etoile=$("etoile"), msg=$("msg"), btn=$("regarder"), chooser=$("chooser"), changer=$("changer");
+
+  function setMsg(t){ msg.style.opacity=0; setTimeout(function(){ msg.textContent=t; msg.style.opacity=1; }, 250); }
+
+  function render(rows){
+    rows = rows || [];
+    var moi = role();
+    if(!moi){
+      chooser.style.display="flex"; chooser.hidden=false;
+      $("zone-action").style.display="none"; changer.style.display="none";
+      setMsg("Dis-moi qui tu es, et cette étoile deviendra la vôtre.");
+      return;
+    }
+    chooser.style.display="none"; $("zone-action").style.display=""; changer.style.display="inline-block";
+    var autre = moi==="elle" ? "lui" : "elle";
+    var jeTouche = rows.some(function(x){ return x.role===moi; });
+    var autreTouche = rows.some(function(x){ return x.role===autre; });
+    var nomAutre = NOMS[autre];
+
+    if(jeTouche) etoile.classList.add("on"); else etoile.classList.remove("on");
+    btn.disabled = jeTouche;
+    btn.textContent = jeTouche ? "Tu l'as regardée ce soir 🤍" : "La regarder ce soir";
+
+    if(jeTouche && autreTouche){ etoile.classList.add("on"); setMsg("Vous avez regardé la même étoile ce soir. Où que vous soyez, vous étiez ensemble sous elle. 🤍"); }
+    else if(jeTouche && !autreTouche){ setMsg("Tu l'as regardée ce soir. J'espère que "+nomAutre+" la regardera aussi, avant de dormir."); }
+    else if(!jeTouche && autreTouche){ setMsg(nomAutre+" a déjà regardé notre étoile ce soir 🤍 Regarde-la, toi aussi."); }
+    else { setMsg("Ce soir, cette étoile est la nôtre. Regarde-la, et pense à l'autre."); }
+  }
+
+  function refresh(){ lire().then(render); }
+
+  function faireToucher(){
+    var moi = role(); if(!moi) return;
+    btn.disabled=true;
+    toucher(moi).then(function(){ refresh(); });
+    // retour immédiat, l'écriture se confirme au refresh
+    etoile.classList.add("on");
+  }
+  btn.addEventListener("click", faireToucher);
+  etoile.addEventListener("click", function(){ if(!btn.disabled && role()) faireToucher(); });
+
+  chooser.addEventListener("click", function(e){
+    var b = e.target.closest ? e.target.closest("[data-r]") : null;
+    if(!b) return;
+    try{ localStorage.setItem("moi_role", b.getAttribute("data-r")); }catch(e2){}
+    refresh();
+  });
+  changer.addEventListener("click", function(e){ e.preventDefault(); try{ localStorage.removeItem("moi_role"); }catch(e2){} render([]); });
+
+  refresh();
+
+  // ---- petit ciel étoilé en fond ----
+  (function(){
+    var c=$("ciel"), x=c.getContext("2d"), W,H,st=[];
+    function rz(){ W=c.width=innerWidth; H=c.height=innerHeight; st=[]; var n=Math.min(120, Math.round(W*H/16000)); for(var i=0;i<n;i++) st.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+.2,p:Math.random()*6.28,v:Math.random()*1.2+.3}); }
+    addEventListener("resize", rz); rz();
+    var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches, t=0;
+    function frame(){ requestAnimationFrame(frame); if(document.hidden) return; t+=0.016; x.clearRect(0,0,W,H);
+      for(var i=0;i<st.length;i++){ var s=st[i]; var a=reduce?0.7:(0.4+0.5*Math.sin(t*s.v+s.p)); x.globalAlpha=a; x.fillStyle="#e9e2f7"; x.beginPath(); x.arc(s.x,s.y,s.r,0,6.28); x.fill(); }
+      x.globalAlpha=1;
+    }
+    frame();
+  })();
+})();
+</script>
+<script src="/presence.js" defer></script>
+</body>
+</html>
