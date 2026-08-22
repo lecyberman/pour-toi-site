@@ -1729,7 +1729,7 @@ function afficherListeAlbums() {
     card.innerHTML = `
       <div class="album-couverture" style="background: linear-gradient(135deg, ${album.couleur}40, ${album.couleur}20)">
         ${album.couverture
-          ? `<img src="${album.couverture}" alt="${album.titre}" />`
+          ? `<img src="${album.couverture}" alt="${album.titre}" loading="lazy" decoding="async" />`
           : `<span class="album-emoji">${album.emoji}</span>`}
       </div>
       <div class="album-info">
