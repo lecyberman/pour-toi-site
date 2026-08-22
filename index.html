@@ -101,6 +101,14 @@
     #monde .famille{ margin-bottom:34px; }
     #monde .famille-titre{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:1.08rem; margin:0 0 13px; padding-left:4px; letter-spacing:.01em; opacity:.92; }
     html[data-theme="clair"] #monde .famille-titre{ color:#8E6FBF; }
+    /* vedette contextuelle (met en avant 1-2 cartes selon le moment) */
+    #monde .vedette{ margin:2px 0 32px; }
+    #monde .vedette-eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.12rem; margin:0 0 13px; padding-left:4px; }
+    #monde .vedette-grille{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
+    #monde .vedette .kase{ border-color:rgba(180,155,218,.42); background:linear-gradient(180deg, rgba(180,155,218,.17), rgba(180,155,218,.05)); }
+    #monde .vedette .kase:hover{ border-color:rgba(180,155,218,.6); }
+    html[data-theme="clair"] #monde .vedette-eyebrow{ color:#8E6FBF; }
+    html[data-theme="clair"] #monde .vedette .kase{ background:#fff !important; }
 
     /* ===== Encart notifications douces ===== */
     #monde .notif-doux{ display:flex; flex-wrap:wrap; align-items:center; gap:14px; justify-content:space-between;
@@ -221,6 +229,11 @@
         <h2>Par où tu veux entrer ce soir ?</h2>
         <p>Tout ici a été pensé pour toi. Prends ton temps, ouvre ce qui t'appelle. Rien ne presse.</p>
       </div>
+      <div id="vedette" class="vedette" hidden style="display:none">
+        <p class="vedette-eyebrow" id="vedette-eyebrow"></p>
+        <div class="vedette-grille" id="vedette-grille"></div>
+      </div>
+
       <div class="famille">
         <p class="famille-titre">Nous</p>
         <div class="grille">
@@ -1068,6 +1081,38 @@
     // rappels.js est en defer : on attend qu'il soit prêt
     var essais = 0;
     (function attendre(){ if(window.Rappels || essais > 25){ refresh(); } else { essais++; setTimeout(attendre, 150); } })();
+  })();
+  </script>
+  <script>
+  /* ===== Vedette contextuelle du hub (selon l'heure / le 15) ===== */
+  (function(){
+    var box = document.getElementById('vedette');
+    var eb = document.getElementById('vedette-eyebrow');
+    var gr = document.getElementById('vedette-grille');
+    if(!box || !gr) return;
+    var C = {
+      dadoucherie:{ic:'💌', t:'Ta page', d:"Ton bonjour et ta lettre du jour t'attendent.", h:'/dadoucherie'},
+      dormir:{ic:'🌧️', t:"Pour t'endormir", d:'Des sons doux et un minuteur, pour glisser dans le sommeil.', h:'/dormir'},
+      cocon:{ic:'🫂', t:'Ton cocon', d:'Si la nuit est dure, viens te poser un moment.', h:'/cocon'},
+      le15:{ic:'🎁', t:"C'est le 15", d:"Notre jour. Une lettre et un cadeau t'attendent.", h:'/le-15'},
+      mer:{ic:'🌊', t:'Bord de mer', d:'La même mer, la même lune, rien qu\'à nous.', h:'/mer'},
+      univers:{ic:'✦', t:'Notre univers', d:'Nos moments, en constellation.', h:'/univers'}
+    };
+    var d = new Date(), h = d.getHours(), jour = d.getDate();
+    var eyebrow, keys;
+    if(jour === 15){ eyebrow = "On est le 15, notre jour 🤍"; keys = ['le15']; }
+    else if(h >= 21 || h < 6){ eyebrow = "C'est le soir, prends soin de toi"; keys = ['dormir','cocon']; }
+    else if(h >= 6 && h < 11){ eyebrow = "Bonjour, toi ☀️"; keys = ['dadoucherie']; }
+    else { eyebrow = "Ce moment, rien qu'à nous"; keys = ['mer','univers']; }
+    eb.textContent = eyebrow;
+    gr.innerHTML = '';
+    keys.forEach(function(k){
+      var c = C[k]; if(!c) return;
+      var a = document.createElement('a'); a.className = 'kase'; a.href = c.h;
+      a.innerHTML = '<div class="ic">'+c.ic+'</div><div class="t">'+c.t+'</div><div class="d">'+c.d+'</div>';
+      gr.appendChild(a);
+    });
+    box.style.display = '';
   })();
   </script>
   <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}</script>
