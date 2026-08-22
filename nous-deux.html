@@ -159,7 +159,7 @@
   try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false }); }
   catch (e) { return showFallback(); }
   renderer.setClearColor(0x0d0b1a, 1);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ? 1.5 : 2));
   try { renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.12; } catch (e) {}
 
   var scene = new THREE.Scene();
