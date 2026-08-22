@@ -60,6 +60,11 @@
   .chap h2{font-family:var(--display);font-weight:500;font-size:1.45rem;margin:0 0 12px;line-height:1.2;}
   .chap p{margin:0 0 13px;font-size:1.02rem;}
   .chap p:last-child{margin-bottom:0;}
+  /* révélation douce des chapitres au scroll (repli visible si JS/mouvement absent) */
+  @media (prefers-reduced-motion: no-preference){
+    html.js-anim .chap{ opacity:0; transform:translateX(-10px); transition:opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1); }
+    html.js-anim .chap.vu{ opacity:1; transform:none; }
+  }
   .soft{color:var(--encre-douce);font-size:.94rem;}
   .chanson{
     display:inline-block;background:#F4ECF2;border-radius:100px;padding:6px 14px;
@@ -390,6 +395,21 @@
   });
 })();
 </script>
+  <script>
+  /* révélation des chapitres au scroll */
+  (function(){
+    if(!('IntersectionObserver' in window)) return;
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.documentElement.classList.add('js-anim');
+    function go(){
+      var io = new IntersectionObserver(function(es){
+        es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('vu'); io.unobserve(e.target); } });
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.chap').forEach(function(c){ io.observe(c); });
+    }
+    if(document.readyState !== 'loading') go(); else document.addEventListener('DOMContentLoaded', go);
+  })();
+  </script>
   <script src="/presence.js" defer></script>
 </body>
 </html>
