@@ -253,7 +253,7 @@
       <div class="famille">
         <p class="famille-titre">De moi, pour toi</p>
         <div class="grille">
-          <a class="kase kase-courrier" href="/courrier" id="carte-courrier" hidden><div class="ic">💌</div><div class="t">Mon courrier</div><div class="d">Les mots qu'elle t'a laissés, rien que pour toi.</div></a>
+          <a class="kase kase-courrier" href="/courrier" id="carte-courrier" hidden style="display:none"><div class="ic">💌</div><div class="t">Mon courrier</div><div class="d">Les mots qu'elle t'a laissés, rien que pour toi.</div></a>
           <a class="kase" href="/dadoucherie"><div class="ic">💌</div><div class="t">Ta page</div><div class="d">Ton bonjour, ta lettre du jour, ma voix.</div></a>
           <a class="kase" href="/mer"><div class="ic">🌊</div><div class="t">Bord de mer</div><div class="d">Le compte à rebours, la lune, une bouteille à la mer.</div></a>
           <a class="kase" href="/le-15"><div class="ic">🎁</div><div class="t">Le 15</div><div class="d">Notre jour. Une lettre et un cadeau, chaque 15 du mois.</div></a>
@@ -273,7 +273,7 @@
       </div>
 
       <!-- Notifications douces : activer / tester / couper -->
-      <div id="notif-doux" class="notif-doux" hidden>
+      <div id="notif-doux" class="notif-doux" hidden style="display:none">
         <div class="notif-txt">
           <div class="notif-t">🔔 Mes petits mots, même quand tu ne regardes pas</div>
           <div class="notif-d">Active les rappels sur ton téléphone : un bonjour le matin, une bonne nuit le soir, et un mot doux si la nuit est longue.</div>
@@ -282,7 +282,7 @@
           <button type="button" id="notif-on" class="notif-btn p">Activer 🤍</button>
         </div>
       </div>
-      <div id="notif-ok" class="notif-doux ok" hidden>
+      <div id="notif-ok" class="notif-doux ok" hidden style="display:none">
         <div class="notif-txt">
           <div class="notif-t">🔔 Rappels activés 🤍</div>
           <div class="notif-d">Je viendrai te dire bonjour, bonne nuit, et passer le soir. Tu peux les couper quand tu veux.</div>
@@ -292,7 +292,7 @@
           <button type="button" id="notif-off" class="notif-btn g">Couper</button>
         </div>
       </div>
-      <span id="notif-note" class="notif-note" hidden>Pour les recevoir même l'application fermée, ajoute le site à ton écran d'accueil.</span>
+      <span id="notif-note" class="notif-note" hidden style="display:none">Pour les recevoir même l'application fermée, ajoute le site à ton écran d'accueil.</span>
 
       <p class="monde-sign">tout ça, parce que c'est toi</p>
     </div>
@@ -994,7 +994,7 @@
     function reveler(){
       var lui = estMathieu();
       var carte = document.getElementById('carte-courrier');
-      if(carte) carte.hidden = !lui;
+      if(carte) carte.style.display = lui ? '' : 'none';  // style.display : fiable (l'attribut hidden est écrasé par .kase{display:block})
       var pt = document.getElementById('facteur');
       if(pt){
         pt.style.display = lui ? '' : 'none';
@@ -1039,11 +1039,11 @@
       catch(e){ return false; }
     }
     function refresh(){
-      if(!supporte){ boxOn.hidden = true; boxOk.hidden = true; if(note) note.hidden = true; return; }
+      if(!supporte){ boxOn.style.display = 'none'; boxOk.style.display = 'none'; if(note) note.style.display = 'none'; return; }
       var on = estActive();
-      boxOn.hidden = on;
-      boxOk.hidden = !on;
-      if(note) note.hidden = false;
+      boxOn.style.display = on ? 'none' : '';
+      boxOk.style.display = on ? '' : 'none';
+      if(note) note.style.display = '';
     }
 
     var bOn = document.getElementById("notif-on");

@@ -170,6 +170,8 @@
 
 <script>
 (function(){
+  // Confidentialité : si l'appareil est identifié comme "elle" (dadoucherie), on n'ouvre pas le courrier.
+  try { if (localStorage.getItem("moi_role") === "elle") { location.replace("/"); return; } } catch(e) {}
   var DB_URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
   var DB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
   function hdrs(extra){
