@@ -328,6 +328,7 @@
   var medElle = medaillon("/img/nous/elle.webp", 442 / 420, 3.4, -10.5, 10, 2, "Ton sourire", "Ce sourire-là. Celui qui me fait tout oublier. Je le regarde, et je suis bien.");
   var medLui  = medaillon("/img/nous/lui.webp", 498 / 420, 3.4, 10.5, 9.5, 2, "Moi, qui pense à toi", "Même quand je fais autre chose, une part de moi est toujours en train de penser à toi.");
   var medSouv = medaillon("/img/nous/souvenir1.webp", 832 / 460, 3.0, -12, 4.5, -2, "Notre journée", "Ce jour-là, avec toi, au bord de l'eau. Un des moments que je garde le plus précieusement.");
+  var medSouv2 = medaillon("/img/nous/souvenir2.webp", 574 / 440, 3.0, 12, 5, -1.5, "Ton rire", "Ce rire-là, c'est ma chose préférée au monde. Il me suffit pour être bien.");
 
   // --- petit cœur qui flotte au-dessus ---
   var coeurMat = new THREE.SpriteMaterial({ map: heartTex(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.95 });
@@ -541,6 +542,7 @@
       medElle.position.y = 10 + Math.sin(clock * 0.8) * 0.5;
       medLui.position.y = 9.5 + Math.sin(clock * 0.8 + 2) * 0.5;
       medSouv.position.y = 4.5 + Math.sin(clock * 0.7 + 1) * 0.4;
+      medSouv2.position.y = 5 + Math.sin(clock * 0.75 + 3) * 0.4;
       cadeauG.rotation.y += 0.012; cadeauG.position.y = 1.6 + Math.sin(clock * 1.3 + 1) * 0.18;
       haloCad.material.opacity = 0.45 + Math.sin(clock * 2.2) * 0.12;
       for (var bi = bursts.length - 1; bi >= 0; bi--) {
