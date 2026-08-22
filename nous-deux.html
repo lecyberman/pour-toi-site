@@ -294,58 +294,40 @@
     return eyes;
   }
 
+  // ===== nous deux, en vrai : vos photos fondues dans l'univers =====
+  var texLoader = new THREE.TextureLoader();
+  function chargePhoto(url) { var t = texLoader.load(url); try { t.encoding = THREE.sRGBEncoding; } catch (e) {} t.anisotropy = 4; return t; }
+  function planePhoto(url, w, ratio) {
+    var mat = new THREE.MeshBasicMaterial({ map: chargePhoto(url), transparent: true, depthWrite: false, side: THREE.DoubleSide });
+    return new THREE.Mesh(new THREE.PlaneGeometry(w, w * ratio), mat);
+  }
+  function haloSprite(color, sx, sy, op) {
+    var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: texGlow, color: color, transparent: true, opacity: op, depthWrite: false, blending: THREE.AdditiveBlending }));
+    s.scale.set(sx, sy, 1); return s;
+  }
+
   var couple = new THREE.Group(); scene.add(couple);
+  var billboards = [];
+  var photosCibles = [];
 
-  // --- HOMME (à gauche) ---
-  var homme = new THREE.Group(); homme.position.set(-3.8, 0, 0); homme.rotation.y = 0.12;
-  var hHips = sph(1.45, MAT.basH); hHips.scale.set(1.25, 0.82, 0.95); hHips.position.y = 4.6; homme.add(hHips);
-  var hJg = jambe(MAT.basH, 0.8, 4.5); hJg.position.set(-0.82, 4.6, 0); homme.add(hJg);
-  var hJd = jambe(MAT.basH, 0.8, 4.5); hJd.position.set(0.82, 4.6, 0); homme.add(hJd);
-  var hTorse = cyl(1.95, 1.5, 4.6, MAT.hautH); hTorse.position.y = 7.2; homme.add(hTorse);
-  var hEpaules = sph(2.0, MAT.hautH); hEpaules.scale.set(1.12, 0.55, 0.85); hEpaules.position.y = 9.2; homme.add(hEpaules);
-  var hCou = cyl(0.5, 0.56, 0.9, MAT.peau); hCou.position.y = 9.8; homme.add(hCou);
-  var hTete = sph(1.62, MAT.peau); hTete.scale.set(0.96, 1.08, 0.98); hTete.position.y = 11.0; hTete.rotation.y = -0.1; homme.add(hTete);
-  var hNez = sph(0.2, MAT.peau); hNez.position.set(0, -0.1, 1.55); hTete.add(hNez);
-  [-1, 1].forEach(function (s) { var o = sph(0.26, MAT.peau); o.position.set(s * 1.5, 0, 0); hTete.add(o); });
-  var hCheveux = sph(1.72, MAT.cheveuxH); hCheveux.scale.set(1.03, 0.82, 1.03); hCheveux.position.set(0, 11.55, -0.1); homme.add(hCheveux);
-  var hFront = box(2.7, 0.55, 1.2, MAT.cheveuxH); hFront.position.set(0, 11.95, 0.85); homme.add(hFront);
-  var hBrasG = membre(0.5, 4.7, MAT.hautH); hBrasG.position.set(-2.0, 9.05, 0); hBrasG.rotation.z = 0.3; homme.add(hBrasG);
-  var hMainG = sph(0.42, MAT.peau); hMainG.position.set(0, -4.7, 0); hBrasG.add(hMainG);
-  var hBrasD = new THREE.Group(); hBrasD.position.set(1.95, 9.05, 0); hBrasD.rotation.set(-0.12, 0, -0.98); homme.add(hBrasD);
-  hBrasD.add(membre(0.5, 5.0, MAT.hautH));
-  couple.add(homme);
+  // Pièce maîtresse : vous deux (front contre front)
+  var glowCouple = haloSprite(0xC7B2E6, 13, 20, 0.5); glowCouple.position.set(0, 7.6, -0.5); couple.add(glowCouple);
+  var photoCouple = planePhoto("/img/nous/vous-deux.webp", 6.2, 1303 / 640);
+  photoCouple.position.set(0, 7.6, 0);
+  photoCouple.userData = { type: "photo", nom: "Nous deux", txt: "Toi et moi, front contre front. Où que je sois, c'est là que je veux être : tout contre toi. 🤍" };
+  couple.add(photoCouple); billboards.push(photoCouple); photosCibles.push(photoCouple);
 
-  // --- FEMME (à droite) ---
-  var femme = new THREE.Group(); femme.position.set(3.8, 0, 0); femme.rotation.y = -0.12;
-  var fRobe = cyl(1.0, 3.3, 7.0, MAT.robe); fRobe.position.y = 3.6; femme.add(fRobe);
-  var fHem = new THREE.Mesh(new THREE.CircleGeometry(3.3, 30), MAT.robe); fHem.rotation.x = -Math.PI / 2; fHem.position.y = 0.12; femme.add(fHem);
-  var fBust = cyl(1.15, 1.28, 2.2, MAT.robe); fBust.position.y = 8.0; femme.add(fBust);
-  var fEp = sph(1.25, MAT.robe); fEp.scale.set(1.1, 0.55, 0.85); fEp.position.y = 9.0; femme.add(fEp);
-  var fCou = cyl(0.42, 0.48, 0.8, MAT.peauF); fCou.position.y = 9.55; femme.add(fCou);
-  var fTete = sph(1.5, MAT.peauF); fTete.scale.set(0.95, 1.08, 0.98); fTete.position.y = 10.75; fTete.rotation.y = 0.1; femme.add(fTete);
-  var fNez = sph(0.17, MAT.peauF); fNez.position.set(0, -0.08, 1.42); fTete.add(fNez);
-  var fCheveux = sph(1.66, MAT.cheveuxF); fCheveux.scale.set(1.06, 1.12, 1.06); fCheveux.position.set(0, 11.05, -0.12); femme.add(fCheveux);
-  [-1, 1].forEach(function (s) { var m = cyl(0.55, 0.3, 4.4, MAT.cheveuxF); m.position.set(s * 1.3, 8.9, -0.25); femme.add(m); });
-  var fFront = box(2.3, 0.6, 1.15, MAT.cheveuxF); fFront.position.set(0, 11.35, 0.82); femme.add(fFront);
-  var fBrasD = membre(0.42, 4.4, MAT.robe); fBrasD.position.set(1.55, 8.65, 0); fBrasD.rotation.z = -0.28; femme.add(fBrasD);
-  var fMainD = sph(0.36, MAT.peauF); fMainD.position.set(0, -4.4, 0); fBrasD.add(fMainD);
-  var fBrasG = new THREE.Group(); fBrasG.position.set(-1.55, 8.65, 0); fBrasG.rotation.set(-0.12, 0, 1.0); femme.add(fBrasG);
-  fBrasG.add(membre(0.42, 4.7, MAT.peauF));
-  couple.add(femme);
-
-  // mains jointes au centre
-  var mains = sph(0.6, MAT.peau); mains.position.set(0, 4.5, 0.85); couple.add(mains);
-
-  var hEyes = makeFace(hTete, 0, 1.62, MAT.cheveuxH);
-  var fEyes = makeFace(fTete, 0, 1.5, MAT.cheveuxF);
-
-  var ANIM = {
-    duo: [
-      { grp: homme, torse: hTorse, tete: hTete, eyes: hEyes, ph: 0.0, tilt: -0.05 },
-      { grp: femme, torse: fBust, tete: fTete, eyes: fEyes, ph: 1.7, tilt: 0.05 }
-    ],
-    mains: mains
-  };
+  // Médaillons souvenirs qui gravitent (touchables)
+  function medaillon(url, ratio, w, x, y, z, nom, txt) {
+    var g = new THREE.Group(); g.position.set(x, y, z);
+    g.add(haloSprite(0xB49BDA, w * 1.7, w * ratio * 1.5, 0.4));
+    var p = planePhoto(url, w, ratio); p.userData = { type: "photo", nom: nom, txt: txt }; g.add(p);
+    scene.add(g); billboards.push(g); photosCibles.push(p);
+    return g;
+  }
+  var medElle = medaillon("/img/nous/elle.webp", 442 / 420, 3.4, -10.5, 10, 2, "Ton sourire", "Ce sourire-là. Celui qui me fait tout oublier. Je le regarde, et je suis bien.");
+  var medLui  = medaillon("/img/nous/lui.webp", 498 / 420, 3.4, 10.5, 9.5, 2, "Moi, qui pense à toi", "Même quand je fais autre chose, une part de moi est toujours en train de penser à toi.");
+  var medSouv = medaillon("/img/nous/souvenir1.webp", 832 / 460, 3.0, -12, 4.5, -2, "Notre journée", "Ce jour-là, avec toi, au bord de l'eau. Un des moments que je garde le plus précieusement.");
 
   // --- petit cœur qui flotte au-dessus ---
   var coeurMat = new THREE.SpriteMaterial({ map: heartTex(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.95 });
@@ -353,6 +335,7 @@
 
   // cibles interactives (rempli aussi plus bas par moments + portails)
   var cibles = [];
+  photosCibles.forEach(function (p) { cibles.push(p); });
 
   // --- cadeau à ouvrir (message qui change chaque mois) ---
   var CADEAUX3D = [
@@ -549,18 +532,15 @@
     frame();
 
     if (!reduce) {
-      couple.position.y = Math.sin(clock * 1.1) * 0.22;
-      // vivant : respiration, léger balancement, têtes penchées l'une vers l'autre
-      ANIM.duo.forEach(function (p) {
-        p.torse.scale.y = 1 + Math.sin(clock * 1.6 + p.ph) * 0.022;
-        p.grp.rotation.z = Math.sin(clock * 0.8 + p.ph) * 0.02;
-        p.tete.rotation.z = p.tilt + Math.sin(clock * 0.7 + p.ph) * 0.045;
-      });
-      ANIM.mains.position.y = 4.5 + Math.sin(clock * 1.1) * 0.05;
-      // clignement doux toutes les ~4 s
-      var bt = clock % 4;
-      var ouv = bt < 0.16 ? Math.max(0.08, 1 - Math.sin((bt / 0.16) * Math.PI)) : 1;
-      ANIM.duo.forEach(function (p) { p.eyes.forEach(function (e) { e.scale.y = ouv; }); });
+      couple.position.y = Math.sin(clock * 0.7) * 0.35;
+      // vos photos font face à la caméra en douceur
+      for (var bb = 0; bb < billboards.length; bb++) billboards[bb].lookAt(camera.position);
+      var puls = 1 + Math.sin(clock * 0.9) * 0.015;
+      photoCouple.scale.set(puls, puls, 1);
+      glowCouple.material.opacity = 0.42 + Math.sin(clock * 1.3) * 0.1;
+      medElle.position.y = 10 + Math.sin(clock * 0.8) * 0.5;
+      medLui.position.y = 9.5 + Math.sin(clock * 0.8 + 2) * 0.5;
+      medSouv.position.y = 4.5 + Math.sin(clock * 0.7 + 1) * 0.4;
       cadeauG.rotation.y += 0.012; cadeauG.position.y = 1.6 + Math.sin(clock * 1.3 + 1) * 0.18;
       haloCad.material.opacity = 0.45 + Math.sin(clock * 2.2) * 0.12;
       for (var bi = bursts.length - 1; bi >= 0; bi--) {
