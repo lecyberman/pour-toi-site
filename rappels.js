@@ -7,6 +7,34 @@
 
   var KEY = "rappels_v1";
 
+  // ----- Web Push (notifications même app fermée) -----
+  var VAPID_PUBLIC = "BHfK8OjWY7LGkB57gQP_WQiWUgVA2NRpc-14WUYD1MZZ3ab8QdDAykUp7LL8KAUBfno_4LSN4SAquqmJfm1WyKE";
+  var SB_URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  function urlB64ToUint8(base64String) {
+    var padding = "=".repeat((4 - base64String.length % 4) % 4);
+    var base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    var raw = atob(base64), out = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+  }
+  function abonnerPush() {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    swReady().then(function (reg) {
+      return reg.pushManager.getSubscription().then(function (sub) {
+        return sub || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(VAPID_PUBLIC) });
+      });
+    }).then(function (sub) {
+      if (!sub) return;
+      var j = sub.toJSON(); var role = null; try { role = localStorage.getItem("moi_role"); } catch (e) {}
+      return fetch(SB_URL + "/rest/v1/push_subs?on_conflict=endpoint", {
+        method: "POST",
+        headers: { "apikey": SB_ANON, "Authorization": "Bearer " + SB_ANON, "Content-Type": "application/json", "Prefer": "resolution=ignore-duplicates,return=minimal" },
+        body: JSON.stringify({ endpoint: sub.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, role: role })
+      });
+    }).catch(function () {});
+  }
+
   // créneaux par défaut [heure, minute]
   var HEURES = { bonjour: [8, 30], nuit: [22, 0], check: [23, 30] };
 
@@ -147,6 +175,7 @@
     return Notification.requestPermission().then(function (p) {
       if (p === "granted") {
         planifier();
+        abonnerPush();
         swReady().then(function (reg) {
           reg.showNotification("Je suis là 🤍", {
             body: "À partir de maintenant, je viendrai te dire bonjour, bonne nuit, et passer le soir.",
@@ -178,6 +207,7 @@
   // Au chargement : si déjà activé, on rafraîchit la programmation (fenêtre glissante).
   if (("Notification" in window) && Notification.permission === "granted" && cfg().enabled) {
     planifier();
+    abonnerPush();
   }
 
   window.Rappels = { activer: activer, desactiver: desactiver, tester: tester, planifier: planifier, config: cfg };
