@@ -1,9 +1,19 @@
 // Service worker "Pour toi" - reseau d'abord pour le contenu, cache pour les medias
-const CACHE = 'pourtoi-v4';
-const CORE = ['/', '/icon.svg', '/manifest.json'];
+const CACHE = 'pourtoi-v5';
+const CORE = [
+  '/', '/index.html', '/style.css', '/theme.css',
+  '/app.js', '/script.js', '/supabase.js', '/db.js',
+  '/rappels.js', '/presence.js', '/manifest.json',
+  '/icon.svg', '/icon-192.png', '/icon-512.png'
+];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
+  // precache resilient : une URL absente n'annule pas l'installation
+  e.waitUntil(
+    caches.open(CACHE)
+      .then((c) => Promise.allSettled(CORE.map((u) => c.add(u))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (e) => {
