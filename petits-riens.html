@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0d0b1a" />
+<title>Le tiroir des petits riens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -8%, #271f45 0%, transparent 55%),
+      radial-gradient(90% 60% at 12% 108%, #1d2246 0%, transparent 60%),
+      #0d0b1a; overflow-x:hidden; }
+  .wrap{ max-width:600px; margin:0 auto; padding:max(24px,env(safe-area-inset-top)) 20px 90px; }
+  a.retour{ display:inline-block; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; margin-bottom:20px; }
+  a.retour:hover{ color:#fff; }
+  .tete{ text-align:center; margin-bottom:16px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.05rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(1.8rem,6.5vw,2.4rem); margin:0; color:#FBF4EA; line-height:1.15; }
+  .sous{ color:#A99CC4; font-size:.92rem; margin:.5rem auto 0; max-width:38ch; line-height:1.5; }
+
+  .form{ display:flex; gap:8px; margin:20px 0 8px; }
+  .form input{ flex:1; min-width:0; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.16); border-radius:100px; color:#EDE9F3; padding:13px 16px; font-family:inherit; font-size:1rem; }
+  .form input:focus{ outline:2px solid #A886DA; }
+  .form button{ font-family:inherit; font-weight:700; font-size:.95rem; color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border:none; border-radius:100px; padding:0 20px; cursor:pointer; flex-shrink:0; }
+  .form button:disabled{ opacity:.6; cursor:default; }
+
+  .chooser{ text-align:center; margin:8px 0 4px; color:#A99CC4; font-size:.9rem; }
+  .chooser .b{ display:inline-flex; gap:8px; margin-top:8px; }
+  .chooser button{ font-family:inherit; font-weight:700; font-size:.9rem; border-radius:100px; padding:9px 16px; cursor:pointer; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#EDE9F3; }
+  .chooser button.p{ color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border-color:transparent; }
+  .changer{ display:block; text-align:center; margin:6px 0 0; font-size:.8rem; color:#B49BDA; text-decoration:none; opacity:.7; }
+
+  #liste{ display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+  .rien{ background:rgba(252,248,250,.05); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:13px 16px; animation:pose .5s ease; }
+  @keyframes pose{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
+  .rien .t{ font-size:1.02rem; color:#F1ECF8; line-height:1.5; }
+  .rien .m{ margin-top:6px; font-size:.78rem; color:#8E82A6; }
+  .rien .m b{ color:#B49BDA; font-weight:700; }
+  .vide{ text-align:center; color:#8E82A6; font-style:italic; font-size:.92rem; padding:24px 10px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="retour" href="/">⌂ Accueil</a>
+    <div class="tete">
+      <p class="eyebrow">les petites choses qu'on oublie de se dire</p>
+      <h1>Le tiroir des petits riens</h1>
+      <p class="sous">Une pensée minuscule, un détail du jour, un « j'ai pensé à toi ». Dépose-le ici, il se posera dans notre tiroir.</p>
+    </div>
+
+    <div id="chooser" class="chooser" hidden style="display:none">
+      Pour déposer un petit rien, dis-moi qui tu es :
+      <div class="b"><button class="p" data-r="lui">Mathieu</button><button data-r="elle">dadoucherie</button></div>
+    </div>
+
+    <div id="zone-form">
+      <div class="form">
+        <input type="text" id="texte" maxlength="180" placeholder="j'ai vu un chien qui te ressemblait…" />
+        <button id="deposer">Déposer</button>
+      </div>
+      <a href="#" class="changer" id="changer" hidden style="display:none">changer d'identité</a>
+    </div>
+
+    <div id="liste"><p class="vide">Le tiroir est encore vide. Dépose le premier petit rien.</p></div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var URL_SB = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  var NOMS = { elle:"dadoucherie", lui:"Mathieu" };
+  function hdrs(extra){ var h={ "apikey":ANON, "Authorization":"Bearer "+ANON, "Content-Type":"application/json" }; for(var k in (extra||{})) h[k]=extra[k]; return h; }
+  function role(){ try{ var r=localStorage.getItem("moi_role"); return (r==="elle"||r==="lui")?r:null; }catch(e){ return null; } }
+  function esc(s){ return (s||"").replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+  function lire(){ return fetch(URL_SB+"/rest/v1/petits_riens?select=role,texte,created_at&order=created_at.desc&limit=60", { headers:hdrs() }).then(function(r){ return r.json(); }).catch(function(){ return []; }); }
+  function deposer(r, texte){ return fetch(URL_SB+"/rest/v1/petits_riens", { method:"POST", headers:hdrs({ "Prefer":"return=minimal" }), body:JSON.stringify({ role:r, texte:texte }) }); }
+
+  function ilya(iso){
+    var d = (Date.now() - new Date(iso).getTime())/1000;
+    if(d < 60) return "à l'instant";
+    if(d < 3600) return "il y a " + Math.floor(d/60) + " min";
+    if(d < 86400) return "il y a " + Math.floor(d/3600) + " h";
+    var j = Math.floor(d/86400);
+    return j===1 ? "hier" : "il y a " + j + " jours";
+  }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var liste=$("liste"), input=$("texte"), btn=$("deposer"), chooser=$("chooser"), changer=$("changer");
+
+  function majIdentite(){
+    var moi = role();
+    chooser.style.display = moi ? "none" : "block";
+    $("zone-form").style.display = moi ? "" : "none";
+    changer.style.display = moi ? "block" : "none";
+  }
+
+  function render(rows){
+    rows = rows || [];
+    if(!rows.length){ liste.innerHTML = '<p class="vide">Le tiroir est encore vide. Dépose le premier petit rien.</p>'; return; }
+    liste.innerHTML = "";
+    rows.forEach(function(r){
+      var nom = NOMS[r.role] || "quelqu'un";
+      var d = document.createElement("div"); d.className = "rien";
+      d.innerHTML = '<div class="t">'+esc(r.texte)+'</div><div class="m">déposé par <b>'+esc(nom)+'</b> · '+ilya(r.created_at)+'</div>';
+      liste.appendChild(d);
+    });
+  }
+
+  function refresh(){ lire().then(render); }
+
+  function faireDeposer(){
+    var moi = role(); if(!moi){ majIdentite(); return; }
+    var t = input.value.trim(); if(!t) return;
+    btn.disabled = true;
+    deposer(moi, t).then(function(){ input.value=""; btn.disabled=false; refresh(); })
+      .catch(function(){ btn.disabled=false; });
+  }
+  btn.addEventListener("click", faireDeposer);
+  input.addEventListener("keydown", function(e){ if(e.key==="Enter") faireDeposer(); });
+
+  chooser.addEventListener("click", function(e){
+    var b = e.target.closest ? e.target.closest("[data-r]") : null;
+    if(!b) return;
+    try{ localStorage.setItem("moi_role", b.getAttribute("data-r")); }catch(e2){}
+    majIdentite();
+  });
+  changer.addEventListener("click", function(e){ e.preventDefault(); try{ localStorage.removeItem("moi_role"); }catch(e2){} majIdentite(); });
+
+  majIdentite();
+  refresh();
+  setInterval(refresh, 20000); // rafraîchit doucement pour voir les dépôts de l'autre
+})();
+</script>
+<script src="/presence.js" defer></script>
+</body>
+</html>

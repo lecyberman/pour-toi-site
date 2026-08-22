@@ -34,6 +34,7 @@
     { "source": "/dramas", "destination": "/dramas.html" },
     { "source": "/humeurs", "destination": "/humeurs.html" },
     { "source": "/etoile", "destination": "/etoile.html" },
+    { "source": "/petits-riens", "destination": "/petits-riens.html" },
     { "source": "/dormir", "destination": "/dormir.html" },
     { "source": "/journal", "destination": "/journal.html" },
     { "source": "/bibliotheque", "destination": "/bibliotheque.html" },
