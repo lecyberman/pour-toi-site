@@ -93,6 +93,13 @@
       transition:transform .25s cubic-bezier(.22,.61,.36,1), background .3s, border-color .3s, box-shadow .3s; }
     #monde .kase:hover{ transform:translateY(-3px); background:linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.05)); border-color:rgba(180,155,218,.5);
       box-shadow:0 22px 48px -24px rgba(0,0,0,.66), 0 10px 34px -14px rgba(142,111,191,.4), inset 0 1px 0 rgba(255,255,255,.1); }
+    /* entrée des cartes en cascade douce (seulement si JS + mouvement autorisé) */
+    @media (prefers-reduced-motion: no-preference){
+      html.js-anim #monde .kase{ opacity:0; }
+      html.js-anim #monde .kase.vu{ animation:kaseIn .6s cubic-bezier(.22,.61,.36,1) both; }
+      html.js-anim #monde .kase.anim-fini{ animation:none; opacity:1; }
+      @keyframes kaseIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+    }
     #monde .kase .ic{ font-size:1.7rem; }
     #monde .kase .t{ font-family:'Fraunces',serif; font-weight:500; font-size:1.18rem; margin-top:8px; color:#FBF4EA; }
     #monde .kase .d{ font-family:'Nunito Sans',sans-serif; font-size:.86rem; color:#B4AAC8; margin-top:3px; line-height:1.45; }
@@ -1113,6 +1120,29 @@
       gr.appendChild(a);
     });
     box.style.display = '';
+  })();
+  </script>
+  <script>
+  /* ===== Entrée des cartes du hub en cascade douce ===== */
+  (function(){
+    if(!('IntersectionObserver' in window)) return;
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.documentElement.classList.add('js-anim');
+    function setup(){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(!en.isIntersecting) return;
+          var el = en.target;
+          var idx = el.parentNode ? Array.prototype.indexOf.call(el.parentNode.children, el) : 0;
+          el.style.animationDelay = Math.min(idx, 9) * 45 + 'ms';
+          el.addEventListener('animationend', function(){ el.classList.add('anim-fini'); }, { once:true });
+          el.classList.add('vu');
+          io.unobserve(el);
+        });
+      }, { threshold: 0.08 });
+      document.querySelectorAll('#monde .kase').forEach(function(c){ io.observe(c); });
+    }
+    if(document.readyState !== 'loading') setup(); else document.addEventListener('DOMContentLoaded', setup);
   })();
   </script>
   <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}</script>
