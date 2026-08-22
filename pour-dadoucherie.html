@@ -1760,5 +1760,7 @@
   requestAnimationFrame(frame);
 })();
 </script>
+  <script>/* sa page l'identifie comme "elle" (sans écraser si déjà défini) */try{if(!localStorage.getItem("moi_role"))localStorage.setItem("moi_role","elle");}catch(e){}</script>
+  <script src="/presence.js" defer></script>
 </body>
 </html>
