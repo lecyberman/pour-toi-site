@@ -1,6 +1,7 @@
-/* presence.js, un badge discret quand l'autre est sur le site en ce moment.
-   Utilise Supabase Realtime presence (canal partagé "nous-deux-live").
-   Sûr : si hors-ligne ou lib absente, il ne se passe rien. Aucune donnée envoyée ailleurs.
+/* presence.js — identité + statut de connexion de l'autre.
+   Tu choisis qui tu es (Mathieu ou dadoucherie), puis tu vois si l'autre
+   est connecté ou pas, en temps réel (Supabase Realtime, canal "nous-deux-live").
+   Sûr : hors-ligne ou lib absente, on garde au moins le choix d'identité.
    Ne pas charger sur /ensemble (qui gère déjà sa propre présence). */
 (function () {
   "use strict";
@@ -10,16 +11,50 @@
   var URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
   var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
   var NOMS = { elle: "dadoucherie", lui: "Mathieu" };
+  var AUTRE = { elle: "lui", lui: "elle" };
 
-  function moiRole() {
-    try { var r = localStorage.getItem("moi_role"); if (r === "elle" || r === "lui") return r; } catch (e) {}
-    var id; try { id = localStorage.getItem("presence_id"); if (!id) { id = "visiteur-" + Math.random().toString(36).slice(2, 8); localStorage.setItem("presence_id", id); } } catch (e) { id = "visiteur"; }
-    return id;
+  function getRole() { try { var r = localStorage.getItem("moi_role"); return (r === "elle" || r === "lui") ? r : null; } catch (e) { return null; } }
+  function setRole(r) { try { localStorage.setItem("moi_role", r); } catch (e) {} }
+
+  var badge = document.createElement("div");
+  badge.id = "presence-badge";
+  badge.style.cssText = "position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:9998;display:flex;align-items:center;gap:8px;background:rgba(24,22,46,.92);border:1px solid rgba(180,155,218,.4);color:#EDE9F3;font-family:'Nunito Sans',system-ui,sans-serif;font-weight:700;font-size:.83rem;padding:7px 13px;border-radius:100px;box-shadow:0 8px 24px -10px rgba(0,0,0,.7);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);max-width:94vw;white-space:nowrap;";
+  function mount() { if (!document.body) { document.addEventListener("DOMContentLoaded", mount); return; } if (!badge.parentNode) document.body.appendChild(badge); }
+  mount();
+
+  var client = null, canal = null, autreEnLigne = false, souscrit = false;
+
+  function dot(color) { return '<span style="width:8px;height:8px;border-radius:50%;background:' + color + ';box-shadow:0 0 8px ' + color + ';flex:none"></span>'; }
+  function lienChanger() { return ' <a href="#" data-changer="1" style="color:#B49BDA;text-decoration:none;font-weight:600;opacity:.7;margin-left:2px">changer</a>'; }
+
+  function render() {
+    var r = getRole();
+    if (!r) {
+      badge.innerHTML =
+        '<span style="opacity:.85">Qui es-tu&nbsp;?</span>' +
+        '<button data-r="lui" style="cursor:pointer;border:none;border-radius:100px;padding:5px 12px;font-weight:700;font-family:inherit;color:#1a1430;background:linear-gradient(135deg,#CBB4EC,#A886DA)">Mathieu</button>' +
+        '<button data-r="elle" style="cursor:pointer;border:1px solid rgba(255,255,255,.25);border-radius:100px;padding:5px 12px;font-weight:700;font-family:inherit;color:#EDE9F3;background:rgba(255,255,255,.06)">dadoucherie</button>';
+      return;
+    }
+    var autre = NOMS[AUTRE[r]];
+    var accord = AUTRE[r] === "elle" ? "connectée" : "connecté";
+    if (!souscrit) {
+      badge.innerHTML = dot("#c9a86a") + '<span>connexion…</span>' + lienChanger();
+    } else if (autreEnLigne) {
+      badge.innerHTML = '<a href="/ensemble" style="color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px">' + dot("#8ee6a0") + '<span>' + autre + ' est là, en ce moment 🤍</span></a>' + lienChanger();
+    } else {
+      badge.innerHTML = dot("#6f6a80") + '<span style="opacity:.9">' + autre + " n'est pas " + accord + '</span>' + lienChanger();
+    }
   }
-  var moi = moiRole();
-  var estRole = (moi === "elle" || moi === "lui");
 
-  function charger(cb) {
+  badge.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-r]") : null;
+    if (b) { setRole(b.getAttribute("data-r")); render(); demarrer(); return; }
+    var c = e.target.closest ? e.target.closest("[data-changer]") : null;
+    if (c) { e.preventDefault(); try { if (canal) canal.untrack(); } catch (e2) {} try { localStorage.removeItem("moi_role"); } catch (e2) {} autreEnLigne = false; souscrit = false; render(); }
+  });
+
+  function chargerLib(cb) {
     if (window.supabase && window.supabase.createClient) return cb();
     var s = document.createElement("script");
     s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
@@ -27,48 +62,33 @@
     document.head.appendChild(s);
   }
 
-  charger(function () {
-    if (!window.supabase || !window.supabase.createClient) return;
-    var client, canal;
-    try {
-      client = window.supabase.createClient(URL, ANON, { realtime: { params: { eventsPerSecond: 5 } } });
-      canal = client.channel("nous-deux-live", { config: { presence: { key: moi } } });
-    } catch (e) { return; }
+  function demarrer() {
+    var r = getRole(); if (!r) return;
+    chargerLib(function () {
+      if (!window.supabase || !window.supabase.createClient) return;
+      try {
+        if (!client) client = window.supabase.createClient(URL, ANON, { realtime: { params: { eventsPerSecond: 5 } } });
+        if (canal) { try { canal.untrack(); client.removeChannel(canal); } catch (e) {} canal = null; }
+        souscrit = false; autreEnLigne = false; render();
+        canal = client.channel("nous-deux-live", { config: { presence: { key: r } } });
+        canal.on("presence", { event: "sync" }, function () { maj(r); });
+        canal.subscribe(function (st) {
+          if (st === "SUBSCRIBED") { souscrit = true; try { canal.track({ role: r, page: location.pathname, at: Date.now() }); } catch (e) {} maj(r); }
+        });
+      } catch (e) {}
+    });
+  }
 
-    canal.on("presence", { event: "sync" }, maj);
-    canal.subscribe(function (st) { if (st === "SUBSCRIBED") { try { canal.track({ role: moi, page: location.pathname, at: Date.now() }); } catch (e) {} maj(); } });
+  function maj(r) {
+    try { autreEnLigne = Object.keys(canal.presenceState()).indexOf(AUTRE[r]) > -1; } catch (e) { autreEnLigne = false; }
+    render();
+  }
 
-    var badge = null, masque = false;
-
-    function autresClefs() { try { return Object.keys(canal.presenceState()).filter(function (k) { return k !== moi; }); } catch (e) { return []; } }
-    function autrePresent() {
-      var k = autresClefs();
-      if (estRole) return k.indexOf(moi === "elle" ? "lui" : "elle") > -1;
-      return k.length > 0;
-    }
-    function autreNom() {
-      if (estRole) return NOMS[moi === "elle" ? "lui" : "elle"];
-      var o = autresClefs()[0];
-      return (o === "elle" || o === "lui") ? NOMS[o] : "Quelqu'un";
-    }
-
-    function maj() {
-      if (masque) return;
-      var on = autrePresent();
-      if (on) {
-        if (!badge) {
-          badge = document.createElement("a");
-          badge.href = "/ensemble";
-          badge.id = "presence-badge";
-          badge.style.cssText = "position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:8px;background:rgba(24,22,46,.92);border:1px solid rgba(142,231,160,.5);color:#EDE9F3;text-decoration:none;font-family:'Nunito Sans',system-ui,sans-serif;font-weight:700;font-size:.85rem;padding:8px 14px;border-radius:100px;box-shadow:0 8px 24px -10px rgba(0,0,0,.7);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);animation:presFade .5s ease;";
-          document.body.appendChild(badge);
-          if (!document.getElementById("presStyle")) { var st = document.createElement("style"); st.id = "presStyle"; st.textContent = "@keyframes presFade{from{opacity:0;transform:translate(-50%,-6px)}to{opacity:1;transform:translateX(-50%)}}"; document.head.appendChild(st); }
-        }
-        badge.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#8ee6a0;box-shadow:0 0 8px #8ee6a0"></span> ' + autreNom() + ' est là, en ce moment 🤍';
-      } else if (badge) { badge.remove(); badge = null; }
-    }
-
-    window.addEventListener("beforeunload", function () { try { canal.untrack(); } catch (e) {} });
-    document.addEventListener("visibilitychange", function () { if (!document.hidden) maj(); });
+  window.addEventListener("beforeunload", function () { try { if (canal) canal.untrack(); } catch (e) {} });
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && getRole() && canal) { try { canal.track({ role: getRole(), page: location.pathname, at: Date.now() }); } catch (e) {} }
   });
+
+  render();
+  if (getRole()) demarrer();
 })();
