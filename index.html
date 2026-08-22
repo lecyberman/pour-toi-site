@@ -95,6 +95,10 @@
     #monde .kase .t{ font-family:'Fraunces',serif; font-weight:500; font-size:1.18rem; margin-top:8px; color:#FBF4EA; }
     #monde .kase .d{ font-family:'Nunito Sans',sans-serif; font-size:.86rem; color:#B4AAC8; margin-top:3px; line-height:1.45; }
     #monde .monde-sign{ text-align:center; margin-top:36px; font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; }
+    /* familles du hub (regroupement, sans rien retirer) */
+    #monde .famille{ margin-bottom:34px; }
+    #monde .famille-titre{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:1.08rem; margin:0 0 13px; padding-left:4px; letter-spacing:.01em; opacity:.92; }
+    html[data-theme="clair"] #monde .famille-titre{ color:#8E6FBF; }
 
     /* ===== Encart notifications douces ===== */
     #monde .notif-doux{ display:flex; flex-wrap:wrap; align-items:center; gap:14px; justify-content:space-between;
@@ -215,36 +219,57 @@
         <h2>Par où tu veux entrer ce soir ?</h2>
         <p>Tout ici a été pensé pour toi. Prends ton temps, ouvre ce qui t'appelle. Rien ne presse.</p>
       </div>
-      <div class="grille">
-        <a class="kase kase-courrier" href="/courrier" id="carte-courrier" hidden><div class="ic">💌</div><div class="t">Mon courrier</div><div class="d">Les mots qu'elle t'a laissés, rien que pour toi.</div></a>
-        <a class="kase" href="/mer"><div class="ic">🌊</div><div class="t">Bord de mer</div><div class="d">Le compte à rebours, la lune, une bouteille à la mer.</div></a>
-        <a class="kase" href="/dadoucherie"><div class="ic">💌</div><div class="t">Ta page</div><div class="d">Ton bonjour, ta lettre du jour, ma voix.</div></a>
-        <a class="kase" href="/histoire"><div class="ic">✨</div><div class="t">Notre histoire</div><div class="d">De Snap à nous, en dates et en souvenirs.</div></a>
-        <a class="kase" href="/univers"><div class="ic">✦</div><div class="t">Notre univers</div><div class="d">Nos moments, en constellation.</div></a>
-        <a class="kase" href="/nous-deux"><div class="ic">💞</div><div class="t">Nous deux, en 3D</div><div class="d">Notre monde magique, avec nous deux dedans</div></a>
-        <a class="kase" href="/cocon"><div class="ic">🫂</div><div class="t">Ton cocon</div><div class="d">Si la nuit est dure : dormir, la douleur, la tristesse.</div></a>
-        <a class="kase" href="/dormir"><div class="ic">🌧️</div><div class="t">Pour t'endormir</div><div class="d">Pluie, orage, océan… et un minuteur qui s'éteint tout seul.</div></a>
-        <a class="kase" href="/journal"><div class="ic">📓</div><div class="t">Ton journal du soir</div><div class="d">Écris ce qui pèse, puis laisse-le partir. Rien n'est gardé.</div></a>
-        <a class="kase" href="/chansons"><div class="ic">🎧</div><div class="t">Nos chansons</div><div class="d">Tes préférées, réunies rien que pour toi.</div></a>
-        <a class="kase" href="/bibliotheque"><div class="ic">📚</div><div class="t">Ta bibliothèque</div><div class="d">Tes livres en PDF, à lire directement ici.</div></a>
-        <a class="kase" href="/le-15"><div class="ic">🎁</div><div class="t">Le 15</div><div class="d">Notre jour. Une lettre et un cadeau, chaque 15 du mois.</div></a>
-        <a class="kase" href="/fleurs"><div class="ic">🌷</div><div class="t">Tes fleurs</div><div class="d">Je t'en offre une nouvelle chaque jour.</div></a>
-        <a class="kase" href="/pour-lui"><div class="ic">💗</div><div class="t">Pour lui</div><div class="d">Quand tu ne sais pas comment le dire, je t'aide.</div></a>
-        <a class="kase" href="/ensemble"><div class="ic">💫</div><div class="t">Ensemble, en direct</div><div class="d">Quand vous êtes là tous les deux : jouez en temps réel.</div></a>
-        <a class="kase" href="/toi"><div class="ic">🕯️</div><div class="t">Comment tu te sens</div><div class="d">Dis-moi, demande-moi, dépose un mot.</div></a>
-        <a class="kase" href="/galerie"><div class="ic">📷</div><div class="t">Notre galerie</div><div class="d">Nos photos, en polaroïds.</div></a>
-        <a class="kase" href="/souhaits"><div class="ic">🗺️</div><div class="t">Nos rêves à deux</div><div class="d">Ce qu'on veut vivre, ensemble.</div></a>
-        <a class="kase" href="/reves"><div class="ic">🌍</div><div class="t">Nos voyages rêvés</div><div class="d">Les endroits où je veux t'emmener.</div></a>
-        <a class="kase" href="/mots"><div class="ic">📖</div><div class="t">Nos mots</div><div class="d">Notre journal, nos petits mots.</div></a>
-        <a class="kase" href="/capsules"><div class="ic">✉️</div><div class="t">Nos capsules</div><div class="d">Des lettres à ouvrir plus tard.</div></a>
-        <a class="kase" href="/humeurs"><div class="ic">🌙</div><div class="t">Ce soir je me sens</div><div class="d">Touche l'humeur qui te ressemble.</div></a>
-        <a class="kase" href="/dramas"><div class="ic">🍿</div><div class="t">Nos dramas</div><div class="d">Nos soirées canapé, en liste.</div></a>
-        <a class="kase" href="/jeux"><div class="ic">🎲</div><div class="t">Nos jeux</div><div class="d">Un moment léger, juste pour rire.</div></a>
-        <a class="kase" href="/nuit"><div class="ic">🌌</div><div class="t">Notre nuit</div><div class="d">Le 15 juillet, notre ciel.</div></a>
-        <a class="kase" href="/creations"><div class="ic">🖼️</div><div class="t">Nos créations</div><div class="d">Ce qu'on garde, ce qu'on imagine.</div></a>
-        <a class="kase" onclick="naviguer('comprendre')"><div class="ic">💭</div><div class="t">Ce que je comprends de toi</div><div class="d">Mes observations, avec amour.</div></a>
-        <a class="kase" onclick="naviguer('dessin')"><div class="ic">🎨</div><div class="t">Ton espace de dessin</div><div class="d">Dessine, je serai là après.</div></a>
-        <a class="kase" onclick="naviguer('oeuvre')"><div class="ic">✍️</div><div class="t">Notre œuvre</div><div class="d">Un dessin, quelques mots, gardés.</div></a>
+      <div class="famille">
+        <p class="famille-titre">Nous</p>
+        <div class="grille">
+          <a class="kase" href="/histoire"><div class="ic">✨</div><div class="t">Notre histoire</div><div class="d">De Snap à nous, en dates et en souvenirs.</div></a>
+          <a class="kase" href="/univers"><div class="ic">✦</div><div class="t">Notre univers</div><div class="d">Nos moments, en constellation.</div></a>
+          <a class="kase" href="/nous-deux"><div class="ic">💞</div><div class="t">Nous deux, en 3D</div><div class="d">Notre monde magique, avec nous deux dedans</div></a>
+          <a class="kase" href="/galerie"><div class="ic">📷</div><div class="t">Notre galerie</div><div class="d">Nos photos, en polaroïds.</div></a>
+          <a class="kase" href="/mots"><div class="ic">📖</div><div class="t">Nos mots</div><div class="d">Notre journal, nos petits mots.</div></a>
+          <a class="kase" href="/capsules"><div class="ic">✉️</div><div class="t">Nos capsules</div><div class="d">Des lettres à ouvrir plus tard.</div></a>
+          <a class="kase" href="/souhaits"><div class="ic">🗺️</div><div class="t">Nos rêves à deux</div><div class="d">Ce qu'on veut vivre, ensemble.</div></a>
+          <a class="kase" href="/reves"><div class="ic">🌍</div><div class="t">Nos voyages rêvés</div><div class="d">Les endroits où je veux t'emmener.</div></a>
+          <a class="kase" href="/creations"><div class="ic">🖼️</div><div class="t">Nos créations</div><div class="d">Ce qu'on garde, ce qu'on imagine.</div></a>
+          <a class="kase" href="/dramas"><div class="ic">🍿</div><div class="t">Nos dramas</div><div class="d">Nos soirées canapé, en liste.</div></a>
+          <a class="kase" href="/jeux"><div class="ic">🎲</div><div class="t">Nos jeux</div><div class="d">Un moment léger, juste pour rire.</div></a>
+          <a class="kase" href="/nuit"><div class="ic">🌌</div><div class="t">Notre nuit</div><div class="d">Le 15 juillet, notre ciel.</div></a>
+        </div>
+      </div>
+
+      <div class="famille">
+        <p class="famille-titre">Toi, ce soir</p>
+        <div class="grille">
+          <a class="kase" href="/cocon"><div class="ic">🫂</div><div class="t">Ton cocon</div><div class="d">Si la nuit est dure : dormir, la douleur, la tristesse.</div></a>
+          <a class="kase" href="/dormir"><div class="ic">🌧️</div><div class="t">Pour t'endormir</div><div class="d">Pluie, orage, océan… et un minuteur qui s'éteint tout seul.</div></a>
+          <a class="kase" href="/journal"><div class="ic">📓</div><div class="t">Ton journal du soir</div><div class="d">Écris ce qui pèse, puis laisse-le partir. Rien n'est gardé.</div></a>
+          <a class="kase" href="/toi"><div class="ic">🕯️</div><div class="t">Comment tu te sens</div><div class="d">Dis-moi, demande-moi, dépose un mot.</div></a>
+          <a class="kase" href="/humeurs"><div class="ic">🌙</div><div class="t">Ce soir je me sens</div><div class="d">Touche l'humeur qui te ressemble.</div></a>
+          <a class="kase" href="/chansons"><div class="ic">🎧</div><div class="t">Nos chansons</div><div class="d">Tes préférées, réunies rien que pour toi.</div></a>
+          <a class="kase" href="/bibliotheque"><div class="ic">📚</div><div class="t">Ta bibliothèque</div><div class="d">Tes livres en PDF, à lire directement ici.</div></a>
+        </div>
+      </div>
+
+      <div class="famille">
+        <p class="famille-titre">De moi, pour toi</p>
+        <div class="grille">
+          <a class="kase kase-courrier" href="/courrier" id="carte-courrier" hidden><div class="ic">💌</div><div class="t">Mon courrier</div><div class="d">Les mots qu'elle t'a laissés, rien que pour toi.</div></a>
+          <a class="kase" href="/dadoucherie"><div class="ic">💌</div><div class="t">Ta page</div><div class="d">Ton bonjour, ta lettre du jour, ma voix.</div></a>
+          <a class="kase" href="/mer"><div class="ic">🌊</div><div class="t">Bord de mer</div><div class="d">Le compte à rebours, la lune, une bouteille à la mer.</div></a>
+          <a class="kase" href="/le-15"><div class="ic">🎁</div><div class="t">Le 15</div><div class="d">Notre jour. Une lettre et un cadeau, chaque 15 du mois.</div></a>
+          <a class="kase" href="/fleurs"><div class="ic">🌷</div><div class="t">Tes fleurs</div><div class="d">Je t'en offre une nouvelle chaque jour.</div></a>
+          <a class="kase" href="/pour-lui"><div class="ic">💗</div><div class="t">Pour lui</div><div class="d">Quand tu ne sais pas comment le dire, je t'aide.</div></a>
+          <a class="kase" href="/ensemble"><div class="ic">💫</div><div class="t">Ensemble, en direct</div><div class="d">Quand vous êtes là tous les deux : jouez en temps réel.</div></a>
+        </div>
+      </div>
+
+      <div class="famille">
+        <p class="famille-titre">À créer, à explorer</p>
+        <div class="grille">
+          <a class="kase" onclick="naviguer('comprendre')"><div class="ic">💭</div><div class="t">Ce que je comprends de toi</div><div class="d">Mes observations, avec amour.</div></a>
+          <a class="kase" onclick="naviguer('dessin')"><div class="ic">🎨</div><div class="t">Ton espace de dessin</div><div class="d">Dessine, je serai là après.</div></a>
+          <a class="kase" onclick="naviguer('oeuvre')"><div class="ic">✍️</div><div class="t">Notre œuvre</div><div class="d">Un dessin, quelques mots, gardés.</div></a>
+        </div>
       </div>
 
       <!-- Notifications douces : activer / tester / couper -->
