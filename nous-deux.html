@@ -246,54 +246,6 @@
   var ring = new THREE.Mesh(new THREE.RingGeometry(11, 11.6, 64), ringMat);
   ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05; scene.add(ring);
 
-  // ===== nos deux personnages (plus vrais) =====
-  var MAT = {
-    peau:     new THREE.MeshStandardMaterial({ color: 0xEFC3A2, roughness: 0.7, metalness: 0 }),
-    peauF:    new THREE.MeshStandardMaterial({ color: 0xF4CEB3, roughness: 0.68, metalness: 0 }),
-    hautH:    new THREE.MeshStandardMaterial({ color: 0x4B3B78, roughness: 0.6 }),
-    basH:     new THREE.MeshStandardMaterial({ color: 0x2E2749, roughness: 0.68 }),
-    chaussH:  new THREE.MeshStandardMaterial({ color: 0x1a1630, roughness: 0.45 }),
-    cheveuxH: new THREE.MeshStandardMaterial({ color: 0x241B2E, roughness: 0.85 }),
-    robe:     new THREE.MeshStandardMaterial({ color: 0x9B7BD0, roughness: 0.48 }),
-    cheveuxF: new THREE.MeshStandardMaterial({ color: 0x5f3b28, roughness: 0.8 }),
-    yeux:     new THREE.MeshStandardMaterial({ color: 0x241d2b, roughness: 0.3 }),
-    blanc:    new THREE.MeshStandardMaterial({ color: 0xF7F2EA, roughness: 0.4 }),
-    levres:   new THREE.MeshStandardMaterial({ color: 0xCF7F83, roughness: 0.55 }),
-    joue:     new THREE.MeshStandardMaterial({ color: 0xEE9CA8, roughness: 0.9, transparent: true, opacity: 0.4 })
-  };
-  function cyl(rt, rb, h, mat) { return new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, 24), mat); }
-  function sph(r, mat) { return new THREE.Mesh(new THREE.SphereGeometry(r, 24, 18), mat); }
-  function box(w, h, d, mat) { return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); }
-  // capsule verticale, pivot au sommet (le membre "pend" vers le bas)
-  function membre(r, h, mat) {
-    var g = new THREE.Group();
-    var ch = Math.max(0.02, h - 2 * r);
-    var c = new THREE.Mesh(new THREE.CylinderGeometry(r, r, ch, 14), mat); c.position.y = -(r + ch / 2); g.add(c);
-    var t = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 12), mat); t.position.y = -r; g.add(t);
-    var b = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 12), mat); b.position.y = -(r + ch); g.add(b);
-    return g;
-  }
-  function jambe(mat, r, h) {
-    var g = membre(r, h, mat);
-    var pied = box(r * 1.6, r * 0.7, r * 2.6, MAT.chaussH); pied.position.set(0, -h + r * 0.15, r * 1.0); g.add(pied);
-    return g;
-  }
-  // visage : yeux (blanc + iris, clignables), sourcils, sourire, joues
-  function makeFace(host, cy, R, browMat) {
-    var eyes = [];
-    [-1, 1].forEach(function (s) {
-      var eg = new THREE.Group(); eg.position.set(s * R * 0.34, cy + R * 0.12, R * 0.9);
-      var w = sph(R * 0.17, MAT.blanc); w.scale.set(1, 1.1, 0.55); eg.add(w);
-      var ir = new THREE.Mesh(new THREE.SphereGeometry(R * 0.085, 12, 12), MAT.yeux); ir.position.z = R * 0.11; eg.add(ir);
-      host.add(eg); eyes.push(eg);
-      var br = box(R * 0.34, R * 0.06, R * 0.14, browMat); br.position.set(s * R * 0.34, cy + R * 0.35, R * 0.86); host.add(br);
-    });
-    var sm = new THREE.Mesh(new THREE.TorusGeometry(R * 0.24, R * 0.05, 8, 20, Math.PI), MAT.levres);
-    sm.position.set(0, cy - R * 0.32, R * 0.86); sm.rotation.z = Math.PI; host.add(sm);
-    [-1, 1].forEach(function (s) { var j = sph(R * 0.2, MAT.joue); j.scale.set(1, 0.8, 0.5); j.position.set(s * R * 0.5, cy - R * 0.06, R * 0.78); host.add(j); });
-    return eyes;
-  }
-
   // ===== nous deux, en vrai : vos photos fondues dans l'univers =====
   var texLoader = new THREE.TextureLoader();
   function chargePhoto(url) { var t = texLoader.load(url); try { t.encoding = THREE.sRGBEncoding; } catch (e) {} t.anisotropy = 4; return t; }
