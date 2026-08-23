@@ -320,28 +320,28 @@
 
   // ===== nos deux avatars, debout dans notre monde (à peaufiner ensemble) =====
   function tresses(host, cy, R) {
-    // longues tresses sombres à perles dorées, à l'arrière et sur les côtés
-    for (var t = 0; t < 16; t++) {
-      var ang = Math.PI * (0.14 + (t / 15) * 0.72);
-      var side = (t % 2) ? 1 : -1;
-      var bx = Math.cos(ang) * R * 0.86 * side;
-      var bz = -Math.abs(Math.sin(ang)) * R * 0.7 - R * 0.12;
-      var len = 3.0 + Math.random() * 1.4;
+    // longues tresses à perles dorées, tout autour de la tête (on dégage juste le visage)
+    var N = 22;
+    for (var t = 0; t < N; t++) {
+      var a = (t / N) * Math.PI * 2;
+      var x = Math.sin(a), z = Math.cos(a);
+      if (z > 0.72) continue; // fenêtre avant-centre = visage, on saute
+      var len = 3.6 + Math.random() * 1.7;
       var str = new THREE.Group();
-      var body = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.09, R * 0.06, len, 7), MAT.tresse);
+      var body = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.09, R * 0.055, len, 7), MAT.tresse);
       body.position.y = -len / 2; str.add(body);
-      for (var pb = 0; pb < 2; pb++) {
-        var pearl = new THREE.Mesh(new THREE.SphereGeometry(R * 0.12, 8, 8), MAT.perle);
-        pearl.position.y = -len * (0.45 + pb * 0.4); str.add(pearl);
+      for (var pb = 0; pb < 3; pb++) {
+        var pearl = new THREE.Mesh(new THREE.SphereGeometry(R * 0.11, 8, 8), MAT.perle);
+        pearl.position.y = -len * (0.32 + pb * 0.28); str.add(pearl);
       }
-      str.position.set(bx, cy + R * 0.34, bz);
-      str.rotation.x = -0.18 - Math.random() * 0.12;
-      str.rotation.z = side * (0.05 + Math.random() * 0.08);
+      str.position.set(x * R * 0.9, cy + R * 0.3, z * R * 0.85);
+      str.rotation.x = (z > 0 ? -0.14 : 0.12) - Math.random() * 0.1; // devant : penche vers l'avant ; arrière : vers l'arrière
+      str.rotation.z = -x * 0.12;
       host.add(str);
     }
     // calotte de cheveux sur le crâne
-    var cap = new THREE.Mesh(new THREE.SphereGeometry(R * 1.02, 20, 16, 0, Math.PI * 2, 0, Math.PI * 0.62), MAT.tresse);
-    cap.position.y = cy + R * 0.16; host.add(cap);
+    var cap = new THREE.Mesh(new THREE.SphereGeometry(R * 1.03, 20, 16, 0, Math.PI * 2, 0, Math.PI * 0.66), MAT.tresse);
+    cap.position.y = cy + R * 0.14; host.add(cap);
   }
 
   function makeElle() {
