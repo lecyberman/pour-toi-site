@@ -19,6 +19,8 @@
     { "source": "/reves", "destination": "/reves.html" },
     { "source": "/portrait", "destination": "/portrait.html" },
     { "source": "/livre", "destination": "/livre.html" },
+    { "source": "/souvenirs", "destination": "/souvenirs.html" },
+    { "source": "/carnet", "destination": "/souvenirs.html" },
     { "source": "/avent", "destination": "/avent.html" },
     { "source": "/au-cas-ou", "destination": "/au-cas-ou.html" },
     { "source": "/demande", "destination": "/demande.html" },
