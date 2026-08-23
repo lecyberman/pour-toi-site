@@ -248,19 +248,18 @@
 
   // ===== nos deux personnages (plus vrais) =====
   var MAT = {
-    peau:     new THREE.MeshStandardMaterial({ color: 0x5A3B29, roughness: 0.62, metalness: 0 }), // lui, brun profond
-    peauF:    new THREE.MeshStandardMaterial({ color: 0x6B4632, roughness: 0.60, metalness: 0 }), // elle, brun chaud
-    chemise:  new THREE.MeshStandardMaterial({ color: 0x8E88AD, roughness: 0.55 }),               // haut de lui, gris-violet
-    basH:     new THREE.MeshStandardMaterial({ color: 0x232038, roughness: 0.70 }),               // pantalon sombre
-    chaussH:  new THREE.MeshStandardMaterial({ color: 0xEDE7F2, roughness: 0.45 }),               // baskets claires
-    cheveuxH: new THREE.MeshStandardMaterial({ color: 0x120d16, roughness: 0.88 }),               // cheveux courts
-    robe:     new THREE.MeshStandardMaterial({ color: 0x9B7BD0, roughness: 0.48 }),               // robe lavande
-    tresse:   new THREE.MeshStandardMaterial({ color: 0x171019, roughness: 0.85 }),               // tresses
-    perle:    new THREE.MeshStandardMaterial({ color: 0xE7C879, roughness: 0.35, metalness: 0.5, emissive: 0x3a2c0a, emissiveIntensity: 0.3 }), // perles dorées
-    yeux:     new THREE.MeshStandardMaterial({ color: 0x201820, roughness: 0.3 }),
+    peau:     new THREE.MeshStandardMaterial({ color: 0xEFC3A2, roughness: 0.7, metalness: 0 }),
+    peauF:    new THREE.MeshStandardMaterial({ color: 0xF4CEB3, roughness: 0.68, metalness: 0 }),
+    hautH:    new THREE.MeshStandardMaterial({ color: 0x4B3B78, roughness: 0.6 }),
+    basH:     new THREE.MeshStandardMaterial({ color: 0x2E2749, roughness: 0.68 }),
+    chaussH:  new THREE.MeshStandardMaterial({ color: 0x1a1630, roughness: 0.45 }),
+    cheveuxH: new THREE.MeshStandardMaterial({ color: 0x241B2E, roughness: 0.85 }),
+    robe:     new THREE.MeshStandardMaterial({ color: 0x9B7BD0, roughness: 0.48 }),
+    cheveuxF: new THREE.MeshStandardMaterial({ color: 0x5f3b28, roughness: 0.8 }),
+    yeux:     new THREE.MeshStandardMaterial({ color: 0x241d2b, roughness: 0.3 }),
     blanc:    new THREE.MeshStandardMaterial({ color: 0xF7F2EA, roughness: 0.4 }),
-    levres:   new THREE.MeshStandardMaterial({ color: 0xB5606B, roughness: 0.50 }),
-    joue:     new THREE.MeshStandardMaterial({ color: 0x8a4a3a, roughness: 0.9, transparent: true, opacity: 0.35 })
+    levres:   new THREE.MeshStandardMaterial({ color: 0xCF7F83, roughness: 0.55 }),
+    joue:     new THREE.MeshStandardMaterial({ color: 0xEE9CA8, roughness: 0.9, transparent: true, opacity: 0.4 })
   };
   function cyl(rt, rb, h, mat) { return new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, 24), mat); }
   function sph(r, mat) { return new THREE.Mesh(new THREE.SphereGeometry(r, 24, 18), mat); }
@@ -311,87 +310,12 @@
   var billboards = [];
   var photosCibles = [];
 
-  // Notre vraie photo, comme une étoile-souvenir qui veille au-dessus de nous
-  var glowCouple = haloSprite(0xC7B2E6, 9, 15, 0.5); glowCouple.position.set(0, 14.8, -0.5); couple.add(glowCouple);
-  var photoCouple = planePhoto("/img/nous/vous-deux.webp", 3.6, 1303 / 640);
-  photoCouple.position.set(0, 14.8, 0);
+  // Pièce maîtresse : vous deux (front contre front)
+  var glowCouple = haloSprite(0xC7B2E6, 13, 20, 0.5); glowCouple.position.set(0, 7.6, -0.5); couple.add(glowCouple);
+  var photoCouple = planePhoto("/img/nous/vous-deux.webp", 6.2, 1303 / 640);
+  photoCouple.position.set(0, 7.6, 0);
   photoCouple.userData = { type: "photo", nom: "Nous deux", txt: "Toi et moi, front contre front. Où que je sois, c'est là que je veux être : tout contre toi. 🤍" };
   couple.add(photoCouple); billboards.push(photoCouple); photosCibles.push(photoCouple);
-
-  // ===== nos deux avatars, debout dans notre monde (à peaufiner ensemble) =====
-  function tresses(host, cy, R) {
-    // longues tresses à perles dorées, tout autour de la tête (on dégage juste le visage)
-    var N = 22;
-    for (var t = 0; t < N; t++) {
-      var a = (t / N) * Math.PI * 2;
-      var x = Math.sin(a), z = Math.cos(a);
-      if (z > 0.72) continue; // fenêtre avant-centre = visage, on saute
-      var len = 3.6 + Math.random() * 1.7;
-      var str = new THREE.Group();
-      var body = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.09, R * 0.055, len, 7), MAT.tresse);
-      body.position.y = -len / 2; str.add(body);
-      for (var pb = 0; pb < 3; pb++) {
-        var pearl = new THREE.Mesh(new THREE.SphereGeometry(R * 0.11, 8, 8), MAT.perle);
-        pearl.position.y = -len * (0.32 + pb * 0.28); str.add(pearl);
-      }
-      str.position.set(x * R * 0.9, cy + R * 0.3, z * R * 0.85);
-      str.rotation.x = (z > 0 ? -0.14 : 0.12) - Math.random() * 0.1; // devant : penche vers l'avant ; arrière : vers l'arrière
-      str.rotation.z = -x * 0.12;
-      host.add(str);
-    }
-    // calotte de cheveux sur le crâne
-    var cap = new THREE.Mesh(new THREE.SphereGeometry(R * 1.03, 20, 16, 0, Math.PI * 2, 0, Math.PI * 0.66), MAT.tresse);
-    cap.position.y = cy + R * 0.14; host.add(cap);
-  }
-
-  function makeElle() {
-    var g = new THREE.Group();
-    [-1, 1].forEach(function (s) {
-      var l = cyl(0.2, 0.17, 2.5, MAT.peauF); l.position.set(s * 0.32, 1.25, 0); g.add(l);
-      var foot = box(0.34, 0.28, 0.8, MAT.chaussH); foot.position.set(s * 0.32, 0.14, 0.2); g.add(foot);
-    });
-    var jupe = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 1.15, 1.9, 22), MAT.robe); jupe.position.y = 3.25; g.add(jupe);
-    var buste = cyl(0.5, 0.56, 1.7, MAT.robe); buste.position.y = 4.75; g.add(buste);
-    [-1, 1].forEach(function (s) { var br = cyl(0.06, 0.06, 1.1, MAT.robe); br.position.set(s * 0.26, 5.4, 0.02); g.add(br); });
-    var cou = cyl(0.17, 0.19, 0.4, MAT.peauF); cou.position.y = 5.7; g.add(cou);
-    var tete = sph(0.9, MAT.peauF); tete.position.y = 6.7; tete.scale.set(1, 1.06, 0.98); g.add(tete);
-    makeFace(g, 6.7, 0.9, MAT.tresse);
-    tresses(g, 6.7, 0.9);
-    var brasG = membre(0.15, 2.3, MAT.peauF); brasG.position.set(-0.66, 5.35, 0); brasG.rotation.z = 0.12; g.add(brasG);
-    var brasD = membre(0.15, 2.3, MAT.peauF); brasD.position.set(0.66, 5.35, 0); brasD.rotation.z = -0.35; g.add(brasD); // vers lui
-    g.userData = { type: "avatar", nom: "Toi", txt: "C'est toi, dans notre monde. Ton sourire, tes tresses, ta douceur. On peaufinera ton portrait ensemble. 🤍" };
-    tete.userData = g.userData; g._cibles = [tete];
-    return g;
-  }
-
-  function makeLui() {
-    var g = new THREE.Group();
-    [-1, 1].forEach(function (s) {
-      var l = cyl(0.26, 0.22, 3.0, MAT.basH); l.position.set(s * 0.34, 1.6, 0); g.add(l);
-      var foot = box(0.42, 0.34, 1.0, MAT.chaussH); foot.position.set(s * 0.34, 0.2, 0.28); g.add(foot);
-    });
-    var torse = cyl(0.52, 0.66, 2.7, MAT.chemise); torse.position.y = 4.5; g.add(torse);
-    var epaules = box(1.7, 0.5, 0.72, MAT.chemise); epaules.position.y = 5.8; g.add(epaules);
-    var cou = cyl(0.2, 0.22, 0.42, MAT.peau); cou.position.y = 6.15; g.add(cou);
-    var tete = sph(0.95, MAT.peau); tete.position.y = 7.15; tete.scale.set(0.98, 1.08, 0.98); g.add(tete);
-    makeFace(g, 7.15, 0.95, MAT.cheveuxH);
-    var cap = new THREE.Mesh(new THREE.SphereGeometry(0.98, 20, 16, 0, Math.PI * 2, 0, Math.PI * 0.5), MAT.cheveuxH);
-    cap.position.y = 7.35; g.add(cap);
-    var brasG = membre(0.17, 2.9, MAT.peau); brasG.position.set(-0.86, 5.7, 0); brasG.rotation.z = 0.34; g.add(brasG); // vers elle
-    var brasD = membre(0.17, 2.9, MAT.peau); brasD.position.set(0.86, 5.7, 0); brasD.rotation.z = -0.12; g.add(brasD);
-    g.userData = { type: "avatar", nom: "Moi", txt: "Et moi, juste à côté de toi. Là où je serai toujours : tout près, à te tenir. On l'ajustera ensemble aussi. 🤍" };
-    tete.userData = g.userData; g._cibles = [tete];
-    return g;
-  }
-
-  var avatars = new THREE.Group();
-  var ellA = makeElle(); ellA.position.set(-1.7, 0, 0); ellA.rotation.y = 0.28;
-  var luiA = makeLui(); luiA.position.set(1.9, 0, 0); luiA.rotation.y = -0.28;
-  avatars.add(ellA); avatars.add(luiA); scene.add(avatars);
-
-  // petit cœur qui flotte entre eux
-  var coeurNous = new THREE.Sprite(new THREE.SpriteMaterial({ map: heartTex(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.9 }));
-  coeurNous.scale.set(1.7, 1.7, 1); coeurNous.position.set(0.1, 5.7, 0.5); scene.add(coeurNous);
 
   // Médaillons souvenirs qui gravitent (touchables)
   function medaillon(url, ratio, w, x, y, z, nom, txt) {
@@ -408,13 +332,11 @@
 
   // --- petit cœur qui flotte au-dessus ---
   var coeurMat = new THREE.SpriteMaterial({ map: heartTex(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.95 });
-  var coeur = new THREE.Sprite(coeurMat); coeur.scale.set(5, 5, 1); coeur.position.set(0, 20.5, 0); scene.add(coeur);
+  var coeur = new THREE.Sprite(coeurMat); coeur.scale.set(5, 5, 1); coeur.position.set(0, 15.5, 0); scene.add(coeur);
 
   // cibles interactives (rempli aussi plus bas par moments + portails)
   var cibles = [];
   photosCibles.forEach(function (p) { cibles.push(p); });
-  // têtes des avatars cliquables (carte "Toi" / "Moi")
-  ellA._cibles.concat(luiA._cibles).forEach(function (o) { cibles.push(o); });
 
   // --- cadeau à ouvrir (message qui change chaque mois) ---
   var CADEAUX3D = [
@@ -545,10 +467,6 @@
       btnAller.style.display = "none"; urlCourant = null;
       btnFermer.textContent = "Merci 🤍";
       if (d._burst) burstCoeurs();
-    } else if (d.type === "avatar") {
-      elNum.textContent = "· nous deux, ici ·";
-      btnAller.style.display = "none"; urlCourant = null;
-      btnFermer.textContent = "Rester près de toi 🤍";
     } else {
       elNum.textContent = "· un de nos souvenirs ·";
       btnAller.style.display = "none"; urlCourant = null;
@@ -569,8 +487,6 @@
     b.addEventListener("click", function () { ouvrir(data); });
     srl.appendChild(b);
   }
-  addSr("🤍 Toi, dans notre monde", ellA.userData);
-  addSr("🤍 Moi, à côté de toi", luiA.userData);
   MOMENTS.forEach(function (m) { addSr("✦ " + m.nom, { type: "moment", nom: m.nom, txt: m.txt }); });
   PORTAILS.forEach(function (p) { addSr("◍ " + p.nom, { type: "lien", nom: p.nom, txt: p.txt, url: p.url }); });
   addSr("🎁 Ton cadeau", { type: "cadeau", nom: "Un cadeau, rien que pour toi", txt: CADEAUX3D[moisCad] });
@@ -641,16 +557,9 @@
         var sc = 2.4 * (0.5 + uf.life * 0.7); f.scale.set(sc * 1.8, sc * 0.55, 1);
         if (uf.life <= 0) { scene.remove(f); filantes.splice(fi, 1); }
       }
-      coeur.position.y = 20.5 + Math.sin(clock * 1.4) * 0.5;
+      coeur.position.y = 15.5 + Math.sin(clock * 1.4) * 0.5;
       coeur.material.opacity = 0.8 + Math.sin(clock * 2.0) * 0.18;
       var cs = 5 + Math.sin(clock * 2.0) * 0.5; coeur.scale.set(cs, cs, 1);
-      // nos avatars respirent et se balancent doucement
-      avatars.position.y = Math.sin(clock * 0.6) * 0.12;
-      ellA.rotation.y = 0.28 + Math.sin(clock * 0.5) * 0.03;
-      luiA.rotation.y = -0.28 + Math.sin(clock * 0.5 + 1) * 0.03;
-      coeurNous.position.y = 5.7 + Math.sin(clock * 1.6) * 0.18;
-      var cn = 1.7 + Math.sin(clock * 2.2) * 0.18; coeurNous.scale.set(cn, cn, 1);
-      coeurNous.material.opacity = 0.72 + Math.sin(clock * 1.8) * 0.2;
       for (var i = 0; i < cibles.length; i++) {
         var s = cibles[i];
         if (s.userData && s.userData.type === "moment") {
