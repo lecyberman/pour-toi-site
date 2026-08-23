@@ -27,11 +27,12 @@
     }).then(function (sub) {
       if (!sub) return;
       var j = sub.toJSON(); var role = null; try { role = localStorage.getItem("moi_role"); } catch (e) {}
-      return fetch(SB_URL + "/rest/v1/push_subs?on_conflict=endpoint", {
+      return fetch(SB_URL + "/rest/v1/push_subs", {
         method: "POST",
-        headers: { "apikey": SB_ANON, "Authorization": "Bearer " + SB_ANON, "Content-Type": "application/json", "Prefer": "resolution=ignore-duplicates,return=minimal" },
+        headers: { "apikey": SB_ANON, "Authorization": "Bearer " + SB_ANON, "Content-Type": "application/json", "Prefer": "return=minimal" },
         body: JSON.stringify({ endpoint: sub.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, role: role })
       });
+      // insert simple : si l'endpoint existe déjà, le serveur renvoie 409, sans conséquence (déjà abonné).
     }).catch(function () {});
   }
 
