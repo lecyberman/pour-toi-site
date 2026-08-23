@@ -1109,11 +1109,13 @@
       cocon:{ic:'🫂', t:'Ton cocon', d:'Si la nuit est dure, viens te poser un moment.', h:'/cocon'},
       le15:{ic:'🎁', t:"C'est le 15", d:"Notre jour. Une lettre et un cadeau t'attendent.", h:'/le-15'},
       mer:{ic:'🌊', t:'Bord de mer', d:'La même mer, la même lune, rien qu\'à nous.', h:'/mer'},
-      univers:{ic:'✦', t:'Notre univers', d:'Nos moments, en constellation.', h:'/univers'}
+      univers:{ic:'✦', t:'Notre univers', d:'Nos moments, en constellation.', h:'/univers'},
+      avent:{ic:'🎄', t:"Le calendrier de l'avent", d:"Une petite surprise chaque jour jusqu'à Noël.", h:'/avent'}
     };
-    var d = new Date(), h = d.getHours(), jour = d.getDate();
+    var d = new Date(), h = d.getHours(), jour = d.getDate(), mois = d.getMonth();
     var eyebrow, keys;
-    if(jour === 15){ eyebrow = "On est le 15, notre jour 🤍"; keys = ['le15']; }
+    if(mois === 11 && jour <= 25){ eyebrow = "C'est bientôt Noël 🎄"; keys = (jour === 15) ? ['avent','le15'] : ['avent']; }
+    else if(jour === 15){ eyebrow = "On est le 15, notre jour 🤍"; keys = ['le15']; }
     else if(h >= 21 || h < 6){ eyebrow = "C'est le soir, prends soin de toi"; keys = ['dormir','cocon']; }
     else if(h >= 6 && h < 11){ eyebrow = "Bonjour, toi ☀️"; keys = ['dadoucherie']; }
     else { eyebrow = "Ce moment, rien qu'à nous"; keys = ['mer','univers']; }
