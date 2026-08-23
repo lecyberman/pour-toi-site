@@ -1,11 +1,12 @@
 // Service worker "Pour toi" - reseau d'abord pour le contenu, cache pour les medias
-const CACHE = 'pourtoi-v5';
+const CACHE = 'pourtoi-v6';
 const CORE = [
   '/', '/index.html', '/style.css', '/theme.css',
   '/app.js', '/script.js', '/supabase.js', '/db.js',
-  '/rappels.js', '/presence.js', '/manifest.json',
+  '/presence.js', '/manifest.json',
   '/icon.svg', '/icon-192.png', '/icon-512.png'
 ];
+// note : rappels.js volontairement hors precache (toujours récupéré frais)
 
 self.addEventListener('install', (e) => {
   // precache resilient : une URL absente n'annule pas l'installation
