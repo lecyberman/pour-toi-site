@@ -28,16 +28,26 @@
   @media (max-width:420px){ .villes{ grid-template-columns:1fr; } }
   .carte{ background:rgba(255,255,255,.05); border:1px solid rgba(180,155,218,.24); border-radius:20px; padding:20px 16px; text-align:center; }
   .carte .qui{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:.95rem; margin:0 0 2px; }
-  .carte .ville{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:1.05rem; color:#FBF4EA; margin:0 0 10px; }
-  .carte .ic{ font-size:3.2rem; line-height:1; margin:4px 0 6px; }
+  .carte .ville{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:1.05rem; color:#FBF4EA; margin:0 0 10px; min-height:1.25em; }
+  .carte .ic{ font-size:3.2rem; line-height:1; margin:4px 0 6px; min-height:3.2rem; }
   .carte .temp{ font-family:'Fraunces',serif; font-weight:500; font-size:2rem; color:#F1ECF8; }
   .carte .desc{ color:#C9C1D8; font-size:.9rem; margin-top:4px; min-height:1.2em; }
-  .carte .heure{ color:rgba(201,193,216,.6); font-size:.8rem; margin-top:8px; }
+  .carte .heure{ color:rgba(201,193,216,.6); font-size:.8rem; margin-top:8px; min-height:1em; }
 
   .liaison{ text-align:center; margin:22px auto 0; }
   .liaison .coeur{ font-size:1.4rem; }
   .liaison .mot{ font-family:'Fraunces',serif; font-style:italic; color:#E9DEF7; font-size:1.14rem; line-height:1.7; max-width:34ch; margin:10px auto 0; min-height:3.2em; transition:opacity .5s; }
-  .maj{ text-align:center; color:rgba(201,193,216,.55); font-size:.78rem; margin-top:18px; }
+
+  .reglage{ margin:24px auto 0; width:100%; max-width:400px; background:rgba(255,255,255,.04); border:1px solid rgba(180,155,218,.2); border-radius:16px; padding:16px; }
+  .reglage h2{ font-family:'Fraunces',serif; font-weight:500; font-size:1.02rem; margin:0 0 10px; color:#FBF4EA; }
+  .reglage .row{ display:flex; gap:8px; }
+  .reglage input{ flex:1; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.16); border-radius:12px; color:#EDE9F3; padding:11px 12px; font-family:inherit; font-size:.95rem; }
+  .reglage input:focus{ outline:2px solid #A886DA; }
+  .reglage button{ font-family:inherit; font-weight:700; font-size:.9rem; color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border:none; border-radius:100px; padding:11px 16px; cursor:pointer; white-space:nowrap; }
+  .reglage .pos{ margin-top:10px; width:100%; background:rgba(255,255,255,.07); color:#EDE9F3; border:1px solid rgba(255,255,255,.18); }
+  .reglage .ok{ color:#8ee6a0; font-size:.82rem; margin-top:10px; min-height:1em; }
+  .reglage .note{ color:rgba(201,193,216,.7); font-size:.8rem; margin-top:8px; }
+  .maj{ text-align:center; color:rgba(201,193,216,.55); font-size:.78rem; margin-top:16px; }
   .maj a{ color:#B49BDA; cursor:pointer; text-decoration:underline; }
 </style>
 </head>
@@ -51,18 +61,18 @@
 
     <div class="villes">
       <div class="carte" id="c-elle">
-        <p class="qui">chez toi</p>
+        <p class="qui" id="q-elle">chez toi</p>
         <p class="ville" id="v-elle">…</p>
         <div class="ic" id="i-elle">🌫️</div>
-        <div class="temp" id="t-elle">—</div>
+        <div class="temp" id="t-elle"></div>
         <div class="desc" id="d-elle">on regarde le ciel…</div>
         <div class="heure" id="h-elle"></div>
       </div>
       <div class="carte" id="c-lui">
-        <p class="qui">chez moi</p>
+        <p class="qui" id="q-lui">chez Mathieu</p>
         <p class="ville" id="v-lui">…</p>
         <div class="ic" id="i-lui">🌫️</div>
-        <div class="temp" id="t-lui">—</div>
+        <div class="temp" id="t-lui"></div>
         <div class="desc" id="d-lui">on regarde le ciel…</div>
         <div class="heure" id="h-lui"></div>
       </div>
@@ -73,17 +83,31 @@
       <p class="mot" id="mot">Où que soient nos deux ciels, ils regardent la même lune.</p>
     </div>
 
+    <div class="reglage" id="reglage">
+      <h2 id="reg-titre">Où es-tu en ce moment ?</h2>
+      <div class="row">
+        <input type="text" id="in-ville" placeholder="ta ville (ex : Marseille, Lyon, Paris…)" />
+        <button id="save">Poser</button>
+      </div>
+      <button class="pos" id="geoloc">📍 utiliser ma position</button>
+      <p class="ok" id="okmsg"></p>
+      <p class="note" id="reg-note"></p>
+    </div>
+
     <p class="maj">Météo en direct. <a id="rafraichir">rafraîchir</a></p>
   </div>
 
 <script>
 (function(){
   "use strict";
-  // ==== À PERSONNALISER : vos deux villes (nom + coordonnées) ====
-  var CONFIG = {
-    elle: { nom: "Lyon",  lat: 45.7640, lon: 4.8357 },
-    lui:  { nom: "Paris", lat: 48.8566, lon: 2.3522 }
-  };
+  var URL_SB = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  function hdrs(extra){ var h={ "apikey":ANON, "Authorization":"Bearer "+ANON, "Content-Type":"application/json" }; for(var k in (extra||{})) h[k]=extra[k]; return h; }
+  function role(){ try{ var r=localStorage.getItem("moi_role"); return (r==="elle"||r==="lui")?r:null; }catch(e){ return null; } }
+  function $(id){ return document.getElementById(id); }
+  var NOMS = { elle:"dadoucherie", lui:"Mathieu" };
+
+  var loc = { elle:null, lui:null };
 
   function meteoInfo(code){
     if(code === 0) return { ic:"☀️", t:"ciel dégagé", g:"soleil" };
@@ -99,59 +123,122 @@
     return { ic:"🌡️", t:"", g:"doux" };
   }
 
-  // petit mot tendre selon les deux temps
+  function memeVille(){
+    if(!loc.elle || !loc.lui) return false;
+    return Math.abs(loc.elle.lat-loc.lui.lat) < 0.4 && Math.abs(loc.elle.lon-loc.lui.lon) < 0.4;
+  }
   function motTendre(gElle, gLui){
+    if(memeVille()) return "Vous êtes sous le même ciel en ce moment. Profite, c'est rare et c'est précieux. 🤍";
     if(gElle === "pluie" || gElle === "orage") return "Il pleut sur ton ciel. Imagine que je tiens le parapluie, tout contre toi.";
     if(gElle === "neige") return "Il neige chez toi. Mets-toi au chaud, je te réchaufferais si j'étais là.";
-    if(gElle === "soleil" && gLui !== "soleil") return "Tu as le soleil, j'ai le gris. Garde-m'en un peu pour ce soir.";
+    if(gElle === "soleil" && gLui !== "soleil") return "Tu as le soleil, j'ai le gris. Garde-m'en un peu pour la prochaine fois.";
     if(gElle === "soleil" && gLui === "soleil") return "Le même soleil sur nous deux aujourd'hui. C'est déjà un peu être ensemble.";
     if(gElle === "brume") return "Un peu de brume sur ton ciel. Moi je te vois clairement, même de loin.";
     if(gLui === "pluie" || gLui === "orage") return "Il pleut de mon côté, mais penser à toi, ça met du soleil.";
     return "Deux ciels différents, une seule pensée : toi.";
   }
 
-  function url(v){
-    return "https://api.open-meteo.com/v1/forecast?latitude="+v.lat+"&longitude="+v.lon+"&current=temperature_2m,weather_code,is_day&timezone=auto";
+  // ---- Supabase : lire / écrire les localisations ----
+  function lireLoc(){
+    return fetch(URL_SB+"/rest/v1/localisation?select=role,ville,lat,lon", { headers:hdrs() })
+      .then(function(r){ return r.json(); })
+      .then(function(rows){ (rows||[]).forEach(function(x){ loc[x.role] = x; }); })
+      .catch(function(){});
   }
-  function charge(v){
-    return fetch(url(v)).then(function(r){ return r.json(); }).then(function(j){
-      var c = j && j.current ? j.current : null;
-      if(!c) throw new Error("pas de données");
-      return { temp: Math.round(c.temperature_2m), code: c.weather_code, jour: c.is_day, heure: c.time };
+  function ecrireLoc(r, ville, lat, lon){
+    // upsert : on tente un PATCH, sinon POST
+    return fetch(URL_SB+"/rest/v1/localisation?role=eq."+r, {
+      method:"PATCH", headers:hdrs({ "Prefer":"return=representation" }),
+      body: JSON.stringify({ ville:ville, lat:lat, lon:lon, updated_at:new Date().toISOString() })
+    }).then(function(res){ return res.json(); }).then(function(out){
+      if(out && out.length) return out;
+      return fetch(URL_SB+"/rest/v1/localisation", { method:"POST", headers:hdrs({ "Prefer":"return=minimal" }),
+        body: JSON.stringify({ role:r, ville:ville, lat:lat, lon:lon }) });
     });
   }
-  function heureLocale(v){
-    try{ return new Date().toLocaleTimeString("fr-FR", { hour:"2-digit", minute:"2-digit", timeZone: undefined }); }catch(e){ return ""; }
-  }
-  function $(id){ return document.getElementById(id); }
 
-  function afficher(pref, v, data){
-    $("v"+pref).textContent = v.nom;
-    if(!data){ $("d"+pref).textContent = "ciel indisponible pour l'instant"; return null; }
-    var info = meteoInfo(data.code);
-    $("i"+pref).textContent = info.ic;
-    $("t"+pref).textContent = data.temp + "°";
-    $("d"+pref).textContent = info.t;
-    // heure locale de la ville (extrait de l'API : data.heure est l'heure locale)
-    try{ var hm = (data.heure||"").split("T")[1]; if(hm) $("h"+pref).textContent = "il est " + hm.slice(0,5) + " là-bas"; }catch(e){}
-    return info.g;
+  // ---- open-meteo : géocodage + météo ----
+  function geocoder(nom){
+    return fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&language=fr&format=json&name="+encodeURIComponent(nom))
+      .then(function(r){ return r.json(); })
+      .then(function(j){ var x = j && j.results && j.results[0]; if(!x) return null; return { ville:x.name, lat:x.latitude, lon:x.longitude }; });
+  }
+  function meteo(v){
+    return fetch("https://api.open-meteo.com/v1/forecast?latitude="+v.lat+"&longitude="+v.lon+"&current=temperature_2m,weather_code,is_day&timezone=auto")
+      .then(function(r){ return r.json(); })
+      .then(function(j){ var c = j && j.current; if(!c) return null; return { temp:Math.round(c.temperature_2m), code:c.weather_code, heure:c.time }; });
   }
 
-  function tout(){
-    $("mot").style.opacity = 1;
-    Promise.all([ charge(CONFIG.elle).catch(function(){return null;}), charge(CONFIG.lui).catch(function(){return null;}) ])
-      .then(function(res){
-        var gElle = afficher("-elle", CONFIG.elle, res[0]);
-        var gLui  = afficher("-lui",  CONFIG.lui,  res[1]);
-        if(gElle && gLui){
-          var m = $("mot"); m.style.opacity = 0;
-          setTimeout(function(){ m.textContent = motTendre(gElle, gLui); m.style.opacity = 1; }, 300);
-        }
-      });
+  function libelleQui(){
+    var moi = role();
+    $("q-elle").textContent = (moi === "elle") ? "chez toi" : "chez dadoucherie";
+    $("q-lui").textContent  = (moi === "lui")  ? "chez toi" : "chez Mathieu";
   }
 
-  document.getElementById("rafraichir").addEventListener("click", tout);
-  tout();
+  function rendreCarte(pref, r){
+    var v = loc[r];
+    if(!v || v.lat == null){
+      $("v"+pref).textContent = "à définir";
+      $("i"+pref).textContent = "…";
+      $("t"+pref).textContent = "";
+      $("d"+pref).textContent = (role()===r) ? "dis-moi où tu es 👇" : "en attente de sa ville";
+      $("h"+pref).textContent = "";
+      return Promise.resolve(null);
+    }
+    $("v"+pref).textContent = v.ville || "sa position";
+    return meteo(v).then(function(m){
+      if(!m){ $("d"+pref).textContent = "ciel indisponible"; return null; }
+      var info = meteoInfo(m.code);
+      $("i"+pref).textContent = info.ic;
+      $("t"+pref).textContent = m.temp + "°";
+      $("d"+pref).textContent = info.t;
+      try{ var hm=(m.heure||"").split("T")[1]; if(hm) $("h"+pref).textContent = "il est "+hm.slice(0,5)+" là-bas"; }catch(e){}
+      return info.g;
+    });
+  }
+
+  function rendre(){
+    libelleQui();
+    Promise.all([ rendreCarte("-elle","elle"), rendreCarte("-lui","lui") ]).then(function(res){
+      var gElle=res[0], gLui=res[1];
+      if(gElle && gLui){ var m=$("mot"); m.style.opacity=0; setTimeout(function(){ m.textContent=motTendre(gElle,gLui); m.style.opacity=1; }, 300); }
+      else if(memeVille()){ $("mot").textContent = motTendre(); }
+    });
+  }
+
+  // ---- réglage (pour la personne connectée) ----
+  function majReglage(){
+    var moi = role();
+    if(!moi){ $("reg-titre").textContent = "Qui es-tu ?"; $("reg-note").textContent = "Choisis qui tu es dans le badge en haut, puis reviens poser ta ville."; $("in-ville").disabled=true; $("save").disabled=true; $("geoloc").disabled=true; return; }
+    $("in-ville").disabled=false; $("save").disabled=false; $("geoloc").disabled=false;
+    $("reg-titre").textContent = "Où es-tu en ce moment ?";
+    var v = loc[moi];
+    $("reg-note").textContent = v && v.ville ? ("Actuellement : "+v.ville+". Change quand tu bouges.") : "Pose ta ville, "+NOMS[moi]+" verra ton ciel.";
+    if(v && v.ville) $("in-ville").value = v.ville;
+  }
+  function enregistrer(ville, lat, lon){
+    var moi = role(); if(!moi) return;
+    $("okmsg").style.color="#8ee6a0"; $("okmsg").textContent="…";
+    ecrireLoc(moi, ville, lat, lon).then(function(){ loc[moi]={role:moi,ville:ville,lat:lat,lon:lon}; $("okmsg").textContent="C'est posé 🤍"; majReglage(); rendre(); })
+      .catch(function(){ $("okmsg").style.color="#e6a6a6"; $("okmsg").textContent="Oups, réessaie."; });
+  }
+
+  $("save").addEventListener("click", function(){
+    var nom = $("in-ville").value.trim();
+    if(!nom){ $("okmsg").style.color="#e6a6a6"; $("okmsg").textContent="Écris une ville d'abord."; return; }
+    $("okmsg").style.color="#8ee6a0"; $("okmsg").textContent="je cherche…";
+    geocoder(nom).then(function(g){ if(!g){ $("okmsg").style.color="#e6a6a6"; $("okmsg").textContent="Ville introuvable, réessaie."; return; } enregistrer(g.ville, g.lat, g.lon); });
+  });
+  $("geoloc").addEventListener("click", function(){
+    if(!navigator.geolocation){ $("okmsg").style.color="#e6a6a6"; $("okmsg").textContent="Position non disponible sur cet appareil."; return; }
+    $("okmsg").style.color="#8ee6a0"; $("okmsg").textContent="je te localise…";
+    navigator.geolocation.getCurrentPosition(function(p){
+      enregistrer("ma position", p.coords.latitude, p.coords.longitude);
+    }, function(){ $("okmsg").style.color="#e6a6a6"; $("okmsg").textContent="Localisation refusée. Écris ta ville à la place."; }, { timeout:10000 });
+  });
+  document.getElementById("rafraichir").addEventListener("click", rendre);
+
+  lireLoc().then(function(){ majReglage(); rendre(); });
 })();
 </script>
 <script src="/presence.js" defer></script>
