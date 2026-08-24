@@ -42,7 +42,7 @@
   .reglage input:focus{ outline:2px solid #A886DA; }
   .reglage button{ margin-top:14px; width:100%; font-family:inherit; font-weight:700; font-size:.95rem; color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border:none; border-radius:100px; padding:12px; cursor:pointer; }
   .reglage .ok{ color:#8ee6a0; font-size:.82rem; margin-top:10px; min-height:1em; }
-  .adminlink{ display:inline-block; margin-top:18px; font-size:.8rem; color:#B49BDA; opacity:.7; cursor:pointer; text-decoration:underline; }
+  .adminlink{ display:none; margin-top:18px; font-size:.8rem; color:#B49BDA; opacity:.7; cursor:pointer; text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -120,8 +120,9 @@
   }
 
   function afficher(row){
-    // réglage visible seulement pour Mathieu
-    if(role() === "lui"){ $("toggle-reglage").hidden = false; }
+    // réglage visible seulement pour Mathieu (piloté par style.display pour ne pas être écrasé par la CSS)
+    if(role() === "lui"){ $("toggle-reglage").hidden = false; $("toggle-reglage").style.display = "inline-block"; }
+    else { $("toggle-reglage").style.display = "none"; $("reglage").classList.remove("on"); }
 
     if(!row || !row.date_cible){
       $("compte").hidden = true; $("mot").textContent = ""; $("vide").hidden = false; $("lieu").textContent = "";
