@@ -5,161 +5,138 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="robots" content="noindex, nofollow" />
 <meta name="theme-color" content="#0b0a16" />
-<title>Nos messages</title>
+<title>Notre chat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
 <style>
   *{ box-sizing:border-box; }
-  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+  html,body{ margin:0; height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
     background:
       radial-gradient(120% 90% at 50% -10%, #241d40 0%, transparent 55%),
       radial-gradient(90% 70% at 50% 115%, #17152f 0%, transparent 60%),
-      #0b0a16; overflow-x:hidden; }
-  a.retour{ position:fixed; top:calc(12px + env(safe-area-inset-top)); left:14px; z-index:3; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
-    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; }
-  a.retour:hover{ color:#fff; }
-  .wrap{ max-width:560px; margin:0 auto; padding:max(62px,env(safe-area-inset-top)) 20px calc(50px + env(safe-area-inset-bottom)); }
-  .tete{ text-align:center; margin-bottom:20px; }
-  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.06rem; margin:0 0 .3rem; }
-  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.6rem); margin:0; color:#FBF4EA; }
-  .sous{ color:#A99CC4; font-size:.92rem; margin:.4rem auto 0; max-width:34ch; text-align:center; }
+      #0b0a16; }
+  .app{ display:flex; flex-direction:column; height:100dvh; max-width:600px; margin:0 auto; }
+  .barre{ display:flex; align-items:center; gap:10px; padding:calc(10px + env(safe-area-inset-top)) 14px 10px; border-bottom:1px solid rgba(180,155,218,.16); }
+  .barre a.retour{ font-size:.85rem; color:rgba(237,233,243,.72); text-decoration:none; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:6px 12px; }
+  .barre .t{ flex:1; text-align:center; }
+  .barre .t h1{ font-family:'Fraunces',serif; font-weight:500; font-size:1.25rem; margin:0; color:#FBF4EA; }
+  .barre .t .st{ font-size:.72rem; color:rgba(201,193,216,.7); }
+  .barre .effacer{ font-size:.8rem; color:#d9a2a2; background:rgba(255,255,255,.05); border:1px solid rgba(217,162,162,.3); border-radius:100px; padding:6px 11px; cursor:pointer; }
 
-  /* composer (Mathieu) */
-  .composer{ margin-top:18px; background:rgba(255,255,255,.05); border:1px solid rgba(180,155,218,.24); border-radius:18px; padding:16px; display:none; }
-  .composer.on{ display:block; }
-  .composer textarea{ width:100%; min-height:120px; resize:vertical; background:rgba(255,255,255,.05); border:1px solid rgba(180,155,218,.24); border-radius:14px;
-    color:#F1ECF8; padding:14px; font-family:'Fraunces',Georgia,serif; font-size:1.08rem; line-height:1.7; }
-  .composer textarea:focus{ outline:2px solid rgba(168,134,218,.55); }
-  .composer .envoi{ margin-top:12px; display:flex; align-items:center; gap:12px; }
-  .composer button{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.98rem; border-radius:100px; padding:12px 22px; cursor:pointer; border:1px solid transparent;
-    color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); box-shadow:0 12px 28px -14px rgba(168,134,218,.8); }
-  .composer button:disabled{ opacity:.55; cursor:default; }
-  .composer .info{ font-size:.85rem; color:#8ee6a0; min-height:1em; }
+  .fil{ flex:1; overflow-y:auto; padding:16px 14px 8px; display:flex; flex-direction:column; gap:8px; }
+  .note{ text-align:center; color:rgba(201,193,216,.6); font-size:.78rem; margin:6px auto 10px; max-width:32ch; font-style:italic; }
+  .bulle{ max-width:78%; padding:11px 15px; border-radius:20px; font-size:1.04rem; line-height:1.5; white-space:pre-line; word-wrap:break-word; animation:pop .25s ease; }
+  @keyframes pop{ from{ opacity:0; transform:translateY(6px) scale(.98);} to{ opacity:1; transform:none; } }
+  .bulle.moi{ align-self:flex-end; color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border-bottom-right-radius:6px; }
+  .bulle.autre{ align-self:flex-start; background:rgba(255,255,255,.08); border:1px solid rgba(180,155,218,.2); border-bottom-left-radius:6px; }
+  .bulle .h{ display:block; margin-top:5px; font-size:.68rem; opacity:.6; text-align:right; }
+  .fade{ animation:sortir .6s ease forwards; }
+  @keyframes sortir{ to{ opacity:0; transform:translateY(-6px) scale(.96); } }
+  .vide{ text-align:center; color:#9488ab; font-style:italic; margin:auto; padding:20px; line-height:1.7; }
 
-  .fil{ margin-top:22px; display:flex; flex-direction:column; gap:12px; }
-  .titre-fil{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:1rem; margin:6px 2px 0; }
-  .msg{ background:rgba(255,255,255,.055); border:1px solid rgba(180,155,218,.22); border-radius:16px; padding:16px 18px; }
-  .msg.neuf{ border-color:rgba(180,155,218,.55); box-shadow:0 0 0 1px rgba(180,155,218,.25) inset; }
-  .msg p{ font-family:'Fraunces',Georgia,serif; font-size:1.12rem; line-height:1.7; color:#F1ECF8; margin:0; white-space:pre-line; }
-  .msg .meta{ margin-top:10px; font-size:.78rem; color:rgba(201,193,216,.65); display:flex; justify-content:space-between; gap:10px; }
-  .msg .meta .etat{ color:#B49BDA; }
-  .vide{ color:#A99CC4; font-style:italic; text-align:center; margin-top:22px; line-height:1.7; }
+  .saisie{ display:flex; gap:8px; padding:10px 12px calc(12px + env(safe-area-inset-bottom)); border-top:1px solid rgba(180,155,218,.16); }
+  .saisie input{ flex:1; background:rgba(255,255,255,.06); border:1px solid rgba(180,155,218,.28); border-radius:100px; color:#F1ECF8; padding:13px 16px; font-family:inherit; font-size:1rem; }
+  .saisie input:focus{ outline:2px solid rgba(168,134,218,.5); }
+  .saisie button{ border:none; border-radius:50%; width:48px; height:48px; cursor:pointer; color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); font-size:1.2rem; box-shadow:0 10px 24px -12px rgba(168,134,218,.9); }
+  .saisie button:disabled{ opacity:.5; }
 
-  .chooser{ margin-top:24px; text-align:center; }
-  .chooser p{ color:#B7ACCB; margin-bottom:12px; }
-  .chooser .b{ display:inline-flex; gap:10px; }
-  .chooser button{ font-family:inherit; font-weight:700; font-size:.95rem; border-radius:100px; padding:11px 18px; cursor:pointer; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#EDE9F3; }
+  .chooser{ margin:auto; text-align:center; padding:30px; }
+  .chooser p{ color:#B7ACCB; margin-bottom:14px; }
+  .chooser button{ font-family:inherit; font-weight:700; font-size:.95rem; border-radius:100px; padding:11px 18px; margin:0 5px; cursor:pointer; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#EDE9F3; }
   .chooser button.p{ color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border-color:transparent; }
 </style>
 </head>
 <body>
-  <a class="retour" href="/">⌂ Accueil</a>
-  <div class="wrap">
-    <div class="tete">
-      <p class="eyebrow" id="eyebrow">un mot qui arrive tout de suite</p>
-      <h1 id="titre">Nos messages</h1>
-      <p class="sous" id="sous"></p>
+  <div class="app">
+    <div class="barre">
+      <a class="retour" href="/">⌂</a>
+      <div class="t"><h1>Notre chat</h1><div class="st" id="st">rien que nous deux</div></div>
+      <button class="effacer" id="effacer" title="Tout effacer">🔥</button>
     </div>
-
-    <div class="composer" id="composer">
-      <textarea id="texte" placeholder="Écris-lui un mot… elle recevra une notification tout de suite."></textarea>
-      <div class="envoi">
-        <button id="envoyer">Envoyer 🤍</button>
-        <span class="info" id="info"></span>
-      </div>
-    </div>
-
-    <div class="chooser" id="chooser" style="display:none">
-      <p>Qui es-tu ?</p>
-      <div class="b">
-        <button class="p" data-r="lui">Mathieu</button>
-        <button data-r="elle">dadoucherie</button>
-      </div>
-    </div>
-
-    <p class="titre-fil" id="titre-fil" style="display:none"></p>
     <div class="fil" id="fil"></div>
-    <p class="vide" id="vide" style="display:none"></p>
+    <div class="saisie" id="saisie">
+      <input type="text" id="texte" placeholder="Écris un mot…" autocomplete="off" />
+      <button id="envoyer" aria-label="Envoyer">➤</button>
+    </div>
   </div>
 
-<script src="/db.js"></script>
 <script>
 (function(){
   "use strict";
+  var URL_SB = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  function hdrs(extra){ var h={ "apikey":ANON, "Authorization":"Bearer "+ANON, "Content-Type":"application/json" }; for(var k in (extra||{})) h[k]=extra[k]; return h; }
   function role(){ try{ var r=localStorage.getItem("moi_role"); return (r==="elle"||r==="lui")?r:null; }catch(e){ return null; } }
   function $(id){ return document.getElementById(id); }
   function esc(s){ return (s||"").replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
-  function quand(iso){ try{ var d=new Date(iso); return d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})+" à "+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ""; } }
+  function hhmm(iso){ try{ return new Date(iso).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ""; } }
+  var GRACE_MS = 10000; // les messages lus disparaissent 10 s après lecture
 
-  function chargerFil(moi){
-    return DB.select('messages','de_role=eq.lui&order=created_at.desc').then(function(rows){
-      rows = rows || [];
-      var fil = $("fil"); fil.innerHTML = "";
-      if(!rows.length){
-        $("vide").style.display="block";
-        $("vide").textContent = (moi==="lui") ? "Tu ne lui as pas encore écrit ici. Ton premier mot va lui arriver comme une petite surprise." : "Aucun message pour l'instant. Ils apparaîtront ici, avec une notification.";
-        $("titre-fil").style.display="none";
-        return rows;
+  function lire(){ return fetch(URL_SB+"/rest/v1/messages?order=created_at.asc&select=id,texte,de_role,lu,lu_at,created_at",{ headers:hdrs() }).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }); }
+  function envoyerMsg(t){ var moi=role(); return fetch(URL_SB+"/rest/v1/messages",{ method:"POST", headers:hdrs({ "Prefer":"return=minimal" }), body:JSON.stringify({ texte:t, de_role:moi }) }); }
+  function marquerLu(ids){ if(!ids.length) return Promise.resolve(); return fetch(URL_SB+"/rest/v1/messages?id=in.("+ids.join(",")+")",{ method:"PATCH", headers:hdrs({ "Prefer":"return=minimal" }), body:JSON.stringify({ lu:true, lu_at:new Date().toISOString() }) }); }
+  function purger(){ var seuil=new Date(Date.now()-GRACE_MS).toISOString(); return fetch(URL_SB+"/rest/v1/messages?lu=eq.true&lu_at=lt."+encodeURIComponent(seuil),{ method:"DELETE", headers:hdrs({ "Prefer":"return=minimal" }) }).catch(function(){}); }
+  function toutEffacer(){ return fetch(URL_SB+"/rest/v1/messages?id=not.is.null",{ method:"DELETE", headers:hdrs({ "Prefer":"return=minimal" }) }).catch(function(){}); }
+
+  var fil=$("fil"), connus={};
+  function rendre(rows){
+    var moi=role();
+    // vider si plus rien
+    if(!rows.length){ if(!fil.querySelector(".vide")){ fil.innerHTML='<p class="vide">Écris le premier mot 🤍<br>Ce qui se dit ici s\'efface une fois lu.</p>'; } connus={}; return; }
+    var videEl=fil.querySelector(".vide"); if(videEl) videEl.remove();
+    var vus={};
+    rows.forEach(function(m){
+      vus[m.id]=1;
+      if(!connus[m.id]){
+        var b=document.createElement("div");
+        b.className="bulle "+(m.de_role===moi?"moi":"autre");
+        b.id="m_"+m.id;
+        b.innerHTML=esc(m.texte)+'<span class="h">'+hhmm(m.created_at)+'</span>';
+        fil.appendChild(b); connus[m.id]=b;
       }
-      $("vide").style.display="none";
-      $("titre-fil").style.display="block";
-      $("titre-fil").textContent = (moi==="lui") ? "Ce que tu lui as envoyé" : "Ce que Mathieu t'a écrit";
-      rows.forEach(function(m){
-        var d=document.createElement("div"); d.className="msg"+((moi==="elle" && !m.lu)?" neuf":"");
-        var etat = (moi==="lui") ? (m.lu ? "Lu 🤍" : (m.envoye ? "Envoyé" : "…")) : (m.lu ? "" : "nouveau");
-        d.innerHTML = '<p>'+esc(m.texte)+'</p><div class="meta"><span>'+quand(m.created_at)+'</span><span class="etat">'+etat+'</span></div>';
-        fil.appendChild(d);
-      });
-      return rows;
+    });
+    // retirer visuellement ceux qui ont disparu (purgés)
+    Object.keys(connus).forEach(function(id){
+      if(!vus[id]){ var el=connus[id]; if(el&&!el._out){ el._out=true; el.classList.add("fade"); setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },600); } delete connus[id]; }
+    });
+    fil.scrollTop=fil.scrollHeight;
+  }
+
+  function cycle(){
+    if(!role()) return;
+    lire().then(function(rows){
+      rendre(rows);
+      var moi=role();
+      var aLire=rows.filter(function(m){ return m.de_role!==moi && !m.lu; }).map(function(m){ return m.id; });
+      var p = aLire.length ? marquerLu(aLire) : Promise.resolve();
+      p.then(purger);
     });
   }
 
-  function marquerLus(){
-    // côté elle : marque les messages non lus comme lus
-    return DB.update('messages','de_role=eq.lui&lu=eq.false',{ lu:true });
+  function demarrer(){
+    $("saisie").style.display="flex";
+    cycle();
+    setInterval(cycle, 3000);
   }
 
-  function rendre(){
-    var moi = role();
-    $("composer").classList.remove("on");
-    $("chooser").style.display="none";
-    if(!moi){
-      $("sous").textContent = "Dis-moi qui tu es pour continuer.";
-      $("chooser").style.display="block";
-      $("titre-fil").style.display="none"; $("fil").innerHTML=""; $("vide").style.display="none";
-      return;
-    }
-    if(moi==="lui"){
-      $("eyebrow").textContent = "un mot qui arrive tout de suite";
-      $("sous").textContent = "Écris-lui. Elle reçoit une notification sur son téléphone, même l'application fermée.";
-      $("composer").classList.add("on");
-      chargerFil(moi);
-    } else {
-      $("eyebrow").textContent = "rien que pour toi";
-      $("sous").textContent = "Les mots que Mathieu t'a envoyés.";
-      chargerFil(moi).then(function(rows){ if(rows && rows.some(function(m){return !m.lu;})) marquerLus(); });
-    }
+  function envoyer(){
+    var t=$("texte").value.trim(); if(!t) return;
+    $("texte").value="";
+    envoyerMsg(t).then(function(){ cycle(); });
   }
+  $("envoyer").addEventListener("click", envoyer);
+  $("texte").addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); envoyer(); } });
+  $("effacer").addEventListener("click", function(){ if(confirm("Tout effacer, pour vous deux ?")){ toutEffacer().then(cycle); } });
 
-  $("envoyer").addEventListener("click", function(){
-    var t = $("texte").value.trim();
-    if(!t){ $("info").style.color="#e6a6a6"; $("info").textContent="Écris un mot d'abord."; return; }
-    $("envoyer").disabled=true; $("info").style.color="#8ee6a0"; $("info").textContent="envoi…";
-    DB.insert('messages',{ texte:t, de_role:'lui' }).then(function(res){
-      $("envoyer").disabled=false;
-      if(res && res.ok){ $("texte").value=""; $("info").textContent="Envoyé 🤍 elle va recevoir la notification."; chargerFil("lui"); }
-      else { $("info").style.color="#e6a6a6"; $("info").textContent="Oups, réessaie."; }
-    });
-  });
-
-  $("chooser").addEventListener("click", function(e){
-    var b = e.target.closest ? e.target.closest("[data-r]") : null; if(!b) return;
-    try{ localStorage.setItem("moi_role", b.getAttribute("data-r")); }catch(e2){}
-    rendre();
-  });
-
-  rendre();
+  // choix d'identité si besoin
+  if(!role()){
+    fil.innerHTML='<div class="chooser"><p>Qui es-tu ?</p><div><button class="p" data-r="lui">Mathieu</button><button data-r="elle">dadoucherie</button></div></div>';
+    $("saisie").style.display="none";
+    fil.addEventListener("click", function(e){ var b=e.target.closest?e.target.closest("[data-r]"):null; if(!b) return; try{ localStorage.setItem("moi_role", b.getAttribute("data-r")); }catch(e2){} fil.innerHTML=""; demarrer(); });
+  } else {
+    demarrer();
+  }
 })();
 </script>
 <script src="/presence.js" defer></script>
