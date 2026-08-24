@@ -1,5 +1,5 @@
 // Service worker "Pour toi" - reseau d'abord pour le contenu, cache pour les medias
-const CACHE = 'pourtoi-v6';
+const CACHE = 'pourtoi-v7';
 const CORE = [
   '/', '/index.html', '/style.css', '/theme.css',
   '/app.js', '/script.js', '/supabase.js', '/db.js',
