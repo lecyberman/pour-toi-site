@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0b0a16" />
+<title>Notre ciel partagé</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 90% at 50% -10%, #241d40 0%, transparent 55%),
+      radial-gradient(90% 70% at 50% 115%, #16203f 0%, transparent 60%),
+      #0b0a16; overflow-x:hidden; }
+  a.retour{ position:fixed; top:calc(12px + env(safe-area-inset-top)); left:14px; z-index:3; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; }
+  a.retour:hover{ color:#fff; }
+  .wrap{ max-width:600px; margin:0 auto; padding:max(62px,env(safe-area-inset-top)) 20px calc(50px + env(safe-area-inset-bottom)); }
+  .tete{ text-align:center; margin-bottom:20px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.06rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.6rem); margin:0; color:#FBF4EA; }
+
+  .villes{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px; }
+  @media (max-width:420px){ .villes{ grid-template-columns:1fr; } }
+  .carte{ background:rgba(255,255,255,.05); border:1px solid rgba(180,155,218,.24); border-radius:20px; padding:20px 16px; text-align:center; }
+  .carte .qui{ font-family:'Fraunces',serif; font-style:italic; color:#B49BDA; font-size:.95rem; margin:0 0 2px; }
+  .carte .ville{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:1.05rem; color:#FBF4EA; margin:0 0 10px; }
+  .carte .ic{ font-size:3.2rem; line-height:1; margin:4px 0 6px; }
+  .carte .temp{ font-family:'Fraunces',serif; font-weight:500; font-size:2rem; color:#F1ECF8; }
+  .carte .desc{ color:#C9C1D8; font-size:.9rem; margin-top:4px; min-height:1.2em; }
+  .carte .heure{ color:rgba(201,193,216,.6); font-size:.8rem; margin-top:8px; }
+
+  .liaison{ text-align:center; margin:22px auto 0; }
+  .liaison .coeur{ font-size:1.4rem; }
+  .liaison .mot{ font-family:'Fraunces',serif; font-style:italic; color:#E9DEF7; font-size:1.14rem; line-height:1.7; max-width:34ch; margin:10px auto 0; min-height:3.2em; transition:opacity .5s; }
+  .maj{ text-align:center; color:rgba(201,193,216,.55); font-size:.78rem; margin-top:18px; }
+  .maj a{ color:#B49BDA; cursor:pointer; text-decoration:underline; }
+</style>
+</head>
+<body>
+  <a class="retour" href="/">⌂ Accueil</a>
+  <div class="wrap">
+    <div class="tete">
+      <p class="eyebrow">le même moment, deux ciels</p>
+      <h1>Notre ciel partagé</h1>
+    </div>
+
+    <div class="villes">
+      <div class="carte" id="c-elle">
+        <p class="qui">chez toi</p>
+        <p class="ville" id="v-elle">…</p>
+        <div class="ic" id="i-elle">🌫️</div>
+        <div class="temp" id="t-elle">—</div>
+        <div class="desc" id="d-elle">on regarde le ciel…</div>
+        <div class="heure" id="h-elle"></div>
+      </div>
+      <div class="carte" id="c-lui">
+        <p class="qui">chez moi</p>
+        <p class="ville" id="v-lui">…</p>
+        <div class="ic" id="i-lui">🌫️</div>
+        <div class="temp" id="t-lui">—</div>
+        <div class="desc" id="d-lui">on regarde le ciel…</div>
+        <div class="heure" id="h-lui"></div>
+      </div>
+    </div>
+
+    <div class="liaison">
+      <div class="coeur">🤍</div>
+      <p class="mot" id="mot">Où que soient nos deux ciels, ils regardent la même lune.</p>
+    </div>
+
+    <p class="maj">Météo en direct. <a id="rafraichir">rafraîchir</a></p>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  // ==== À PERSONNALISER : vos deux villes (nom + coordonnées) ====
+  var CONFIG = {
+    elle: { nom: "Lyon",  lat: 45.7640, lon: 4.8357 },
+    lui:  { nom: "Paris", lat: 48.8566, lon: 2.3522 }
+  };
+
+  function meteoInfo(code){
+    if(code === 0) return { ic:"☀️", t:"ciel dégagé", g:"soleil" };
+    if(code === 1 || code === 2) return { ic:"🌤️", t:"quelques nuages", g:"doux" };
+    if(code === 3) return { ic:"☁️", t:"ciel couvert", g:"gris" };
+    if(code === 45 || code === 48) return { ic:"🌫️", t:"brouillard", g:"brume" };
+    if(code >= 51 && code <= 57) return { ic:"🌦️", t:"bruine", g:"pluie" };
+    if(code >= 61 && code <= 67) return { ic:"🌧️", t:"pluie", g:"pluie" };
+    if(code >= 71 && code <= 77) return { ic:"❄️", t:"neige", g:"neige" };
+    if(code >= 80 && code <= 82) return { ic:"🌧️", t:"averses", g:"pluie" };
+    if(code === 85 || code === 86) return { ic:"🌨️", t:"averses de neige", g:"neige" };
+    if(code >= 95) return { ic:"⛈️", t:"orage", g:"orage" };
+    return { ic:"🌡️", t:"", g:"doux" };
+  }
+
+  // petit mot tendre selon les deux temps
+  function motTendre(gElle, gLui){
+    if(gElle === "pluie" || gElle === "orage") return "Il pleut sur ton ciel. Imagine que je tiens le parapluie, tout contre toi.";
+    if(gElle === "neige") return "Il neige chez toi. Mets-toi au chaud, je te réchaufferais si j'étais là.";
+    if(gElle === "soleil" && gLui !== "soleil") return "Tu as le soleil, j'ai le gris. Garde-m'en un peu pour ce soir.";
+    if(gElle === "soleil" && gLui === "soleil") return "Le même soleil sur nous deux aujourd'hui. C'est déjà un peu être ensemble.";
+    if(gElle === "brume") return "Un peu de brume sur ton ciel. Moi je te vois clairement, même de loin.";
+    if(gLui === "pluie" || gLui === "orage") return "Il pleut de mon côté, mais penser à toi, ça met du soleil.";
+    return "Deux ciels différents, une seule pensée : toi.";
+  }
+
+  function url(v){
+    return "https://api.open-meteo.com/v1/forecast?latitude="+v.lat+"&longitude="+v.lon+"&current=temperature_2m,weather_code,is_day&timezone=auto";
+  }
+  function charge(v){
+    return fetch(url(v)).then(function(r){ return r.json(); }).then(function(j){
+      var c = j && j.current ? j.current : null;
+      if(!c) throw new Error("pas de données");
+      return { temp: Math.round(c.temperature_2m), code: c.weather_code, jour: c.is_day, heure: c.time };
+    });
+  }
+  function heureLocale(v){
+    try{ return new Date().toLocaleTimeString("fr-FR", { hour:"2-digit", minute:"2-digit", timeZone: undefined }); }catch(e){ return ""; }
+  }
+  function $(id){ return document.getElementById(id); }
+
+  function afficher(pref, v, data){
+    $("v"+pref).textContent = v.nom;
+    if(!data){ $("d"+pref).textContent = "ciel indisponible pour l'instant"; return null; }
+    var info = meteoInfo(data.code);
+    $("i"+pref).textContent = info.ic;
+    $("t"+pref).textContent = data.temp + "°";
+    $("d"+pref).textContent = info.t;
+    // heure locale de la ville (extrait de l'API : data.heure est l'heure locale)
+    try{ var hm = (data.heure||"").split("T")[1]; if(hm) $("h"+pref).textContent = "il est " + hm.slice(0,5) + " là-bas"; }catch(e){}
+    return info.g;
+  }
+
+  function tout(){
+    $("mot").style.opacity = 1;
+    Promise.all([ charge(CONFIG.elle).catch(function(){return null;}), charge(CONFIG.lui).catch(function(){return null;}) ])
+      .then(function(res){
+        var gElle = afficher("-elle", CONFIG.elle, res[0]);
+        var gLui  = afficher("-lui",  CONFIG.lui,  res[1]);
+        if(gElle && gLui){
+          var m = $("mot"); m.style.opacity = 0;
+          setTimeout(function(){ m.textContent = motTendre(gElle, gLui); m.style.opacity = 1; }, 300);
+        }
+      });
+  }
+
+  document.getElementById("rafraichir").addEventListener("click", tout);
+  tout();
+})();
+</script>
+<script src="/presence.js" defer></script>
+</body>
+</html>

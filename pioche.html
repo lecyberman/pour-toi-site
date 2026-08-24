@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0b0a16" />
+<title>La pioche du jour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 90% at 50% -10%, #241d40 0%, transparent 55%),
+      radial-gradient(90% 70% at 50% 115%, #17152f 0%, transparent 60%),
+      #0b0a16; overflow-x:hidden; }
+  a.retour{ position:fixed; top:calc(12px + env(safe-area-inset-top)); left:14px; z-index:3; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; }
+  a.retour:hover{ color:#fff; }
+  .wrap{ max-width:520px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    padding:max(64px,env(safe-area-inset-top)) 22px calc(40px + env(safe-area-inset-bottom)); }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.08rem; margin:0 0 .35rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.7rem); margin:0 0 .2rem; color:#FBF4EA; }
+  .sous{ color:#A99CC4; font-size:.92rem; margin:.4rem auto 0; max-width:30ch; }
+
+  /* bocal */
+  .bocal{ position:relative; width:186px; height:210px; margin:30px auto 6px; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:transform .2s; }
+  .bocal:active{ transform:scale(.97); }
+  .bocal .halo{ position:absolute; inset:-22% -10%; border-radius:50%; background:radial-gradient(circle, rgba(199,178,230,.4), rgba(180,155,218,.12) 48%, transparent 72%); animation:respire 4.6s ease-in-out infinite; }
+  .verre{ position:absolute; left:50%; top:26px; transform:translateX(-50%); width:150px; height:170px; border-radius:22px 22px 28px 28px;
+    background:linear-gradient(180deg, rgba(203,180,236,.16), rgba(168,134,218,.10)); border:2px solid rgba(203,180,236,.5);
+    box-shadow:inset 0 10px 30px rgba(255,255,255,.12), 0 18px 40px -18px rgba(168,134,218,.7); overflow:hidden; }
+  .couvercle{ position:absolute; left:50%; top:12px; transform:translateX(-50%); width:120px; height:22px; border-radius:10px;
+    background:linear-gradient(180deg,#CBB4EC,#A886DA); box-shadow:0 6px 16px -8px rgba(168,134,218,.9); z-index:2; }
+  .coeurs{ position:absolute; inset:0; }
+  .coeurs i{ position:absolute; font-size:1.1rem; opacity:.9; animation:flotte 5s ease-in-out infinite; }
+  @keyframes respire{ 0%,100%{ transform:scale(1); opacity:.9; } 50%{ transform:scale(1.05); opacity:1; } }
+  @keyframes flotte{ 0%,100%{ transform:translateY(0) rotate(-4deg); } 50%{ transform:translateY(-8px) rotate(4deg); } }
+
+  /* petit mot pioché */
+  .papier{ margin:14px auto 0; max-width:34ch; width:100%; background:rgba(255,255,255,.055); border:1px solid rgba(180,155,218,.28); border-radius:18px;
+    padding:22px 20px; opacity:0; transform:translateY(10px) scale(.98); transition:opacity .5s ease, transform .5s cubic-bezier(.22,.61,.36,1); }
+  .papier.on{ opacity:1; transform:none; }
+  .papier p{ font-family:'Fraunces',Georgia,serif; font-style:italic; font-size:1.16rem; line-height:1.7; color:#F1ECF8; margin:0; }
+  .papier .sign{ display:block; margin-top:12px; font-style:normal; font-family:'Nunito Sans',sans-serif; font-size:.82rem; color:#B49BDA; letter-spacing:.02em; }
+
+  .btn{ margin-top:22px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:1rem; border-radius:100px; padding:14px 26px; cursor:pointer; border:1px solid transparent;
+    color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); box-shadow:0 14px 32px -14px rgba(168,134,218,.8); }
+  .compteur{ margin-top:14px; color:rgba(201,193,216,.65); font-size:.8rem; min-height:1.1em; }
+</style>
+</head>
+<body>
+  <a class="retour" href="/">⌂ Accueil</a>
+  <div class="wrap">
+    <p class="eyebrow">quand tu veux entendre que je t'aime</p>
+    <h1>La pioche du jour</h1>
+    <p class="sous">Touche le bocal. Il en sort un petit mot de moi, au hasard, rien que pour toi.</p>
+
+    <div class="bocal" id="bocal" role="button" aria-label="Piocher un petit mot">
+      <div class="halo"></div>
+      <div class="couvercle"></div>
+      <div class="verre"><div class="coeurs" id="coeurs"></div></div>
+    </div>
+
+    <div class="papier" id="papier" aria-live="polite">
+      <p id="mot"></p>
+      <span class="sign">Mathieu 🤍</span>
+    </div>
+
+    <button class="btn" id="piocher">Piocher un mot</button>
+    <p class="compteur" id="compteur"></p>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  // Des petits mots de Mathieu. Tu peux en ajouter/retirer librement dans cette liste.
+  var MOTS = [
+    "Si tu lis ça, c'est que tu me manques. Et si tu ne lis pas ça, tu me manques quand même.",
+    "Je t'aime les jours faciles, et je t'aime encore plus les jours compliqués.",
+    "Où que je sois, une partie de moi est toujours restée à côté de toi.",
+    "Tu es la première belle pensée de mes matins et la dernière de mes nuits.",
+    "Je ne compte pas les kilomètres entre nous. Je compte les fois où je vais te serrer fort.",
+    "Ton rire, c'est ma chanson préférée. Je la connais par cœur et je ne m'en lasse pas.",
+    "Merci d'exister exactement comme tu es. Je ne changerais rien.",
+    "Quand tu doutes de toi, souviens-toi que moi, je n'ai jamais douté de toi une seule seconde.",
+    "Tu es mon endroit préféré, même quand on est loin.",
+    "Je t'ai choisie, et je te rechoisis chaque jour, sans hésiter.",
+    "Respire. Je suis là, à un message, à une pensée, à un bocal de distance.",
+    "Tu n'as pas à être forte tout le temps. Avec moi, tu as le droit d'être juste toi.",
+    "Sept ans, et tu me fais toujours le même effet. C'est toi, c'est comme ça.",
+    "Si un jour tu te sens seule, ouvre ce bocal : je serai toujours dedans.",
+    "Je suis fier de toi. De tout ce que tu traverses, de tout ce que tu es.",
+    "Tu es belle quand tu ris, belle quand tu boudes, belle même quand tu ne me crois pas.",
+    "On a construit quelque chose que la distance n'arrive pas à casser. C'est rare. C'est nous.",
+    "Ce soir, où que tu sois, tu es aimée. Garde ça avec toi pour dormir.",
+    "Je pense à toi plus souvent que tu ne l'imagines. Là, par exemple.",
+    "Ma place préférée au monde, c'est tout contre toi. Le reste, c'est juste en attendant.",
+    "Tu comptes plus que tout ce que je pourrais écrire dans ce petit bocal.",
+    "Prends soin de toi comme je prendrais soin de toi si j'étais là.",
+    "Un jour, il n'y aura plus d'écran entre nous. En attendant, il y a ce mot, et tout mon amour dedans.",
+    "Je t'aime. Simplement, entièrement, sans date d'expiration."
+  ];
+
+  var papier = document.getElementById("papier");
+  var mot = document.getElementById("mot");
+  var btn = document.getElementById("piocher");
+  var bocal = document.getElementById("bocal");
+  var compteur = document.getElementById("compteur");
+
+  // petits cœurs qui flottent dans le bocal
+  (function(){
+    var z = document.getElementById("coeurs");
+    var ic = ["🤍","💜","✨","💫"];
+    for(var i=0;i<7;i++){
+      var s=document.createElement("i");
+      s.textContent = ic[i % ic.length];
+      s.style.left = (12 + Math.random()*72) + "%";
+      s.style.top = (18 + Math.random()*66) + "%";
+      s.style.animationDelay = (Math.random()*4).toFixed(2) + "s";
+      s.style.animationDuration = (4 + Math.random()*3).toFixed(2) + "s";
+      z.appendChild(s);
+    }
+  })();
+
+  // deck mélangé, sans répétition avant d'avoir tout parcouru
+  var deck = [], vus = 0;
+  function melanger(){ deck = MOTS.map(function(m,i){ return i; }); for(var i=deck.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=deck[i]; deck[i]=deck[j]; deck[j]=t; } }
+  melanger();
+
+  function piocher(){
+    if(deck.length === 0){ melanger(); }
+    var idx = deck.pop();
+    papier.classList.remove("on");
+    setTimeout(function(){
+      mot.textContent = MOTS[idx];
+      papier.classList.add("on");
+    }, 180);
+    vus++;
+    compteur.textContent = "Il en reste " + deck.length + " avant d'avoir fait le tour.";
+    btn.textContent = "En piocher un autre";
+  }
+
+  btn.addEventListener("click", piocher);
+  bocal.addEventListener("click", piocher);
+})();
+</script>
+<script src="/presence.js" defer></script>
+</body>
+</html>
