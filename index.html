@@ -202,6 +202,22 @@
 </head>
 <body>
 
+  <!-- Le 15 : ouverture plein écran de la surprise d'anniversaire (une fois par jour) -->
+  <script>
+  (function(){
+    try{
+      var d = new Date();
+      if(d.getDate() === 15 && location.pathname !== "/anniversaire"){
+        var cle = "anniv_vu_" + d.getFullYear() + "-" + (d.getMonth()+1) + "-15";
+        if(!localStorage.getItem(cle)){
+          localStorage.setItem(cle, "1");
+          location.replace("/anniversaire");
+        }
+      }
+    }catch(e){}
+  })();
+  </script>
+
   <!-- ============================================================
        SECTION 1, ACCUEIL
   ============================================================ -->
@@ -247,6 +263,7 @@
           <a class="kase" href="/histoire"><div class="ic">✨</div><div class="t">Notre histoire</div><div class="d">De Snap à nous, en dates et en souvenirs.</div></a>
           <a class="kase" href="/univers"><div class="ic">✦</div><div class="t">Notre univers</div><div class="d">Nos moments, en constellation.</div></a>
           <a class="kase" href="/etoile"><div class="ic">🌟</div><div class="t">Notre étoile</div><div class="d">Chaque soir, une étoile rien qu'à vous deux.</div></a>
+          <a class="kase" href="/fil"><div class="ic">🧵</div><div class="t">Le fil invisible</div><div class="d">Un fil de lumière entre nous : il s'allume quand on est là tous les deux.</div></a>
           <a class="kase" href="/nous-deux"><div class="ic">💞</div><div class="t">Nous deux, en 3D</div><div class="d">Notre monde magique, avec nous deux dedans</div></a>
           <a class="kase" href="/galerie"><div class="ic">📷</div><div class="t">Notre galerie</div><div class="d">Nos photos, en polaroïds.</div></a>
           <a class="kase" href="/mots"><div class="ic">📖</div><div class="t">Nos mots</div><div class="d">Notre journal, nos petits mots.</div></a>
@@ -260,6 +277,7 @@
           <a class="kase" href="/dramas"><div class="ic">🍿</div><div class="t">Nos dramas</div><div class="d">Nos soirées canapé, en liste.</div></a>
           <a class="kase" href="/jeux"><div class="ic">🎲</div><div class="t">Nos jeux</div><div class="d">Un moment léger, juste pour rire.</div></a>
           <a class="kase" href="/nuit"><div class="ic">🌌</div><div class="t">Notre nuit</div><div class="d">Le 15 juillet, notre ciel.</div></a>
+          <a class="kase" href="/coffret"><div class="ic">💝</div><div class="t">Le coffret de la rencontre</div><div class="d">Chaque année, au jour de notre rencontre, il s'ouvre sur l'année passée.</div></a>
         </div>
       </div>
 
@@ -267,7 +285,9 @@
         <p class="famille-titre">Toi, ce soir</p>
         <div class="grille">
           <a class="kase" href="/cocon"><div class="ic">🫂</div><div class="t">Ton cocon</div><div class="d">Si la nuit est dure : dormir, la douleur, la tristesse.</div></a>
+          <a class="kase" href="/calin"><div class="ic">🤗</div><div class="t">La boîte à câlins</div><div class="d">Un câlin quand la distance pèse : demande, je te serre fort.</div></a>
           <a class="kase" href="/dormir"><div class="ic">🌧️</div><div class="t">Pour t'endormir</div><div class="d">Pluie, orage, océan… et un minuteur qui s'éteint tout seul.</div></a>
+          <a class="kase" href="/bonne-nuit"><div class="ic">💤</div><div class="t">Bonne nuit</div><div class="d">On se dit bonne nuit, où qu'on soit. Le soir bascule en douceur.</div></a>
           <a class="kase" href="/journal"><div class="ic">📓</div><div class="t">Ton journal du soir</div><div class="d">Écris ce qui pèse, puis laisse-le partir. Rien n'est gardé.</div></a>
           <a class="kase" href="/toi"><div class="ic">🕯️</div><div class="t">Comment tu te sens</div><div class="d">Dis-moi, demande-moi, dépose un mot.</div></a>
           <a class="kase" href="/humeurs"><div class="ic">🌙</div><div class="t">Ce soir je me sens</div><div class="d">Touche l'humeur qui te ressemble.</div></a>
@@ -285,6 +305,7 @@
           <a class="kase" href="/mer"><div class="ic">🌊</div><div class="t">Bord de mer</div><div class="d">Le compte à rebours, la lune, une bouteille à la mer.</div></a>
           <a class="kase" href="/retrouvailles"><div class="ic">⏳</div><div class="t">Nos retrouvailles</div><div class="d">Le décompte jusqu'au jour où je te retrouve.</div></a>
           <a class="kase" href="/le-15"><div class="ic">🎁</div><div class="t">Le 15</div><div class="d">Notre jour. Une lettre et un cadeau, chaque 15 du mois.</div></a>
+          <a class="kase" href="/anniversaire"><div class="ic">🎂</div><div class="t">Joyeux anniversaire</div><div class="d">Ta surprise du jour : souffle les bougies, et laisse-toi faire.</div></a>
           <a class="kase" href="/fleurs"><div class="ic">🌷</div><div class="t">Tes fleurs</div><div class="d">Je t'en offre une nouvelle chaque jour.</div></a>
           <a class="kase" href="/pioche"><div class="ic">🫙</div><div class="t">La pioche du jour</div><div class="d">Touche le bocal, un petit mot de moi en sort.</div></a>
           <a class="kase" href="/ciel"><div class="ic">🌤️</div><div class="t">Notre ciel partagé</div><div class="d">La météo de nos deux villes, côte à côte.</div></a>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0d0b1a" />
+<title>La boîte à câlins</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 85% at 50% -8%, #2a1d38 0%, transparent 55%),
+      radial-gradient(90% 65% at 50% 112%, #241a3d 0%, transparent 60%),
+      #0d0b1a; overflow-x:hidden; }
+  a.retour{ position:fixed; top:calc(12px + env(safe-area-inset-top)); left:14px; z-index:6; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; }
+  a.retour:hover{ color:#fff; }
+  .wrap{ position:relative; z-index:1; max-width:520px; margin:0 auto; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    padding:max(64px,env(safe-area-inset-top)) 22px calc(34px + env(safe-area-inset-bottom)); }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#E4B4D0; font-size:1.08rem; margin:0 0 .35rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.6rem); margin:0 0 .1rem; color:#FBF4EA; }
+
+  .coeur{ font-size:4.4rem; margin:18px 0 4px; filter:drop-shadow(0 0 22px rgba(228,180,208,.6)); animation:battre 2.6s ease-in-out infinite; }
+  @keyframes battre{ 0%,100%{ transform:scale(1);} 15%{ transform:scale(1.12);} 30%{ transform:scale(1);} }
+
+  .msg{ font-family:'Fraunces',serif; font-style:italic; color:#F3E4EE; font-size:1.14rem; line-height:1.6; margin:14px auto 0; max-width:30ch; min-height:3em; transition:opacity .45s; }
+
+  .btn{ margin-top:22px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:1.02rem; border-radius:100px; padding:15px 30px; cursor:pointer; border:1px solid transparent;
+    color:#2a1226; background:linear-gradient(135deg,#F0C4DC,#D28CB8); box-shadow:0 14px 32px -14px rgba(210,140,184,.85); transition:transform .18s ease, box-shadow .3s, opacity .3s; }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn:disabled{ opacity:.5; cursor:default; transform:none; }
+  .btn.repondre{ color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); box-shadow:0 14px 32px -14px rgba(168,134,218,.8); }
+
+  .champ{ margin-top:14px; width:100%; max-width:340px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.16); border-radius:100px; color:#EDE9F3; padding:12px 18px; font-family:inherit; font-size:.98rem; text-align:center; }
+  .champ:focus{ outline:2px solid #D28CB8; }
+  .sous{ margin-top:16px; color:rgba(201,193,216,.7); font-size:.82rem; max-width:32ch; line-height:1.5; }
+  .chooser{ margin-top:18px; display:flex; gap:10px; justify-content:center; }
+  .chooser button{ font-family:inherit; font-weight:700; font-size:.95rem; border-radius:100px; padding:11px 18px; cursor:pointer; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#EDE9F3; }
+  .chooser button.p{ color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border-color:transparent; }
+  .changer{ display:inline-block; margin-top:16px; font-size:.82rem; color:#B49BDA; text-decoration:none; opacity:.75; }
+  .appel{ margin-top:20px; width:100%; max-width:360px; background:linear-gradient(180deg, rgba(228,180,208,.16), rgba(228,180,208,.05)); border:1px solid rgba(228,180,208,.4); border-radius:18px; padding:16px 18px; }
+  .appel .qui{ font-family:'Fraunces',serif; font-weight:500; color:#FBF4EA; font-size:1.06rem; }
+  .appel .quand{ font-size:.78rem; color:rgba(201,193,216,.7); margin-top:3px; }
+
+  /* étreinte : lumière chaude qui enveloppe */
+  #etreinte{ position:fixed; inset:0; z-index:20; pointer-events:none; opacity:0; transition:opacity .6s ease;
+    background:radial-gradient(circle at 50% 55%, rgba(240,196,220,.55), rgba(199,178,230,.28) 38%, rgba(13,11,26,0) 72%); }
+  #etreinte.on{ opacity:1; }
+  #etreinte .bras{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  #etreinte .bras .c{ font-size:6rem; filter:drop-shadow(0 0 30px rgba(240,196,220,.8)); animation:serre 2.4s ease; }
+  @keyframes serre{ 0%{ transform:scale(2.2); opacity:0;} 30%{ transform:scale(1); opacity:1;} 80%{ transform:scale(1); opacity:1;} 100%{ transform:scale(1.05); opacity:0;} }
+</style>
+</head>
+<body>
+  <a class="retour" href="/">⌂ Accueil</a>
+  <div id="etreinte" aria-hidden="true"><div class="bras"><div class="c">🤗</div></div></div>
+  <div class="wrap">
+    <p class="eyebrow">quand la distance pèse un peu</p>
+    <h1>La boîte à câlins</h1>
+    <div class="coeur" id="coeur">🫂</div>
+
+    <p class="msg" id="msg">Si tu as besoin d'être serrée fort, touche le bouton. Je le saurai tout de suite.</p>
+
+    <div id="appel" class="appel" hidden style="display:none">
+      <div class="qui" id="appel-qui"></div>
+      <div class="quand" id="appel-quand"></div>
+    </div>
+
+    <div id="zone-action">
+      <button class="btn" id="demander">J'ai besoin d'un câlin 🤍</button>
+      <div><input type="text" id="mot" class="champ" maxlength="120" placeholder="un mot, si tu veux (facultatif)" hidden style="display:none" /></div>
+    </div>
+
+    <div class="chooser" id="chooser" hidden style="display:none">
+      <button class="p" data-r="lui">Je suis Mathieu</button>
+      <button data-r="elle">Je suis dadoucherie</button>
+    </div>
+
+    <a href="#" class="changer" id="changer" hidden style="display:none">ce n'est pas toi ? changer</a>
+    <p class="sous">Un câlin demandé arrive comme une notification à l'autre. Il peut t'en renvoyer un : une lumière chaude, une petite vibration, et le sentiment d'être serré fort.</p>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var URL_SB = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  var NOMS = { elle:"dadoucherie", lui:"Mathieu" };
+  var AUTRE = { elle:"lui", lui:"elle" };
+  function hdrs(extra){ var h={ "apikey":ANON, "Authorization":"Bearer "+ANON, "Content-Type":"application/json" }; for(var k in (extra||{})) h[k]=extra[k]; return h; }
+  function role(){ try{ var r=localStorage.getItem("moi_role"); return (r==="elle"||r==="lui")?r:null; }catch(e){ return null; } }
+  function esc(s){ return (s||"").replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function vibrer(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
+  var $ = function(id){ return document.getElementById(id); };
+  var msg=$("msg"), btnDem=$("demander"), champ=$("mot"), chooser=$("chooser"), changer=$("changer"), appel=$("appel");
+
+  function setMsg(t){ msg.style.opacity=0; setTimeout(function(){ msg.textContent=t; msg.style.opacity=1; }, 200); }
+  function ilya(iso){ var d=(Date.now()-new Date(iso).getTime())/1000; if(d<60)return "à l'instant"; if(d<3600)return "il y a "+Math.floor(d/60)+" min"; if(d<86400)return "il y a "+Math.floor(d/3600)+" h"; var j=Math.floor(d/86400); return j===1?"hier":"il y a "+j+" j"; }
+
+  function lire(){ return fetch(URL_SB+"/rest/v1/calins?select=id,de_role,type,texte,created_at&order=created_at.desc&limit=20", { headers:hdrs() }).then(function(r){ return r.json(); }).catch(function(){ return []; }); }
+  function ajouter(type, texte){ return fetch(URL_SB+"/rest/v1/calins", { method:"POST", headers:hdrs({ "Prefer":"return=minimal" }), body:JSON.stringify({ de_role:role(), type:type, texte:texte||null }) }); }
+
+  var dernierVuId = null, initFait=false;
+
+  function etreinte(){
+    var e=$("etreinte");
+    // relance l'animation en re-montant l'élément .c
+    var bras=e.querySelector(".bras"); bras.innerHTML='<div class="c">🤗</div>';
+    e.classList.add("on"); vibrer([60,80,60,80,120]);
+    setTimeout(function(){ e.classList.remove("on"); }, 2400);
+  }
+
+  function majIdentite(){
+    var moi = role();
+    chooser.style.display = moi ? "none" : "flex";
+    $("zone-action").style.display = moi ? "" : "none";
+    changer.style.display = moi ? "inline-block" : "none";
+    champ.style.display = moi ? "block" : "none"; champ.hidden = !moi;
+    if(!moi){ setMsg("Dis-moi qui tu es, et je saurai à qui envoyer le câlin."); appel.style.display="none"; }
+  }
+
+  function render(rows){
+    rows = rows || [];
+    var moi = role(); if(!moi){ majIdentite(); return; }
+    var autre = AUTRE[moi];
+
+    // dernière demande de l'autre + ma dernière réponse
+    var demAutre = rows.find(function(r){ return r.de_role===autre && r.type==="demande"; });
+    var repMoi   = rows.find(function(r){ return r.de_role===moi && r.type==="reponse"; });
+    var enAttente = demAutre && (!repMoi || new Date(repMoi.created_at) < new Date(demAutre.created_at));
+
+    if(enAttente){
+      appel.style.display="block"; appel.hidden=false;
+      $("appel-qui").textContent = NOMS[autre] + " a besoin d'un câlin 🤍";
+      $("appel-quand").textContent = (demAutre.texte ? "« "+demAutre.texte+" » · " : "") + ilya(demAutre.created_at);
+      btnDem.className="btn repondre"; btnDem.textContent="Lui envoyer un câlin 🤗"; btnDem.dataset.mode="reponse";
+      champ.placeholder="un mot avec ton câlin (facultatif)";
+    } else {
+      appel.style.display="none";
+      btnDem.className="btn"; btnDem.textContent="J'ai besoin d'un câlin 🤍"; btnDem.dataset.mode="demande";
+      champ.placeholder="un mot, si tu veux (facultatif)";
+    }
+
+    // détecter un nouveau câlin-réponse reçu (pour l'étreinte)
+    var repAutre = rows.find(function(r){ return r.de_role===autre && r.type==="reponse"; });
+    if(initFait && repAutre && repAutre.id !== dernierVuId){
+      // s'il est vraiment nouveau (plus récent que ce qu'on avait vu)
+    }
+    // marque l'état "dernier vu" avec le plus grand id présent
+    var maxId = rows.reduce(function(m,r){ return Math.max(m, r.id); }, 0);
+    if(!initFait){ dernierVuId = maxId; initFait=true; }
+    else if(maxId > dernierVuId){
+      // il y a du nouveau depuis la dernière fois — si c'est une réponse de l'autre, on enveloppe
+      var nouveaux = rows.filter(function(r){ return r.id > dernierVuId; });
+      dernierVuId = maxId;
+      var recuReponse = nouveaux.some(function(r){ return r.de_role===autre && r.type==="reponse"; });
+      var recuDemande = nouveaux.some(function(r){ return r.de_role===autre && r.type==="demande"; });
+      if(recuReponse){ setMsg(NOMS[autre]+" te serre fort, là, maintenant. 🤗"); etreinte(); }
+      else if(recuDemande){ setMsg(NOMS[autre]+" a besoin d'un câlin. Réponds-lui quand tu veux."); vibrer([40,60,40]); }
+    }
+  }
+
+  function refresh(){ return lire().then(render); }
+
+  function agir(){
+    var moi = role(); if(!moi) return;
+    var mode = btnDem.dataset.mode || "demande";
+    var t = (champ.value||"").trim();
+    btnDem.disabled=true;
+    ajouter(mode, t).then(function(){
+      champ.value="";
+      if(mode==="reponse"){ setMsg("Ton câlin est parti vers "+NOMS[AUTRE[moi]]+". 🤗"); etreinte(); }
+      else { setMsg("C'est envoyé 🤍 "+NOMS[AUTRE[moi]]+" va recevoir ton besoin de câlin."); }
+      setTimeout(function(){ btnDem.disabled=false; refresh(); }, 700);
+    }).catch(function(){ btnDem.disabled=false; });
+  }
+  btnDem.addEventListener("click", agir);
+  champ.addEventListener("keydown", function(e){ if(e.key==="Enter") agir(); });
+
+  chooser.addEventListener("click", function(e){ var b=e.target.closest?e.target.closest("[data-r]"):null; if(!b)return; try{ localStorage.setItem("moi_role", b.getAttribute("data-r")); }catch(e2){} majIdentite(); refresh(); demarrerRealtime(); });
+  changer.addEventListener("click", function(e){ e.preventDefault(); try{ localStorage.removeItem("moi_role"); }catch(e2){} initFait=false; majIdentite(); });
+
+  majIdentite();
+  refresh();
+  setInterval(refresh, 6000); // repli si le temps réel n'est pas dispo
+
+  // ---- temps réel (réception immédiate) ----
+  var client=null, canal=null;
+  function demarrerRealtime(){
+    if(!role()) return;
+    if(window.supabase && window.supabase.createClient){ return brancher(); }
+    var s=document.createElement("script"); s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"; s.onload=brancher; s.onerror=function(){}; document.head.appendChild(s);
+  }
+  function brancher(){
+    try{
+      if(!window.supabase||!window.supabase.createClient) return;
+      if(!client) client=window.supabase.createClient(URL_SB, ANON);
+      if(canal) return;
+      canal = client.channel("calins-live");
+      canal.on("postgres_changes", { event:"INSERT", schema:"public", table:"calins" }, function(){ refresh(); });
+      canal.subscribe();
+    }catch(e){}
+  }
+  demarrerRealtime();
+})();
+</script>
+<script src="/presence.js" defer></script>
+</body>
+</html>

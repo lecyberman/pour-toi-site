@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0b0a16" />
+<title>Le coffret de la rencontre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 90% at 50% -10%, #221a40 0%, transparent 55%),
+      radial-gradient(90% 70% at 50% 115%, #15132e 0%, transparent 60%),
+      #0b0a16; overflow-x:hidden; }
+  a.retour{ position:fixed; top:calc(12px + env(safe-area-inset-top)); left:14px; z-index:6; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; }
+  a.retour:hover{ color:#fff; }
+  .wrap{ position:relative; z-index:1; max-width:560px; margin:0 auto; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    padding:max(64px,env(safe-area-inset-top)) 22px calc(40px + env(safe-area-inset-bottom)); }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.08rem; margin:0 0 .35rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,7vw,2.7rem); margin:0 0 .1rem; color:#FBF4EA; }
+
+  .boite{ font-size:5rem; margin:22px 0 6px; cursor:pointer; -webkit-tap-highlight-color:transparent; filter:drop-shadow(0 0 24px rgba(199,178,230,.5)); transition:transform .3s; }
+  .boite:hover{ transform:translateY(-3px) scale(1.03); }
+  .boite.secoue{ animation:secoue 1.1s ease; }
+  @keyframes secoue{ 0%,100%{ transform:rotate(0);} 20%{ transform:rotate(-6deg);} 40%{ transform:rotate(6deg);} 60%{ transform:rotate(-4deg);} 80%{ transform:rotate(4deg);} }
+
+  .msg{ font-family:'Fraunces',serif; font-style:italic; color:#E9DEF7; font-size:1.14rem; line-height:1.6; margin:12px auto 0; max-width:32ch; }
+  .compte{ display:flex; gap:9px; justify-content:center; margin:22px 0 4px; flex-wrap:wrap; }
+  .bloc{ background:rgba(255,255,255,.05); border:1px solid rgba(180,155,218,.26); border-radius:14px; padding:12px 8px; min-width:64px; }
+  .bloc .n{ font-family:'Fraunces',serif; font-weight:600; font-size:1.7rem; color:#F1ECF8; line-height:1; }
+  .bloc .l{ font-size:.66rem; color:rgba(201,193,216,.75); margin-top:5px; text-transform:uppercase; letter-spacing:.07em; }
+  .sous{ margin-top:18px; color:rgba(201,193,216,.7); font-size:.82rem; max-width:34ch; line-height:1.5; }
+
+  .btn{ margin-top:8px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:1rem; border-radius:100px; padding:14px 26px; cursor:pointer; border:1px solid transparent;
+    color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); box-shadow:0 14px 32px -14px rgba(168,134,218,.8); }
+  .btn.ghost{ color:#EDE9F3; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.2); box-shadow:none; font-size:.85rem; padding:10px 18px; }
+
+  /* réglage (Mathieu) */
+  .reglage{ margin-top:22px; width:100%; max-width:360px; background:rgba(255,255,255,.04); border:1px solid rgba(180,155,218,.2); border-radius:16px; padding:16px; display:none; }
+  .reglage.on{ display:block; }
+  .reglage h2{ font-family:'Fraunces',serif; font-weight:500; font-size:1.02rem; margin:0 0 10px; color:#FBF4EA; }
+  .reglage label{ display:block; text-align:left; font-size:.8rem; color:#B7ACCB; margin:8px 0 4px; }
+  .reglage input{ width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.16); border-radius:12px; color:#EDE9F3; padding:11px 12px; font-family:inherit; font-size:.95rem; }
+  .reglage input:focus{ outline:2px solid #A886DA; }
+  .reglage .row{ display:flex; gap:8px; margin-top:12px; }
+  .reglage button{ flex:1; font-family:inherit; font-weight:700; font-size:.9rem; color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border:none; border-radius:100px; padding:11px; cursor:pointer; }
+  .reglage .ok{ color:#8ee6a0; font-size:.8rem; margin-top:10px; min-height:1em; }
+  .adminlink{ display:none; margin-top:16px; font-size:.8rem; color:#B49BDA; opacity:.7; cursor:pointer; text-decoration:underline; }
+
+  /* montage plein écran */
+  #montage{ position:fixed; inset:0; z-index:30; background:radial-gradient(circle at 50% 30%, #1c1740, #0b0a16 70%); display:none; align-items:center; justify-content:center; padding:40px 26px; }
+  #montage.on{ display:flex; }
+  #montage .fermer{ position:fixed; top:calc(14px + env(safe-area-inset-top)); right:16px; z-index:32; font-size:1.4rem; color:rgba(237,233,243,.7); background:none; border:none; cursor:pointer; }
+  .slide{ max-width:520px; text-align:center; opacity:0; transform:translateY(12px); transition:opacity .8s ease, transform .8s ease; }
+  .slide.vu{ opacity:1; transform:none; }
+  .slide .kicker{ font-family:'Nunito Sans',sans-serif; text-transform:uppercase; letter-spacing:.14em; font-size:.72rem; color:#B49BDA; margin-bottom:14px; }
+  .slide .emoji{ font-size:3rem; margin-bottom:14px; filter:drop-shadow(0 0 18px rgba(199,178,230,.6)); }
+  .slide .texte{ font-family:'Fraunces',serif; font-style:italic; font-weight:400; color:#F3ECFB; font-size:clamp(1.3rem,4.4vw,1.7rem); line-height:1.55; }
+  .slide .meta{ margin-top:16px; font-size:.82rem; color:rgba(201,193,216,.65); }
+  #montage .barre{ position:fixed; left:0; right:0; bottom:0; height:4px; background:rgba(255,255,255,.08); }
+  #montage .barre span{ display:block; height:100%; width:0; background:linear-gradient(90deg,#CBB4EC,#A886DA); transition:width .4s linear; }
+  #montage .tap{ position:fixed; bottom:16px; left:0; right:0; text-align:center; font-size:.76rem; color:rgba(201,193,216,.55); }
+</style>
+</head>
+<body>
+  <a class="retour" href="/">⌂ Accueil</a>
+  <div class="wrap">
+    <p class="eyebrow" id="eyebrow">une fois par an, rien que pour nous</p>
+    <h1>Le coffret de la rencontre</h1>
+
+    <div class="boite" id="boite" role="button" aria-label="Le coffret">🎁</div>
+    <p class="msg" id="msg">Chaque année, au jour où tout a commencé, ce coffret s'ouvre sur l'année qu'on vient de vivre.</p>
+
+    <div class="compte" id="compte" hidden style="display:none">
+      <div class="bloc"><div class="n" id="j">0</div><div class="l">jours</div></div>
+      <div class="bloc"><div class="n" id="h">0</div><div class="l">heures</div></div>
+      <div class="bloc"><div class="n" id="m">0</div><div class="l">min</div></div>
+    </div>
+
+    <div id="zone-ouvrir" hidden style="display:none"><button class="btn" id="ouvrir">Ouvrir le coffret ✦</button></div>
+
+    <p class="sous" id="sous"></p>
+
+    <a class="adminlink" id="toggle-reglage" hidden>régler la date de la rencontre</a>
+    <div class="reglage" id="reglage">
+      <h2>Notre date de rencontre 🤍</h2>
+      <label for="in-date">Le jour où tout a commencé</label>
+      <input type="date" id="in-date" />
+      <div class="row">
+        <button id="save">Enregistrer</button>
+        <button id="apercu" style="background:rgba(255,255,255,.08);color:#EDE9F3;">Aperçu</button>
+      </div>
+      <p class="ok" id="okmsg"></p>
+    </div>
+  </div>
+
+  <div id="montage" aria-hidden="true">
+    <button class="fermer" id="fermer" aria-label="Fermer">✕</button>
+    <div class="slide" id="slide"><div class="kicker" id="s-kicker"></div><div class="emoji" id="s-emoji"></div><div class="texte" id="s-texte"></div><div class="meta" id="s-meta"></div></div>
+    <div class="barre"><span id="barre-fill"></span></div>
+    <div class="tap" id="tap">touche pour la suite</div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var URL_SB = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  var NOMS = { elle:"dadoucherie", lui:"Mathieu" };
+  function hdrs(extra){ var h={ "apikey":ANON, "Authorization":"Bearer "+ANON, "Content-Type":"application/json" }; for(var k in (extra||{})) h[k]=extra[k]; return h; }
+  function role(){ try{ var r=localStorage.getItem("moi_role"); return (r==="elle"||r==="lui")?r:null; }catch(e){ return null; } }
+  function esc(s){ return (s||"").replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  var $ = function(id){ return document.getElementById(id); };
+
+  var dateRencontre = null; // objet Date (année d'origine)
+  var tick=null;
+
+  function lireConfig(){
+    return fetch(URL_SB+"/rest/v1/coffret?id=eq.1&select=date_rencontre", { headers:hdrs() })
+      .then(function(r){ return r.json(); }).then(function(rows){ return (rows&&rows[0])?rows[0]:null; }).catch(function(){ return null; });
+  }
+  function enregistrer(d){
+    return fetch(URL_SB+"/rest/v1/coffret?id=eq.1", { method:"PATCH", headers:hdrs({ "Prefer":"return=minimal" }), body:JSON.stringify({ date_rencontre:d||null, updated_at:new Date().toISOString() }) });
+  }
+
+  // prochaine occurrence (mois/jour) de l'anniversaire
+  function prochainAnniv(){
+    if(!dateRencontre) return null;
+    var now=new Date();
+    var a=new Date(now.getFullYear(), dateRencontre.getMonth(), dateRencontre.getDate(), 0,0,0,0);
+    if(a < new Date(now.getFullYear(), now.getMonth(), now.getDate())) a.setFullYear(now.getFullYear()+1);
+    return a;
+  }
+  function estLeJour(){
+    if(!dateRencontre) return false;
+    var now=new Date();
+    return now.getMonth()===dateRencontre.getMonth() && now.getDate()===dateRencontre.getDate();
+  }
+  function anneesEcoulees(){
+    if(!dateRencontre) return 0;
+    return Math.max(0, new Date().getFullYear() - dateRencontre.getFullYear());
+  }
+
+  function render(){
+    var moi = role();
+    if(moi==="lui"){ $("toggle-reglage").style.display="inline-block"; $("toggle-reglage").hidden=false; }
+    else { $("toggle-reglage").style.display="none"; }
+
+    if(!dateRencontre){
+      $("boite").textContent="🎁";
+      $("compte").style.display="none"; $("zone-ouvrir").style.display="none";
+      if(moi==="lui"){ $("msg").textContent="Pose la date de votre rencontre, et chaque année ce coffret s'ouvrira tout seul, ce jour-là."; $("sous").textContent="Règle-la ci-dessous 🤍"; }
+      else { $("msg").textContent="Chaque année, au jour où tout a commencé, ce coffret s'ouvrira sur l'année qu'on vient de vivre."; $("sous").textContent="Le coffret dort en attendant le grand jour."; }
+      return;
+    }
+
+    if(estLeJour()){
+      var ans=anneesEcoulees();
+      $("boite").textContent="🎁"; $("boite").classList.add("secoue");
+      $("msg").textContent = ans>0 ? ("Aujourd'hui, ça fait "+ans+" an"+(ans>1?"s":"")+" 🤍 Le coffret est prêt à s'ouvrir.") : "C'est le jour de notre rencontre 🤍 Le coffret est prêt.";
+      $("compte").style.display="none";
+      $("zone-ouvrir").style.display="";
+      $("sous").textContent="Touche le coffret, ou le bouton, pour dérouler l'année.";
+    } else {
+      $("boite").textContent="🔒"; $("boite").classList.remove("secoue");
+      $("msg").textContent="Le coffret s'ouvrira le jour de notre rencontre. Encore un peu de patience 🤍";
+      $("compte").style.display="flex";
+      $("zone-ouvrir").style.display= (role()==="lui") ? "" : "none"; // Mathieu peut faire un aperçu
+      if(role()==="lui"){ $("ouvrir").textContent="Aperçu (avant l'heure)"; $("ouvrir").className="btn ghost"; }
+      $("sous").textContent="";
+      majCompte();
+      if(tick) clearInterval(tick); tick=setInterval(majCompte, 1000*30);
+    }
+    // pré-remplir réglage
+    try{ var iso=dateRencontre.getFullYear()+"-"+pad(dateRencontre.getMonth()+1)+"-"+pad(dateRencontre.getDate()); $("in-date").value=iso; }catch(e){}
+  }
+  function pad(n){ return (n<10?"0":"")+n; }
+
+  function majCompte(){
+    var a=prochainAnniv(); if(!a) return;
+    var diff=a.getTime()-Date.now(); if(diff<0) diff=0;
+    var sec=Math.floor(diff/1000);
+    var j=Math.floor(sec/86400); sec-=j*86400;
+    var h=Math.floor(sec/3600); sec-=h*3600;
+    var m=Math.floor(sec/60);
+    $("j").textContent=j; $("h").textContent=h; $("m").textContent=m;
+  }
+
+  // ---------- rétrospective ----------
+  function ilYaUnAn(){ var d=new Date(); d.setFullYear(d.getFullYear()-1); return d.toISOString(); }
+  function get(url){ return fetch(url, { headers:hdrs() }).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }); }
+
+  function construireSlides(){
+    var depuis = ilYaUnAn();
+    var q = "&created_at=gte."+depuis+"&order=created_at.desc&limit=8";
+    return Promise.all([
+      get(URL_SB+"/rest/v1/dadoucherie_mots?select=message,created_at&order=created_at.desc&limit=6"),
+      get(URL_SB+"/rest/v1/petits_riens?select=texte,role,created_at"+q),
+      get(URL_SB+"/rest/v1/souvenirs?select=titre,description,emotion,created_at&order=created_at.desc&limit=6"),
+      get(URL_SB+"/rest/v1/humeurs?select=emoji,label,note,created_at"+q),
+      get(URL_SB+"/rest/v1/souhaits?select=nom,emoji,note&order=created_at.desc&limit=6"),
+      get(URL_SB+"/rest/v1/gratitudes?select=texte,auteur,created_at"+q),
+      get(URL_SB+"/rest/v1/premiers?select=titre,histoire,auteur&order=created_at.desc&limit=4")
+    ]).then(function(res){
+      var mots=res[0]||[], riens=res[1]||[], souv=res[2]||[], hum=res[3]||[], souh=res[4]||[], grat=res[5]||[], prem=res[6]||[];
+      var S=[];
+      var ans=anneesEcoulees();
+      S.push({ kicker:"le coffret de la rencontre", emoji:"🤍", texte: ans>0? ("Une année de nous.<br>La "+(ans)+"ᵉ.") : "Une année de nous.", meta:"" });
+
+      mots.slice(0,3).forEach(function(m){ if(m.message) S.push({ kicker:"un de tes mots", emoji:"💌", texte:esc(m.message), meta:dateFr(m.created_at) }); });
+      souv.slice(0,3).forEach(function(s){ if(s.titre||s.description) S.push({ kicker:"un souvenir gardé", emoji: s.emotion || "✨", texte:esc(s.titre||s.description), meta: s.titre&&s.description? esc(s.description).slice(0,90):"" }); });
+      riens.slice(0,4).forEach(function(r){ if(r.texte) S.push({ kicker:"un petit rien", emoji:"🍃", texte:esc(r.texte), meta:(NOMS[r.role]||"")+" · "+dateFr(r.created_at) }); });
+      grat.slice(0,2).forEach(function(g){ if(g.texte) S.push({ kicker:"une gratitude", emoji:"🕊️", texte:esc(g.texte), meta:g.auteur?("par "+esc(g.auteur)):"" }); });
+      prem.slice(0,2).forEach(function(p){ if(p.titre||p.histoire) S.push({ kicker:"une première fois", emoji:"⭐", texte:esc(p.titre||p.histoire), meta: p.titre&&p.histoire? esc(p.histoire).slice(0,90):"" }); });
+      var humParle = hum.filter(function(h){ return h.label||h.note; });
+      if(humParle.length){ var h=humParle[0]; S.push({ kicker:"une de tes humeurs", emoji:h.emoji||"🌙", texte: esc(h.note||h.label), meta:dateFr(h.created_at) }); }
+      if(souh.length){ var noms=souh.map(function(x){ return (x.emoji?x.emoji+" ":"")+esc(x.nom); }).slice(0,5).join(" · "); S.push({ kicker:"ce qu'on rêve encore", emoji:"🗺️", texte:noms, meta:"nos prochaines pages" }); }
+
+      S.push({ kicker:"et ça continue", emoji:"🌙", texte:"Merci pour cette année.<br>La prochaine sera encore à nous.", meta:"" });
+      return S;
+    });
+  }
+  function dateFr(iso){ try{ return new Date(iso).toLocaleDateString("fr-FR",{ day:"numeric", month:"long" }); }catch(e){ return ""; } }
+
+  var slides=[], idx=0, autoT=null;
+  function ouvrirMontage(){
+    $("boite").classList.remove("secoue");
+    construireSlides().then(function(S){
+      slides = (S && S.length>1) ? S : [{ kicker:"le coffret", emoji:"🤍", texte:"On commence tout juste à remplir cette année. Reviens : elle se remplira de nos mots, nos souvenirs, nos petits riens.", meta:"" }];
+      idx=0; $("montage").classList.add("on"); $("montage").setAttribute("aria-hidden","false");
+      montrer();
+    });
+  }
+  function montrer(){
+    var s=slides[idx]; if(!s) return;
+    var el=$("slide"); el.classList.remove("vu");
+    setTimeout(function(){
+      $("s-kicker").textContent=s.kicker||""; $("s-emoji").textContent=s.emoji||"✦";
+      $("s-texte").innerHTML=s.texte||""; $("s-meta").textContent=s.meta||"";
+      el.classList.add("vu");
+    }, 120);
+    $("barre-fill").style.width = Math.round(((idx+1)/slides.length)*100)+"%";
+    $("tap").textContent = idx>=slides.length-1 ? "touche pour fermer" : "touche pour la suite";
+    if(autoT) clearTimeout(autoT);
+    if(idx < slides.length-1) autoT=setTimeout(suivant, 5200);
+  }
+  function suivant(){ if(idx>=slides.length-1){ fermerMontage(); return; } idx++; montrer(); }
+  function fermerMontage(){ if(autoT) clearTimeout(autoT); $("montage").classList.remove("on"); $("montage").setAttribute("aria-hidden","true"); }
+  $("montage").addEventListener("click", function(e){ if(e.target===$("fermer")) return; suivant(); });
+  $("fermer").addEventListener("click", fermerMontage);
+
+  // ---------- interactions ----------
+  $("boite").addEventListener("click", function(){ if(estLeJour() || role()==="lui") ouvrirMontage(); });
+  $("ouvrir").addEventListener("click", ouvrirMontage);
+  $("toggle-reglage").addEventListener("click", function(){ $("reglage").classList.toggle("on"); });
+  $("save").addEventListener("click", function(){
+    var d=$("in-date").value; if(!d){ $("okmsg").style.color="#e6a6a6"; $("okmsg").textContent="Choisis une date."; return; }
+    $("save").disabled=true; $("okmsg").style.color="#8ee6a0"; $("okmsg").textContent="…";
+    enregistrer(d).then(function(){ $("okmsg").textContent="C'est noté 🤍"; $("save").disabled=false; dateRencontre=new Date(d+"T12:00:00"); render(); })
+      .catch(function(){ $("okmsg").style.color="#e6a6a6"; $("okmsg").textContent="Oups, réessaie."; $("save").disabled=false; });
+  });
+  $("apercu").addEventListener("click", ouvrirMontage);
+
+  // ---------- init ----------
+  lireConfig().then(function(cfg){
+    if(cfg && cfg.date_rencontre){ dateRencontre = new Date(cfg.date_rencontre+"T12:00:00"); }
+    render();
+  });
+})();
+</script>
+<script src="/presence.js" defer></script>
+</body>
+</html>
