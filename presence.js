@@ -92,3 +92,46 @@
   render();
   if (getRole()) demarrer();
 })();
+
+/* ===== V2 immersif : curseur magique + transitions douces (site-wide via presence.js) ===== */
+(function(){
+  "use strict";
+  // 1) curseur étoile + poussière : on charge etincelles.js s'il n'est pas déjà là
+  try {
+    if (!window.__ETINCELLES_ON && !document.querySelector('script[data-etincelles]')) {
+      var s = document.createElement("script");
+      s.src = "/etincelles.js?v=1"; s.defer = true; s.setAttribute("data-etincelles","1");
+      (document.body || document.documentElement).appendChild(s);
+    }
+  } catch(e){}
+
+  // 2) transitions douces entre les pages (fondu à l'arrivée + au clic)
+  try {
+    var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduce && !window.__TRANSITIONS_ON) {
+      window.__TRANSITIONS_ON = true;
+      var st = document.createElement("style");
+      st.textContent = "html.tr-init body{opacity:0;} body{transition:opacity .5s ease;} html.tr-out body{opacity:0;}";
+      document.head.appendChild(st);
+      document.documentElement.classList.add("tr-init");
+      function reveler(){ document.documentElement.classList.remove("tr-init"); }
+      if (document.readyState === "complete" || document.readyState === "interactive") setTimeout(reveler, 30);
+      else window.addEventListener("DOMContentLoaded", function(){ setTimeout(reveler, 30); });
+      window.addEventListener("pageshow", reveler); // retour arrière (bfcache)
+
+      document.addEventListener("click", function(e){
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        var a = e.target && e.target.closest ? e.target.closest("a") : null;
+        if (!a) return;
+        var href = a.getAttribute("href") || "";
+        if (a.target === "_blank" || a.hasAttribute("download")) return;
+        if (!href || href.charAt(0) === "#" || /^(https?:|mailto:|tel:|javascript:)/i.test(href)) return;
+        // lien interne (chemin relatif ou commençant par /)
+        if (href.charAt(0) !== "/" && href.indexOf("./") !== 0 && href.indexOf("../") !== 0) return;
+        e.preventDefault();
+        document.documentElement.classList.add("tr-out");
+        setTimeout(function(){ window.location.href = href; }, 380);
+      }, true);
+    }
+  } catch(e){}
+})();

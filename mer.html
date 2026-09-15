@@ -185,6 +185,10 @@
                   {amp:20,len:0.009,sp:0.015,col:"rgba(100,130,210,.28)",y:0.62},
                   {amp:26,len:0.007,sp:0.010,col:"rgba(80,110,190,.40)",y:0.80} ];
     function draw(){ x.clearRect(0,0,W,H); if(!reduce) t+=1;
+      // reflet de lune qui scintille sur l'eau (colonne douce, légère ondulation)
+      var cx=W*0.5;
+      for(var k=0;k<H;k+=7){ var wob=Math.sin(k*0.06 + t*0.05)*10 + Math.sin(k*0.13 - t*0.03)*5;
+        var aa=0.12*(1-k/H); if(aa>0.004){ x.fillStyle="rgba(210,224,255,"+aa.toFixed(3)+")"; x.fillRect(cx-14+wob, k, 28, 3); } }
       couches.forEach(function(c){ x.beginPath(); x.moveTo(0,H);
         for(var i=0;i<=W;i+=6){ var y=H*c.y + Math.sin(i*c.len + t*c.sp)*c.amp + Math.sin(i*c.len*0.5 - t*c.sp*0.7)*c.amp*0.4; x.lineTo(i,y); }
         x.lineTo(W,H); x.closePath(); x.fillStyle=c.col; x.fill(); });
