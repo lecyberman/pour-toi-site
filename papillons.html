@@ -16,275 +16,196 @@
       radial-gradient(120% 90% at 50% -10%, #2a2150 0%, transparent 55%),
       radial-gradient(90% 80% at 50% 115%, #172a4a 0%, transparent 60%),
       #0b0a16; }
-  #scene{ position:fixed; inset:0; z-index:1; display:block; }
+  #scene{ position:fixed; inset:0; z-index:1; display:block; width:100vw; height:100vh; touch-action:none; }
   .ui{ position:fixed; z-index:2; left:0; right:0; text-align:center; pointer-events:none; }
   .tete{ top:max(26px,env(safe-area-inset-top)); padding:0 20px; }
   .tete .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.05rem; margin:0 0 .25rem; text-shadow:0 2px 18px rgba(0,0,0,.6); }
   .tete h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(1.9rem,6vw,2.6rem); margin:0; color:#FBF4EA; text-shadow:0 4px 30px rgba(0,0,0,.6); }
   .indice{ bottom:max(20px,env(safe-area-inset-bottom)); font-size:.82rem; color:rgba(237,233,243,.6); padding:0 20px; }
   a.retour{ position:fixed; top:max(14px,env(safe-area-inset-top)); left:14px; z-index:3; font-size:.9rem; color:rgba(237,233,243,.75); text-decoration:none;
-    background:rgba(24,22,46,.55); border:1px solid rgba(255,255,255,.14); border-radius:100px; padding:7px 14px; backdrop-filter:blur(8px); pointer-events:auto; }
+    background:rgba(24,22,46,.55); border:1px solid rgba(255,255,255,.14); border-radius:100px; padding:7px 14px; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); pointer-events:auto; }
   a.retour:hover{ color:#fff; }
-  #note{ position:fixed; z-index:3; right:12px; bottom:12px; font-size:.72rem; color:rgba(201,193,216,.5); }
 </style>
 </head>
 <body>
-  <canvas id="scene"></canvas>
+  <canvas id="scene" aria-label="Nos papillons"></canvas>
   <a class="retour" href="/">⌂ Accueil</a>
   <div class="ui tete">
     <p class="eyebrow">rien que pour toi</p>
     <h1>Nos papillons</h1>
   </div>
   <div class="ui indice">Bouge le doigt : ils t'évitent. Reste tranquille : ils se posent.</div>
-  <div id="note"></div>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  if (typeof THREE === "undefined") return;
+  var canvas = document.getElementById('scene');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mobile = matchMedia('(pointer: coarse)').matches || innerWidth < 640;
+
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true }); }
+  catch(e){ return; }
+  renderer.setClearColor(0x000000, 0);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2));
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.set(0, 0, 16);
+
+  scene.add(new THREE.AmbientLight(0xbfa8f0, 1.1));
+  var dir = new THREE.DirectionalLight(0xffffff, 1.0); dir.position.set(4, 8, 10); scene.add(dir);
+
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+
+  // ---- texture d'aile (dessinée sur canvas) ----
+  function wingTexture(){
+    var c = document.createElement('canvas'); c.width = c.height = 160; var x = c.getContext('2d');
+    var g = x.createLinearGradient(0, 20, 150, 150);
+    g.addColorStop(0, '#E9DEF7'); g.addColorStop(.45, '#B49BDA'); g.addColorStop(1, '#7C5FB0');
+    x.fillStyle = g;
+    x.beginPath(); x.moveTo(6, 84);
+    x.bezierCurveTo(2, 18, 150, 2, 150, 46);
+    x.bezierCurveTo(150, 70, 96, 82, 6, 84);
+    x.closePath(); x.fill();
+    x.beginPath(); x.moveTo(8, 86);
+    x.bezierCurveTo(18, 158, 120, 156, 110, 112);
+    x.bezierCurveTo(102, 92, 70, 88, 8, 86);
+    x.closePath(); x.fill();
+    x.fillStyle = 'rgba(255,255,255,.55)'; x.beginPath(); x.arc(112, 40, 9, 0, 6.28); x.fill();
+    x.fillStyle = 'rgba(45,25,70,.45)'; x.beginPath(); x.arc(96, 118, 8, 0, 6.28); x.fill();
+    x.fillStyle = 'rgba(45,25,70,.30)'; x.beginPath(); x.arc(70, 55, 6, 0, 6.28); x.fill();
+    return new THREE.CanvasTexture(c);
   }
-}
-</script>
-<script type="module">
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+  var WING_TEX = wingTexture();
 
-const canvas = document.getElementById('scene');
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const mobile = matchMedia('(pointer: coarse)').matches || innerWidth < 640;
-
-const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
-renderer.setClearColor(0x000000, 0);
-renderer.setPixelRatio(Math.min(devicePixelRatio||1, mobile?1.5:2));
-
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-camera.position.set(0, 0, 16);
-
-scene.add(new THREE.AmbientLight(0xbfa8f0, 1.1));
-const dir = new THREE.DirectionalLight(0xffffff, 1.0); dir.position.set(4, 8, 10); scene.add(dir);
-const warm = new THREE.PointLight(0xE6D8FF, 0.6, 60); warm.position.set(-6, -3, 8); scene.add(warm);
-
-// ---------- texture d'aile procédurale (repli si pas de modèle) ----------
-function wingTexture(){
-  const c = document.createElement('canvas'); c.width = c.height = 160; const x = c.getContext('2d');
-  const g = x.createLinearGradient(0, 20, 150, 150);
-  g.addColorStop(0, '#E9DEF7'); g.addColorStop(.45, '#B49BDA'); g.addColorStop(1, '#7C5FB0');
-  x.fillStyle = g;
-  // lobe supérieur
-  x.beginPath(); x.moveTo(6, 84);
-  x.bezierCurveTo(2, 18, 150, 2, 150, 46);
-  x.bezierCurveTo(150, 70, 96, 82, 6, 84);
-  x.closePath(); x.fill();
-  // lobe inférieur
-  x.beginPath(); x.moveTo(8, 86);
-  x.bezierCurveTo(18, 158, 120, 156, 110, 112);
-  x.bezierCurveTo(102, 92, 70, 88, 8, 86);
-  x.closePath(); x.fill();
-  // motifs
-  x.fillStyle = 'rgba(255,255,255,.55)'; x.beginPath(); x.arc(112, 40, 9, 0, 6.28); x.fill();
-  x.fillStyle = 'rgba(45,25,70,.45)'; x.beginPath(); x.arc(96, 118, 8, 0, 6.28); x.fill();
-  x.fillStyle = 'rgba(45,25,70,.30)'; x.beginPath(); x.arc(70, 55, 6, 0, 6.28); x.fill();
-  // liseré sombre
-  x.strokeStyle = 'rgba(40,22,60,.35)'; x.lineWidth = 3; x.stroke();
-  const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
-}
-const WING_TEX = wingTexture();
-
-function papillonProcedural(){
-  const g = new THREE.Group();
-  const wingMat = new THREE.MeshBasicMaterial({ map: WING_TEX, transparent:true, side:THREE.DoubleSide, depthWrite:false });
-  // aile droite : plan XY, charnière (bord interne) en x=0, s'étend vers +x
-  const wingGeo = new THREE.PlaneGeometry(2.0, 2.4); wingGeo.translate(1.0, 0, 0);
-  const aileD = new THREE.Mesh(wingGeo, wingMat);
-  const aileG = new THREE.Mesh(wingGeo, wingMat); aileG.scale.x = -1; // miroir
-  const pivotD = new THREE.Group(); pivotD.add(aileD); g.add(pivotD);
-  const pivotG = new THREE.Group(); pivotG.add(aileG); g.add(pivotG);
-  // corps
-  const corps = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.08, 2.0, 8),
-    new THREE.MeshStandardMaterial({ color:0x2a1f3a, roughness:.6 }));
-  corps.rotation.x = Math.PI/2; g.add(corps);
-  const tete = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8),
-    new THREE.MeshStandardMaterial({ color:0x1a1230, roughness:.5 }));
-  tete.position.z = 1.05; g.add(tete);
-  // antennes
-  const antMat = new THREE.LineBasicMaterial({ color:0x1a1230 });
-  [-1,1].forEach(s=>{
-    const pts=[new THREE.Vector3(0,0,1.05), new THREE.Vector3(s*0.25,0.2,1.5)];
-    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), antMat));
-  });
-  g.userData.flap = { pivotD, pivotG };
-  g.userData.proc = true;
-  return g;
-}
-
-// ---------- gestion d'un papillon (modèle ou procédural) ----------
-const AIRE = { x: 13, y: 8, z: 6 };
-function rnd(a,b){ return a + Math.random()*(b-a); }
-
-class Papillon {
-  constructor(base){
-    this.obj = base;
-    this.mixer = null;
-    if (base.userData.gltf && base.userData.clip){
-      this.mixer = new THREE.AnimationMixer(base);
-      const act = this.mixer.clipAction(base.userData.clip);
-      act.play(); act.timeScale = rnd(0.8, 1.3);
-    }
-    this.pos = new THREE.Vector3(rnd(-AIRE.x,AIRE.x), rnd(-AIRE.y,AIRE.y), rnd(-AIRE.z,AIRE.z));
-    this.vel = new THREE.Vector3(rnd(-1,1), rnd(-1,1), rnd(-1,1)).normalize().multiplyScalar(rnd(1.2,2.4));
-    this.phase = rnd(0, 6.28);
-    this.flapSpeed = rnd(9, 14);
-    this.wander = rnd(0, 6.28);
-    this.pose = 0;            // temps de pose restant
-    this.prochainePose = rnd(6, 16);
-    this.cible = null;
-    scene.add(base);
+  function fairePapillon(){
+    var g = new THREE.Group();
+    var wingMat = new THREE.MeshBasicMaterial({ map: WING_TEX, transparent:true, side:THREE.DoubleSide, depthWrite:false });
+    var wingGeo = new THREE.PlaneGeometry(2.0, 2.4); wingGeo.translate(1.0, 0, 0);
+    var aileD = new THREE.Mesh(wingGeo, wingMat);
+    var aileG = new THREE.Mesh(wingGeo, wingMat); aileG.scale.x = -1;
+    var pivotD = new THREE.Group(); pivotD.add(aileD); g.add(pivotD);
+    var pivotG = new THREE.Group(); pivotG.add(aileG); g.add(pivotG);
+    var corps = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.07, 2.0, 8),
+      new THREE.MeshStandardMaterial({ color:0x2a1f3a, roughness:.6 }));
+    corps.rotation.x = Math.PI/2; g.add(corps);
+    var tete = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8),
+      new THREE.MeshStandardMaterial({ color:0x1a1230, roughness:.5 }));
+    tete.position.z = 1.05; g.add(tete);
+    g.userData.pivotD = pivotD; g.userData.pivotG = pivotG;
+    return g;
   }
-  update(dt, t, fleurs, repel){
-    const o = this.obj;
-    // décision de se poser
-    if (this.pose <= 0){
-      this.prochainePose -= dt;
-      if (this.prochainePose <= 0 && fleurs.length){
-        this.cible = fleurs[(Math.random()*fleurs.length)|0].position.clone();
-        this.cible.z += 0.4;
-      }
+
+  // ---- fleurs (points d'atterrissage) ----
+  function fleurSprite(){
+    var c=document.createElement('canvas'); c.width=c.height=96; var x=c.getContext('2d');
+    x.translate(48,48);
+    for(var i=0;i<5;i++){ x.rotate(Math.PI*2/5); var g=x.createRadialGradient(0,-22,2,0,-22,18);
+      g.addColorStop(0,'#F3D9F0'); g.addColorStop(1,'rgba(200,150,220,.12)');
+      x.fillStyle=g; x.beginPath(); x.ellipse(0,-22,10,18,0,0,6.28); x.fill(); }
+    x.fillStyle='#F2C14E'; x.beginPath(); x.arc(0,0,8,0,6.28); x.fill();
+    var s=new THREE.Sprite(new THREE.SpriteMaterial({ map:new THREE.CanvasTexture(c), transparent:true, depthWrite:false }));
+    s.scale.set(2.2,2.2,1); return s;
+  }
+  var fleurs=[];
+  [[-8,-6,-1],[7,-6.5,-2],[0,-7,-3]].forEach(function(p){ var f=fleurSprite(); f.position.set(p[0],p[1],p[2]); scene.add(f); fleurs.push(f); });
+
+  // ---- papillons ----
+  var AIRE = { x: 13, y: 8, z: 6 };
+  var N = reduce ? 3 : (mobile ? 5 : 10);
+  var papillons = [];
+  for (var i=0;i<N;i++){
+    var o = fairePapillon();
+    o.scale.setScalar(rnd(0.6, 1.1));
+    var b = {
+      obj:o,
+      pos:new THREE.Vector3(rnd(-AIRE.x,AIRE.x), rnd(-AIRE.y,AIRE.y), rnd(-AIRE.z,AIRE.z)),
+      vel:new THREE.Vector3(rnd(-1,1),rnd(-1,1),rnd(-1,1)).normalize().multiplyScalar(rnd(1.2,2.2)),
+      phase:rnd(0,6.28), flapSpeed:rnd(9,14), wander:rnd(0,6.28),
+      pose:0, prochainePose:rnd(5,15), cible:null
+    };
+    o.position.copy(b.pos);
+    scene.add(o); papillons.push(b);
+  }
+
+  // ---- curseur ----
+  var repel = null;
+  function setPointer(cx, cy){
+    var r = canvas.getBoundingClientRect();
+    repel = { x:((cx-r.left)/r.width)*2-1, y:-((cy-r.top)/r.height)*2+1, t:performance.now() };
+  }
+  addEventListener('mousemove', function(e){ setPointer(e.clientX,e.clientY); }, {passive:true});
+  addEventListener('touchmove', function(e){ if(e.touches[0]) setPointer(e.touches[0].clientX,e.touches[0].clientY); }, {passive:true});
+
+  function resize(){ var w=innerWidth,h=innerHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+  addEventListener('resize', resize); resize();
+
+  var tmp = new THREE.Vector3();
+  function maj(b, dt, t){
+    var o = b.obj;
+    if (b.pose <= 0){
+      b.prochainePose -= dt;
+      if (b.prochainePose <= 0 && fleurs.length){ b.cible = fleurs[(Math.random()*fleurs.length)|0].position.clone(); b.cible.z += 0.4; b.prochainePose = 1e9; }
     } else {
-      this.pose -= dt;
-      if (this.pose <= 0){ this.prochainePose = rnd(8, 18); this.cible = null; this.vel.set(rnd(-1,1),rnd(1,1.5),rnd(-1,1)).normalize().multiplyScalar(rnd(1.2,2.2)); }
+      b.pose -= dt;
+      if (b.pose <= 0){ b.prochainePose = rnd(7,16); b.cible=null; b.vel.set(rnd(-1,1),rnd(1,1.4),rnd(-1,1)).normalize().multiplyScalar(rnd(1.2,2)); }
     }
 
-    if (this.cible && this.pose <= 0){
-      // vole vers la fleur
-      const d = this.cible.clone().sub(this.pos);
-      const dist = d.length();
-      if (dist < 0.6){ this.pose = rnd(2.5, 5); this.vel.multiplyScalar(0.05); }
-      else { d.normalize().multiplyScalar(2.6); this.vel.lerp(d, 0.05); }
-    } else if (this.pose > 0){
-      // posée : quasi immobile, petit balancement
-      this.vel.multiplyScalar(0.85);
-      this.pos.y += Math.sin(t*2 + this.phase) * 0.002;
+    if (b.cible && b.pose <= 0){
+      tmp.copy(b.cible).sub(b.pos); var dist = tmp.length();
+      if (dist < 0.7){ b.pose = rnd(2.5,5); b.vel.multiplyScalar(0.05); }
+      else { tmp.normalize().multiplyScalar(2.4); b.vel.lerp(tmp, 0.05); }
+    } else if (b.pose > 0){
+      b.vel.multiplyScalar(0.85);
+      b.pos.y += Math.sin(t*2 + b.phase) * 0.002;
     } else {
-      // errance douce, non répétitive
-      this.wander += dt * rnd(0.6, 1.1);
-      const steer = new THREE.Vector3(Math.sin(this.wander*0.7+this.phase), Math.cos(this.wander*0.5), Math.sin(this.wander*0.9+1.3)).multiplyScalar(0.9);
-      this.vel.add(steer.multiplyScalar(dt));
-      // rappel vers le centre si trop loin
-      if (Math.abs(this.pos.x) > AIRE.x) this.vel.x -= Math.sign(this.pos.x)*dt*2.2;
-      if (Math.abs(this.pos.y) > AIRE.y) this.vel.y -= Math.sign(this.pos.y)*dt*2.2;
-      if (Math.abs(this.pos.z) > AIRE.z) this.vel.z -= Math.sign(this.pos.z)*dt*2.2;
-      // limite de vitesse
-      const sp = this.vel.length(), max = 2.6;
-      if (sp > max) this.vel.multiplyScalar(max/sp);
+      b.wander += dt * rnd(0.6,1.1);
+      b.vel.x += Math.sin(b.wander*0.7+b.phase) * 0.9 * dt;
+      b.vel.y += Math.cos(b.wander*0.5) * 0.7 * dt;
+      b.vel.z += Math.sin(b.wander*0.9+1.3) * 0.6 * dt;
+      if (Math.abs(b.pos.x) > AIRE.x) b.vel.x -= Math.sign(b.pos.x)*dt*2.2;
+      if (Math.abs(b.pos.y) > AIRE.y) b.vel.y -= Math.sign(b.pos.y)*dt*2.2;
+      if (Math.abs(b.pos.z) > AIRE.z) b.vel.z -= Math.sign(b.pos.z)*dt*2.2;
+      var sp = b.vel.length(); if (sp > 2.6) b.vel.multiplyScalar(2.6/sp);
     }
 
-    // répulsion curseur (en espace écran)
     if (repel){
-      const p = this.pos.clone().project(camera);
-      const dx = p.x - repel.x, dy = p.y - repel.y;
-      const dd = Math.hypot(dx, dy);
-      if (dd < 0.28){
-        const f = (0.28 - dd) * 9;
-        this.vel.x += (dx/(dd||1)) * f * dt * 8;
-        this.vel.y += (dy/(dd||1)) * f * dt * 8;
-        if (this.pose > 0){ this.pose = 0; this.prochainePose = rnd(6,12); this.cible=null; } // s'envole si on la dérange
+      tmp.copy(b.pos).project(camera);
+      var dx = tmp.x - repel.x, dy = tmp.y - repel.y, dd = Math.hypot(dx,dy);
+      if (dd < 0.3){
+        var f = (0.3 - dd) * 10;
+        b.vel.x += (dx/(dd||1)) * f * dt * 9;
+        b.vel.y += (dy/(dd||1)) * f * dt * 9;
+        if (b.pose > 0){ b.pose = 0; b.prochainePose = rnd(5,10); b.cible = null; }
       }
     }
 
-    this.pos.addScaledVector(this.vel, dt);
-    o.position.copy(this.pos);
+    b.pos.addScaledVector(b.vel, dt);
+    o.position.copy(b.pos);
+    if (b.vel.lengthSq() > 0.001){ tmp.copy(b.pos).add(b.vel); o.lookAt(tmp); }
 
-    // orientation vers la direction du vol
-    if (this.vel.lengthSq() > 0.001){
-      const look = this.pos.clone().add(this.vel);
-      o.lookAt(look);
-    }
-
-    // battement d'ailes
-    if (this.mixer){ this.mixer.update(dt); }
-    else if (o.userData.flap){
-      const posé = this.pose > 0;
-      const amp = posé ? 0.5 : 1.15;
-      const spd = posé ? 3 : this.flapSpeed;
-      const a = 0.15 + (Math.sin(t*spd + this.phase)*0.5+0.5) * amp;
-      o.userData.flap.pivotD.rotation.y = -a;
-      o.userData.flap.pivotG.rotation.y =  a;
-    }
+    var pose = b.pose > 0;
+    var amp = pose ? 0.5 : 1.15, spd = pose ? 3 : b.flapSpeed;
+    var a = 0.15 + (Math.sin(t*spd + b.phase)*0.5+0.5) * amp;
+    o.userData.pivotD.rotation.y = -a;
+    o.userData.pivotG.rotation.y =  a;
   }
-}
 
-// ---------- fleurs (points d'atterrissage) ----------
-function fleurSprite(){
-  const c=document.createElement('canvas'); c.width=c.height=96; const x=c.getContext('2d');
-  x.translate(48,48);
-  for(let i=0;i<5;i++){ x.rotate(Math.PI*2/5); const g=x.createRadialGradient(0,-22,2,0,-22,18);
-    g.addColorStop(0,'#F3D9F0'); g.addColorStop(1,'rgba(200,150,220,.15)');
-    x.fillStyle=g; x.beginPath(); x.ellipse(0,-22,10,18,0,0,6.28); x.fill(); }
-  x.fillStyle='#F2C14E'; x.beginPath(); x.arc(0,0,8,0,6.28); x.fill();
-  const t=new THREE.CanvasTexture(c);
-  const s=new THREE.Sprite(new THREE.SpriteMaterial({ map:t, transparent:true, depthWrite:false }));
-  s.scale.set(2.2,2.2,1); return s;
-}
-const fleurs=[];
-[[-8,-6,-1],[7,-6.5,-2],[0,-7,-3]].forEach(p=>{ const f=fleurSprite(); f.position.set(p[0],p[1],p[2]); scene.add(f); fleurs.push(f); });
-
-// ---------- création des papillons ----------
-const N = reduce ? 3 : (mobile ? 5 : 10);
-let papillons = [];
-function peupler(base){
-  for (let i=0;i<N;i++){
-    const b = base ? base.clone(true) : papillonProcedural();
-    if (base){ b.userData.gltf = true; b.userData.clip = base.userData.clip; }
-    b.scale.setScalar(base ? base.userData.baseScale : rnd(0.7, 1.15));
-    papillons.push(new Papillon(b));
+  var last = performance.now();
+  function loop(now){
+    requestAnimationFrame(loop);
+    if (document.hidden){ last = now; return; }
+    var dt = (now-last)/1000; last = now; if (dt>0.05) dt=0.05;
+    var t = now/1000;
+    if (repel && now-repel.t > 250) repel = null;
+    for (var i=0;i<papillons.length;i++) maj(papillons[i], dt, t);
+    renderer.render(scene, camera);
   }
-}
-
-// tenter le modèle GLTF (/papillon.glb) ; sinon procédural
-const draco = new DRACOLoader(); draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/');
-const loader = new GLTFLoader(); loader.setDRACOLoader(draco);
-document.getElementById('note').textContent = 'papillon de repli (dépose /papillon.glb pour le modèle réaliste)';
-loader.load('/papillon.glb',
-  (gltf)=>{
-    const model = gltf.scene;
-    // normaliser la taille
-    const box = new THREE.Box3().setFromObject(model); const size = new THREE.Vector3(); box.getSize(size);
-    const maxd = Math.max(size.x,size.y,size.z)||1; model.userData.baseScale = 2.2 / maxd;
-    model.userData.clip = (gltf.animations && gltf.animations[0]) || null;
-    document.getElementById('note').textContent = 'modèle réaliste chargé 🦋';
-    peupler(model);
-  },
-  undefined,
-  ()=>{ peupler(null); } // pas de modèle : repli procédural
-);
-
-// ---------- curseur ----------
-let repel = null;
-function setPointer(cx, cy){
-  const r = canvas.getBoundingClientRect();
-  repel = { x:((cx-r.left)/r.width)*2-1, y:-((cy-r.top)/r.height)*2+1, t:performance.now() };
-}
-addEventListener('mousemove', e=>setPointer(e.clientX,e.clientY), {passive:true});
-addEventListener('touchmove', e=>{ if(e.touches[0]) setPointer(e.touches[0].clientX,e.touches[0].clientY); }, {passive:true});
-
-// ---------- boucle ----------
-function resize(){ const w=innerWidth,h=innerHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
-addEventListener('resize', resize); resize();
-
-let last=performance.now();
-function loop(now){
   requestAnimationFrame(loop);
-  if (document.hidden) { last=now; return; }
-  let dt=(now-last)/1000; last=now; if(dt>0.05) dt=0.05;
-  const t=now/1000;
-  if (repel && now-repel.t>250) repel=null;
-  for (const p of papillons) p.update(dt, t, fleurs, repel);
-  renderer.render(scene, camera);
-}
-requestAnimationFrame(loop);
+})();
 </script>
 </body>
 </html>

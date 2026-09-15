@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0b0a16" />
+<title>Nos photos & nos voix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; color:#EDE9F3; font-family:'Nunito Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(120% 90% at 50% -10%, #241d40 0%, transparent 55%),
+      radial-gradient(90% 80% at 50% 115%, #17152f 0%, transparent 60%),
+      #0b0a16; overflow-x:hidden; }
+  a.retour{ position:fixed; top:calc(12px + env(safe-area-inset-top)); left:14px; z-index:5; font-size:.9rem; color:rgba(237,233,243,.72); text-decoration:none;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:100px; padding:7px 14px; }
+  .wrap{ max-width:640px; margin:0 auto; padding:max(62px,env(safe-area-inset-top)) 18px calc(50px + env(safe-area-inset-bottom)); }
+  .tete{ text-align:center; margin-bottom:16px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:#C7B2E6; font-size:1.05rem; margin:0 0 .3rem; }
+  h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(1.9rem,6.5vw,2.5rem); margin:0; color:#FBF4EA; }
+
+  .qui{ display:flex; gap:8px; justify-content:center; margin:8px 0 20px; }
+  .qui button{ font-family:inherit; font-weight:700; font-size:.85rem; border-radius:100px; padding:8px 14px; cursor:pointer; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#EDE9F3; }
+  .qui button.on{ color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border-color:transparent; }
+
+  .bloc{ background:rgba(255,255,255,.045); border:1px solid rgba(180,155,218,.2); border-radius:20px; padding:18px 16px; margin-bottom:20px; }
+  .bloc h2{ font-family:'Fraunces',serif; font-weight:500; font-size:1.25rem; color:#FBF4EA; margin:0 0 4px; }
+  .bloc .note{ color:#A99CC4; font-size:.85rem; margin:0 0 14px; line-height:1.5; }
+
+  .btn{ font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:.95rem; border-radius:100px; padding:12px 20px; cursor:pointer; border:1px solid transparent;
+    color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); box-shadow:0 12px 28px -14px rgba(168,134,218,.8); }
+  .btn.g{ color:#EDE9F3; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.18); box-shadow:none; }
+  .btn:disabled{ opacity:.5; cursor:default; }
+  .champ{ width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.16); border-radius:12px; color:#EDE9F3; padding:11px 13px; font-family:inherit; font-size:.95rem; margin-top:10px; }
+  .info{ font-size:.84rem; margin-top:10px; min-height:1em; color:#8ee6a0; }
+
+  /* photos */
+  .grille{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-top:14px; }
+  .ph{ position:relative; border-radius:14px; overflow:hidden; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); }
+  .ph img{ width:100%; height:150px; object-fit:cover; display:block; }
+  .ph .cap{ padding:7px 9px; font-size:.78rem; color:#C9C1D8; }
+  .ph .cap b{ color:#B49BDA; font-weight:700; }
+
+  /* audio */
+  .slots{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+  .slots button{ font-family:inherit; font-weight:700; font-size:.85rem; border-radius:100px; padding:9px 14px; cursor:pointer; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#EDE9F3; }
+  .slots button.on{ color:#1a1430; background:linear-gradient(135deg,#CBB4EC,#A886DA); border-color:transparent; }
+  .rec{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .pastille{ width:12px; height:12px; border-radius:50%; background:#e06a6a; opacity:0; }
+  .pastille.on{ opacity:1; animation:pulse 1s infinite; }
+  @keyframes pulse{ 50%{ opacity:.3; } }
+  .liste-audio{ display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+  .au{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:10px 12px; }
+  .au .t{ font-size:.82rem; color:#B49BDA; font-weight:700; margin-bottom:6px; }
+  .au audio{ width:100%; }
+  .vide{ color:#8E82A6; font-style:italic; font-size:.88rem; }
+</style>
+</head>
+<body>
+  <a class="retour" href="/">⌂ Accueil</a>
+  <div class="wrap">
+    <div class="tete">
+      <p class="eyebrow">nos souvenirs, nos voix</p>
+      <h1>Nos photos & nos voix</h1>
+    </div>
+
+    <div class="qui">
+      <span style="align-self:center;color:#A99CC4;font-size:.85rem;">Tu es :</span>
+      <button data-r="lui" id="q-lui">Mathieu</button>
+      <button data-r="elle" id="q-elle">dadoucherie</button>
+    </div>
+
+    <div class="bloc">
+      <h2>Ajouter une photo 📷</h2>
+      <p class="note">Depuis ton téléphone (galerie ou appareil photo). Une petite légende si tu veux.</p>
+      <input type="file" id="photoInput" accept="image/*" class="champ" />
+      <input type="text" id="photoCap" class="champ" placeholder="légende (facultatif)" />
+      <div style="margin-top:12px;"><button class="btn" id="photoUp">Ajouter la photo</button></div>
+      <p class="info" id="photoInfo"></p>
+      <div class="grille" id="grillePhotos"></div>
+    </div>
+
+    <div class="bloc">
+      <h2>Laisser un mot vocal 🎙️</h2>
+      <p class="note">Choisis le moment, puis enregistre ta voix. L'autre pourra l'écouter, même de loin.</p>
+      <div class="slots" id="slots">
+        <button data-s="bonjour" class="on">Le bonjour ☀️</button>
+        <button data-s="nuit">Bonne nuit 🌙</button>
+        <button data-s="coucou">Petit coucou 🤍</button>
+        <button data-s="libre">Libre</button>
+      </div>
+      <div class="rec">
+        <button class="btn" id="recBtn">● Enregistrer</button>
+        <span class="pastille" id="pastille"></span>
+        <span class="info" id="audioInfo" style="margin-top:0;"></span>
+      </div>
+      <div class="liste-audio" id="listeAudio"></div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var SB = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+  function h(extra){ var o={ "apikey":ANON, "Authorization":"Bearer "+ANON }; for(var k in (extra||{})) o[k]=extra[k]; return o; }
+  function $(id){ return document.getElementById(id); }
+  function role(){ try{ var r=localStorage.getItem("moi_role"); return (r==="elle"||r==="lui")?r:null; }catch(e){ return null; } }
+  function esc(s){ return (s||"").replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+  var NOMS={ lui:"Mathieu", elle:"dadoucherie" };
+
+  // identité
+  function majQui(){ var r=role(); $("q-lui").classList.toggle("on", r==="lui"); $("q-elle").classList.toggle("on", r==="elle"); }
+  $("q-lui").addEventListener("click", function(){ try{localStorage.setItem("moi_role","lui");}catch(e){} majQui(); });
+  $("q-elle").addEventListener("click", function(){ try{localStorage.setItem("moi_role","elle");}catch(e){} majQui(); });
+  majQui();
+
+  // ---- upload générique vers Storage ----
+  function upload(blob, ext, mime){
+    var nom = (role()||"nous") + "-" + Date.now() + "-" + Math.floor(Math.random()*1e6) + "." + ext;
+    return fetch(SB + "/storage/v1/object/media/" + nom, {
+      method:"POST", headers:h({ "Content-Type": mime, "x-upsert":"true" }), body: blob
+    }).then(function(r){ if(!r.ok) throw new Error("upload"); return SB + "/storage/v1/object/public/media/" + nom; });
+  }
+  function enregistrerMedia(type, slot, url, legende){
+    return fetch(SB + "/rest/v1/medias", { method:"POST", headers:h({ "Content-Type":"application/json", "Prefer":"return=minimal" }),
+      body: JSON.stringify({ type:type, slot:slot, url:url, de_role:role(), legende:legende||null }) });
+  }
+
+  // ---- PHOTOS ----
+  function redimensionner(file, maxi){
+    return new Promise(function(res){
+      var img=new Image(), url=URL.createObjectURL(file);
+      img.onload=function(){
+        var w=img.width,hh=img.height, sc=Math.min(1, maxi/Math.max(w,hh));
+        var c=document.createElement("canvas"); c.width=Math.round(w*sc); c.height=Math.round(hh*sc);
+        c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(function(b){ res(b||file); }, "image/jpeg", 0.85);
+      };
+      img.onerror=function(){ URL.revokeObjectURL(url); res(file); };
+      img.src=url;
+    });
+  }
+  $("photoUp").addEventListener("click", function(){
+    var f = $("photoInput").files && $("photoInput").files[0];
+    if(!f){ $("photoInfo").style.color="#e6a6a6"; $("photoInfo").textContent="Choisis une photo d'abord."; return; }
+    if(!role()){ $("photoInfo").style.color="#e6a6a6"; $("photoInfo").textContent="Dis d'abord qui tu es (en haut)."; return; }
+    $("photoUp").disabled=true; $("photoInfo").style.color="#8ee6a0"; $("photoInfo").textContent="envoi…";
+    redimensionner(f, 1600).then(function(blob){
+      return upload(blob, "jpg", "image/jpeg");
+    }).then(function(url){
+      return enregistrerMedia("photo","galerie",url,$("photoCap").value.trim());
+    }).then(function(){
+      $("photoInfo").textContent="Ajoutée 🤍"; $("photoInput").value=""; $("photoCap").value=""; $("photoUp").disabled=false; chargerPhotos();
+    }).catch(function(){ $("photoInfo").style.color="#e6a6a6"; $("photoInfo").textContent="Oups, réessaie."; $("photoUp").disabled=false; });
+  });
+  function chargerPhotos(){
+    fetch(SB+"/rest/v1/medias?type=eq.photo&order=created_at.desc&select=url,legende,de_role", { headers:h() })
+      .then(function(r){ return r.ok?r.json():[]; }).then(function(rows){
+        var g=$("grillePhotos"); g.innerHTML="";
+        if(!rows.length){ g.innerHTML='<p class="vide">Aucune photo encore. Ajoute la première 🤍</p>'; return; }
+        rows.forEach(function(m){
+          var d=document.createElement("div"); d.className="ph";
+          var cap = (m.legende?esc(m.legende):"") + (m.de_role?' <b>'+NOMS[m.de_role]+'</b>':"");
+          d.innerHTML='<img loading="lazy" src="'+m.url+'" alt="notre photo" />'+(cap?'<div class="cap">'+cap+'</div>':"");
+          g.appendChild(d);
+        });
+      }).catch(function(){});
+  }
+  chargerPhotos();
+
+  // ---- AUDIO ----
+  var slotAudio="bonjour";
+  Array.prototype.forEach.call(document.querySelectorAll("#slots button"), function(b){
+    b.addEventListener("click", function(){
+      slotAudio=b.getAttribute("data-s");
+      Array.prototype.forEach.call(document.querySelectorAll("#slots button"), function(x){ x.classList.remove("on"); });
+      b.classList.add("on");
+    });
+  });
+
+  var media=null, chunks=[], recording=false, stream=null;
+  function typeAudio(){
+    if (window.MediaRecorder){
+      if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported("audio/webm")) return { mime:"audio/webm", ext:"webm" };
+      if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported("audio/mp4")) return { mime:"audio/mp4", ext:"m4a" };
+    }
+    return { mime:"audio/mp4", ext:"m4a" };
+  }
+  $("recBtn").addEventListener("click", function(){
+    if(!("MediaRecorder" in window)){ $("audioInfo").style.color="#e6a6a6"; $("audioInfo").textContent="Enregistrement non dispo sur ce navigateur."; return; }
+    if(!role()){ $("audioInfo").style.color="#e6a6a6"; $("audioInfo").textContent="Dis d'abord qui tu es (en haut)."; return; }
+    if(!recording){
+      navigator.mediaDevices.getUserMedia({ audio:true }).then(function(s){
+        stream=s; var ta=typeAudio(); chunks=[];
+        try{ media=new MediaRecorder(s, { mimeType:ta.mime }); }catch(e){ media=new MediaRecorder(s); }
+        media.ondataavailable=function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+        media.onstop=function(){
+          var blob=new Blob(chunks, { type: (media.mimeType||ta.mime) });
+          var ext = (media.mimeType||ta.mime).indexOf("webm")>-1 ? "webm" : "m4a";
+          $("audioInfo").style.color="#8ee6a0"; $("audioInfo").textContent="envoi…";
+          upload(blob, ext, blob.type).then(function(url){ return enregistrerMedia("audio", slotAudio, url, null); })
+            .then(function(){ $("audioInfo").textContent="Envoyé 🤍"; chargerAudios(); })
+            .catch(function(){ $("audioInfo").style.color="#e6a6a6"; $("audioInfo").textContent="Oups, réessaie."; });
+          if(stream){ stream.getTracks().forEach(function(t){ t.stop(); }); }
+        };
+        media.start(); recording=true; $("recBtn").textContent="■ Arrêter"; $("pastille").classList.add("on");
+        $("audioInfo").style.color="#C9C1D8"; $("audioInfo").textContent="j'écoute…";
+      }).catch(function(){ $("audioInfo").style.color="#e6a6a6"; $("audioInfo").textContent="Micro refusé. Autorise le micro pour enregistrer."; });
+    } else {
+      recording=false; $("recBtn").textContent="● Enregistrer"; $("pastille").classList.remove("on");
+      try{ media.stop(); }catch(e){}
+    }
+  });
+
+  var LABELS={ bonjour:"Le bonjour ☀️", nuit:"Bonne nuit 🌙", coucou:"Petit coucou 🤍", libre:"Libre" };
+  function chargerAudios(){
+    fetch(SB+"/rest/v1/medias?type=eq.audio&order=created_at.desc&select=url,slot,de_role", { headers:h() })
+      .then(function(r){ return r.ok?r.json():[]; }).then(function(rows){
+        var l=$("listeAudio"); l.innerHTML="";
+        if(!rows.length){ l.innerHTML='<p class="vide">Aucun mot vocal encore.</p>'; return; }
+        rows.forEach(function(m){
+          var d=document.createElement("div"); d.className="au";
+          d.innerHTML='<div class="t">'+(LABELS[m.slot]||"Mot")+(m.de_role?' · '+NOMS[m.de_role]:"")+'</div><audio controls preload="none" src="'+m.url+'"></audio>';
+          l.appendChild(d);
+        });
+      }).catch(function(){});
+  }
+  chargerAudios();
+})();
+</script>
+<script src="/presence.js" defer></script>
+</body>
+</html>
