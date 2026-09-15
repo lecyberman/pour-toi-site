@@ -1180,6 +1180,8 @@
   })();
   </script>
   <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}</script>
+  <script src="/intro.js?v=1" defer></script>
+  <script src="/etincelles.js?v=1" defer></script>
   <button id="bascule-theme" type="button" aria-label="Changer le theme clair ou sombre">☀</button>
   <script>(function(){var K="theme_pref_v1",root=document.documentElement;function cur(){return root.getAttribute("data-theme")||"sombre";}function apply(t){root.setAttribute("data-theme",t);var b=document.getElementById("bascule-theme");if(b){b.textContent=t==="sombre"?"☀":"☾";}}var p="sombre";try{p=localStorage.getItem(K)||"sombre";}catch(e){}apply(p);document.addEventListener("DOMContentLoaded",function(){var b=document.getElementById("bascule-theme");if(!b)return;b.textContent=cur()==="sombre"?"☀":"☾";b.addEventListener("click",function(){var t=cur()==="sombre"?"clair":"sombre";try{localStorage.setItem(K,t);}catch(e){}apply(t);});});})();</script>
 </body>
