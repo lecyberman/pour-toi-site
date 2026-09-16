@@ -20,7 +20,7 @@ export default function Home() {
         <div style={{ width: "100%", maxWidth: 820, marginTop: 30 }}>
           <Portes />
         </div>
-        <a href="/index.html" style={{ marginTop: 34, fontSize: ".82rem", color: "rgba(199,178,230,.7)", textDecoration: "underline" }}>
+        <a href="https://pour-toi-site.vercel.app/" style={{ marginTop: 34, fontSize: ".82rem", color: "rgba(199,178,230,.7)", textDecoration: "underline" }}>
           tout revoir en détail
         </a>
       </section>
