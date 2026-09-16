@@ -1,0 +1,33 @@
+/* hub.css — style partagé des hubs de parcours (V2). Sombre, premium, calme. */
+:root{
+  --nuit:#0b0a16; --nuit2:#141227; --violet:#A886DA; --violet-clair:#CBB4EC;
+  --lavande:#C7B2E6; --or:#E7C879; --texte:#EDE9F3; --texte-doux:#B7ACCB;
+  --carte:rgba(255,255,255,.05); --bord:rgba(180,155,218,.22);
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; min-height:100%; color:var(--texte); font-family:'Nunito Sans',system-ui,sans-serif;
+  background:
+    radial-gradient(130% 90% at 50% -12%, #241d40 0%, transparent 55%),
+    radial-gradient(90% 80% at 50% 118%, #12203c 0%, transparent 60%),
+    var(--nuit); overflow-x:hidden; }
+a.retour{ position:fixed; top:calc(12px + env(safe-area-inset-top)); left:14px; z-index:5; font-size:.9rem;
+  color:rgba(237,233,243,.72); text-decoration:none; background:rgba(24,22,46,.55);
+  border:1px solid rgba(255,255,255,.14); border-radius:100px; padding:7px 14px; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+a.retour:hover{ color:#fff; }
+.wrap{ max-width:760px; margin:0 auto; padding:max(70px,env(safe-area-inset-top)) 20px calc(60px + env(safe-area-inset-bottom)); }
+.tete{ text-align:center; margin-bottom:26px; }
+.tete .eyebrow{ font-family:'Fraunces',serif; font-style:italic; color:var(--lavande); font-size:1.05rem; margin:0 0 .3rem; }
+.tete h1{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(2rem,6.5vw,2.7rem); margin:0; color:#FBF4EA; }
+.tete p{ color:var(--texte-doux); font-size:1rem; margin:.6rem auto 0; max-width:42ch; line-height:1.6; }
+
+.grille{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:14px; margin-top:22px; }
+a.xp{ display:block; text-decoration:none; text-align:left; background:var(--carte); border:1px solid var(--bord);
+  border-radius:18px; padding:18px 16px; transition:transform .5s cubic-bezier(.2,.7,.2,1), border-color .4s, box-shadow .4s;
+  box-shadow:0 18px 44px -30px rgba(0,0,0,.8); opacity:0; transform:translateY(14px); }
+a.xp.vu{ opacity:1; transform:none; }
+a.xp:hover{ transform:translateY(-4px); border-color:rgba(180,155,218,.5); box-shadow:0 26px 54px -30px rgba(168,134,218,.55); }
+a.xp .ic{ font-size:1.7rem; display:block; margin-bottom:8px; }
+a.xp .t{ display:block; font-weight:700; color:#FBF4EA; font-size:1.05rem; }
+a.xp .d{ display:block; color:var(--texte-doux); font-size:.9rem; margin-top:4px; line-height:1.5; }
+
+@media (prefers-reduced-motion:reduce){ a.xp{ transition:none; opacity:1; transform:none; } }
