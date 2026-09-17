@@ -12,7 +12,7 @@
 
   var cv = document.createElement("canvas");
   cv.setAttribute("aria-hidden","true");
-  cv.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:99990;";
+  cv.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:2147483000;";
   function mount(){ (document.body||document.documentElement).appendChild(cv); if (fine){ try{ document.documentElement.style.cursor="none"; }catch(e){} } }
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
 

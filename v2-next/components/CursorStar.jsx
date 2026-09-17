@@ -11,7 +11,7 @@ export default function CursorStar() {
 
     const cv = document.createElement("canvas");
     cv.setAttribute("aria-hidden", "true");
-    cv.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:99990;";
+    cv.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:2147483000;";
     document.body.appendChild(cv);
     if (fine) document.documentElement.style.cursor = "none";
     const x = cv.getContext("2d");
