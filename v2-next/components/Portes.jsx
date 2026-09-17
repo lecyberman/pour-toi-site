@@ -22,7 +22,7 @@ function Porte({ j }) {
       }}
     >
       <span style={{ position: "absolute", left: "50%", top: -32, transform: "translateX(-50%)", width: 64, height: 64, borderRadius: "50%", background: "radial-gradient(circle," + j.color + "66,transparent 70%)", filter: "blur(4px)" }} />
-      <span style={{ display: "block", fontFamily: "system-ui,sans-serif", fontWeight: 700, color: "#FBF4EA", fontSize: "1.05rem", lineHeight: 1.3 }}>{j.title}</span>
+      <span style={{ display: "block", fontFamily: "system-ui,sans-serif", fontWeight: 700, color: "var(--titre)", fontSize: "1.05rem", lineHeight: 1.3 }}>{j.title}</span>
       <span style={{ display: "block", fontFamily: "'Fraunces',Georgia,serif", fontStyle: "italic", color: j.color, fontSize: ".88rem", marginTop: 6 }}>{j.sub}</span>
     </Link>
   );

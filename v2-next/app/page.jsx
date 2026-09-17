@@ -12,9 +12,9 @@ export default function Home() {
       <Intro />
       <Butterflies count={6} />
       <section style={{ position: "relative", zIndex: 2, minHeight: "100dvh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", padding: "72px 20px" }}>
-        <p className="eyebrow" style={{ fontSize: "1.05rem", margin: "0 0 .3rem", color: "#C7B2E6" }}>notre monde, rien qu&apos;à nous</p>
-        <h1 style={{ fontSize: "clamp(2rem,6vw,2.9rem)", color: "#FBF4EA", margin: "0 0 6px" }}>Par où tu veux entrer&nbsp;?</h1>
-        <p style={{ color: "#B7ACCB", maxWidth: "34ch", lineHeight: 1.6, margin: "0 auto 30px" }}>
+        <p className="eyebrow" style={{ fontSize: "1.05rem", margin: "0 0 .3rem" }}>notre monde, rien qu&apos;à nous</p>
+        <h1 style={{ fontSize: "clamp(2rem,6vw,2.9rem)", color: "var(--titre)", margin: "0 0 6px" }}>Par où tu veux entrer&nbsp;?</h1>
+        <p style={{ color: "var(--texte-doux)", maxWidth: "34ch", lineHeight: 1.6, margin: "0 auto 30px" }}>
           Prends ton temps. Il n&apos;y a rien à faire vite ici.
         </p>
         <div style={{ width: "100%", maxWidth: 820, marginTop: 30 }}>
