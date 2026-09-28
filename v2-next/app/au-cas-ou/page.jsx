@@ -43,7 +43,7 @@ export default function AuCasOu() {
 
   const toggleVoix = () => {
     if (voix && audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; setVoix(false); audioRef.current = null; return; }
-    const a = new Audio(STATIC + "/au-cas-ou.mp3"); audioRef.current = a; setVoix(true);
+    const a = new Audio("/au-cas-ou.mp3"); audioRef.current = a; setVoix(true);
     a.play().catch(() => setVoix(false)); a.addEventListener("ended", () => setVoix(false));
   };
   const ouvrir = (cle) => {

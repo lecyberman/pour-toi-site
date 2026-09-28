@@ -1,6 +1,7 @@
 import "./globals.css";
 import CursorStar from "@/components/CursorStar";
 import ThemeToggle from "@/components/ThemeToggle";
+import PushSync from "@/components/PushSync";
 
 // Applique le thème avant le premier rendu (évite le flash).
 const themeInit = `(function(){try{var t=localStorage.getItem('theme_pref_v1')||'sombre';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
@@ -8,6 +9,7 @@ const themeInit = `(function(){try{var t=localStorage.getItem('theme_pref_v1')||
 export const metadata = {
   title: "Pour toi, un espace à nous",
   description: "Notre monde, rien qu'à nous.",
+  manifest: "/manifest.json",
   robots: { index: false, follow: false }
 };
 
@@ -34,6 +36,7 @@ export default function RootLayout({ children }) {
         {children}
         <ThemeToggle />
         <CursorStar />
+        <PushSync />
       </body>
     </html>
   );

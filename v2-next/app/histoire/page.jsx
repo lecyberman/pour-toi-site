@@ -44,7 +44,7 @@ function Voix({ src }) {
   const audioRef = useRef(null);
   const toggle = () => {
     if (joue && audioRef.current) { audioRef.current.pause(); setJoue(false); return; }
-    const a = new Audio(STATIC + src); audioRef.current = a; setJoue(true);
+    const a = new Audio(src); audioRef.current = a; setJoue(true);
     a.play().catch(() => setJoue(false)); a.addEventListener("ended", () => setJoue(false));
   };
   return <button onClick={toggle} style={{ display: "inline-flex", alignItems: "center", gap: 7, background: joue ? "#E4B266" : "var(--accent)", color: joue ? "#4A3714" : "#1a1430", border: "none", borderRadius: 100, padding: "9px 16px", fontFamily: "var(--sans)", fontWeight: 700, fontSize: ".88rem", cursor: "pointer", marginTop: 10 }}>🔊 {src.includes("nuit") ? "écoute-moi te raconter notre nuit" : "écoute-moi te raconter ce jour"}</button>;

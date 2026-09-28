@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { activerPush } from "@/lib/push";
 
 const CHEMINS = {
   dormir: {
@@ -71,7 +72,16 @@ export default function Cocon() {
   const [mot, setMot] = useState("");
   const [respTxt, setRespTxt] = useState("on respire ensemble ?");
   const [bulleEtat, setBulleEtat] = useState("");
+  const [notifEtat, setNotifEtat] = useState("");
   const respTimer = useRef(null);
+
+  const activerNotifs = async () => {
+    if (!("Notification" in window)) { setNotifEtat("Les notifications ne sont pas dispo sur ce navigateur."); return; }
+    if (Notification.permission === "denied") { setNotifEtat("Les notifications sont bloquées sur ce téléphone. Tu peux les réautoriser dans les réglages."); return; }
+    setNotifEtat("…");
+    const ok = await activerPush();
+    setNotifEtat(ok ? "C'est bon 🤍 On se retrouve tout à l'heure." : "Pas grave, on pourra réessayer plus tard.");
+  };
 
   const c = courant ? CHEMINS[courant] : null;
 
@@ -128,7 +138,13 @@ export default function Cocon() {
               );
             })}
           </div>
-          <div style={{ textAlign: "center", marginTop: 34 }}>
+          <div style={{ marginTop: 44, textAlign: "center", background: "var(--carte)", border: "1px solid var(--bord)", borderRadius: 20, padding: "22px 20px" }}>
+            <h3 style={{ fontFamily: "var(--serif)", fontWeight: 500, fontSize: "1.2rem", color: "var(--titre)", margin: "0 0 8px" }}>Mes petits mots</h3>
+            <p style={{ color: "var(--texte-doux)", fontSize: ".92rem", lineHeight: 1.6, margin: "0 0 14px" }}>Si tu veux, je peux venir te dire bonjour le matin, bonne nuit le soir, et passer tout doucement plus tard dans la nuit, juste pour savoir si tu vas bien.</p>
+            <button onClick={activerNotifs} style={{ fontFamily: "var(--sans)", fontWeight: 700, fontSize: ".94rem", borderRadius: 100, padding: "11px 20px", cursor: "pointer", border: "1px solid transparent", color: "#1a1430", background: "linear-gradient(180deg,#CBB4EC,#A886DA)" }}>Recevoir mes mots</button>
+            <div style={{ fontSize: ".85rem", color: "var(--texte-doux)", marginTop: 10, minHeight: "1.2em" }}>{notifEtat}</div>
+          </div>
+          <div style={{ textAlign: "center", marginTop: 24 }}>
             <a href="/chansons" style={{ color: "var(--accent)", textDecoration: "none", fontFamily: "var(--serif)", fontStyle: "italic", fontSize: "1.02rem" }}>→ Nos chansons, si tu veux de la musique</a>
           </div>
         </>
