@@ -8,6 +8,11 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "jnqyjpgbmjclxbjxbnft.supabase.co" }
     ]
+  },
+  // Pages héritées servies telles quelles depuis public/ (routes propres → .html)
+  async rewrites() {
+    const legacy = ["admin", "portrait", "univers", "demande", "recu", "moi", "fil", "bonne-nuit", "coffret", "anniversaire", "avent"];
+    return legacy.map((p) => ({ source: "/" + p, destination: "/" + p + ".html" }));
   }
 };
 export default nextConfig;
