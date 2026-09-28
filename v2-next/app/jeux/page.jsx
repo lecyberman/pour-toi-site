@@ -130,7 +130,7 @@ export default function Jeux() {
 
   return (
     <div className="jx">
-      <style>{CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div className="page">
         <p className="eyebrow">rien que pour nous</p>
         <h1>Nos jeux</h1>

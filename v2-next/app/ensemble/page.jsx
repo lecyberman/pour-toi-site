@@ -222,7 +222,7 @@ export default function Ensemble() {
 
   return (
     <div className="ens">
-      <style>{CSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div className="wrap">
         <a className="retour" href="/surprise">⌂ rentrer</a>
         <div className="tete"><p className="eyebrow">à distance, mais en même temps</p><h1>Ensemble</h1></div>
