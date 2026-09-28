@@ -3,14 +3,31 @@ import { useMemo, useRef, useEffect } from "react";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
+// Une moitié de papillon (côté droit) : aile supérieure + aile inférieure,
+// racine des ailes au bord gauche (x=0, la charnière du corps), centrée verticalement.
 function wingTexture() {
-  const c = document.createElement("canvas"); c.width = c.height = 160; const x = c.getContext("2d");
-  const g = x.createLinearGradient(0, 20, 150, 150);
-  g.addColorStop(0, "#E9DEF7"); g.addColorStop(.45, "#B49BDA"); g.addColorStop(1, "#7C5FB0"); x.fillStyle = g;
-  x.beginPath(); x.moveTo(6, 84); x.bezierCurveTo(2, 18, 150, 2, 150, 46); x.bezierCurveTo(150, 70, 96, 82, 6, 84); x.closePath(); x.fill();
-  x.beginPath(); x.moveTo(8, 86); x.bezierCurveTo(18, 158, 120, 156, 110, 112); x.bezierCurveTo(102, 92, 70, 88, 8, 86); x.closePath(); x.fill();
-  x.fillStyle = "rgba(255,255,255,.55)"; x.beginPath(); x.arc(112, 40, 9, 0, 6.28); x.fill();
-  x.fillStyle = "rgba(45,25,70,.45)"; x.beginPath(); x.arc(96, 118, 8, 0, 6.28); x.fill();
+  const c = document.createElement("canvas"); c.width = c.height = 256; const x = c.getContext("2d");
+  const g = x.createLinearGradient(0, 20, 240, 240);
+  g.addColorStop(0, "#F1E7FC"); g.addColorStop(.5, "#C3A9EC"); g.addColorStop(1, "#8E6FBF");
+  x.fillStyle = g;
+  // aile supérieure (grande, arrondie, monte vers le haut-droite)
+  x.beginPath(); x.moveTo(8, 128);
+  x.bezierCurveTo(24, 8, 250, 12, 236, 82);
+  x.bezierCurveTo(226, 122, 150, 134, 8, 128);
+  x.closePath(); x.fill();
+  // aile inférieure (plus ronde, descend)
+  x.beginPath(); x.moveTo(10, 130);
+  x.bezierCurveTo(0, 250, 196, 252, 176, 170);
+  x.bezierCurveTo(160, 138, 96, 132, 10, 130);
+  x.closePath(); x.fill();
+  // liseré doux
+  x.strokeStyle = "rgba(70,40,110,.30)"; x.lineWidth = 4;
+  x.beginPath(); x.moveTo(8, 128); x.bezierCurveTo(24, 8, 250, 12, 236, 82); x.stroke();
+  // motifs (ocelles)
+  x.fillStyle = "rgba(255,255,255,.65)"; x.beginPath(); x.arc(184, 64, 15, 0, 6.28); x.fill();
+  x.fillStyle = "rgba(255,255,255,.4)"; x.beginPath(); x.arc(120, 98, 9, 0, 6.28); x.fill();
+  x.fillStyle = "rgba(60,30,90,.5)"; x.beginPath(); x.arc(122, 198, 13, 0, 6.28); x.fill();
+  x.fillStyle = "rgba(255,220,150,.6)"; x.beginPath(); x.arc(122, 198, 5, 0, 6.28); x.fill();
   return new THREE.CanvasTexture(c);
 }
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -23,7 +40,9 @@ function Papillons({ count }) {
     const AIRE = { x: 13, y: 8, z: 6 };
     const tex = wingTexture();
     const wingMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false });
-    const wingGeo = new THREE.PlaneGeometry(2, 2.4); wingGeo.translate(1, 0, 0);
+    // aile : charnière au bord gauche (x=0), s'étend vers +x, hauteur en y
+    const wingGeo = new THREE.PlaneGeometry(2.2, 2.6); wingGeo.translate(1.1, 0, 0);
+    const corpsMat = new THREE.MeshStandardMaterial({ color: 0x3a2a55, roughness: .6 });
     const arr = [];
     const flowers = [[-8, -6, -1], [7, -6.5, -2], [0, -7, -3]].map((p) => new THREE.Vector3(p[0], p[1], p[2]));
     for (let i = 0; i < count; i++) {
@@ -32,11 +51,17 @@ function Papillons({ count }) {
       const ag = new THREE.Mesh(wingGeo, wingMat); ag.scale.x = -1;
       const pd = new THREE.Group(); pd.add(ad); g.add(pd);
       const pg = new THREE.Group(); pg.add(ag); g.add(pg);
-      const corps = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.07, 2, 8), new THREE.MeshStandardMaterial({ color: 0x2a1f3a, roughness: .6 }));
-      corps.rotation.x = Math.PI / 2; g.add(corps);
-      const tete = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), new THREE.MeshStandardMaterial({ color: 0x1a1230, roughness: .5 }));
-      tete.position.z = 1.05; g.add(tete);
-      g.scale.setScalar(rnd(0.6, 1.1));
+      // corps fin, dans le plan des ailes (axe vertical Y), pas perpendiculaire
+      const corps = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.04, 1.7, 8), corpsMat);
+      g.add(corps);
+      const tete = new THREE.Mesh(new THREE.SphereGeometry(0.13, 10, 8), corpsMat);
+      tete.position.y = 0.92; g.add(tete);
+      // antennes
+      const antG = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.01, 0.5, 5), corpsMat);
+      antG.position.set(-0.12, 1.15, 0); antG.rotation.z = 0.5; g.add(antG);
+      const antD = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.01, 0.5, 5), corpsMat);
+      antD.position.set(0.12, 1.15, 0); antD.rotation.z = -0.5; g.add(antD);
+      g.scale.setScalar(rnd(0.65, 1.15));
       const pos = new THREE.Vector3(rnd(-AIRE.x, AIRE.x), rnd(-AIRE.y, AIRE.y), rnd(-AIRE.z, AIRE.z));
       g.position.copy(pos);
       scene.add(g);
@@ -94,7 +119,9 @@ function Papillons({ count }) {
       }
       b.pos.addScaledVector(b.vel, dt);
       b.g.position.copy(b.pos);
-      if (b.vel.lengthSq() > 0.001) { tmp.copy(b.pos).add(b.vel); b.g.lookAt(tmp); }
+      // le papillon reste face à la caméra (à plat, jamais de profil), avec une inclinaison vivante
+      b.g.quaternion.copy(camera.quaternion);
+      b.g.rotateZ(Math.sin(t * 1.2 + b.phase) * 0.12 - b.vel.x * 0.05);
       const posed = b.pose > 0, amp = posed ? 0.5 : 1.15, spd = posed ? 3 : b.flap;
       const a = 0.15 + (Math.sin(t * spd + b.phase) * 0.5 + 0.5) * amp;
       b.pd.rotation.y = -a; b.pg.rotation.y = a;
