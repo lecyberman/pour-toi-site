@@ -4,7 +4,7 @@ import { byJourney } from "@/lib/experienceRegistry";
 // sur le site actuel (déjà en ligne), pour zéro « 404 » et une navigation complète.
 const STATIC_BASE = "https://pour-toi-site.vercel.app";
 // routes déjà portées nativement dans la V2 Next (servies en interne)
-const NATIVE = new Set(["/papillons", "/pioche", "/journal", "/retrouvailles", "/ciel", "/messages", "/humeurs", "/fleurs", "/chansons", "/dramas", "/mots", "/souhaits", "/souvenirs", "/toi", "/cocon", "/dormir", "/capsules", "/creations", "/calin", "/pour-lui", "/etoile", "/petits-riens", "/histoire", "/galerie", "/reves", "/livre"]);
+const NATIVE = new Set(["/papillons", "/pioche", "/journal", "/retrouvailles", "/ciel", "/messages", "/humeurs", "/fleurs", "/chansons", "/dramas", "/mots", "/souhaits", "/souvenirs", "/toi", "/cocon", "/dormir", "/capsules", "/creations", "/calin", "/pour-lui", "/etoile", "/petits-riens", "/histoire", "/galerie", "/reves", "/livre", "/feu", "/jardin", "/ensemble", "/jeux"]);
 
 export default function JourneyHub({ journey }) {
   const items = byJourney(journey);
