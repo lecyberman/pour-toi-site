@@ -291,6 +291,31 @@ export default function Dadoucherie() {
       /* BOUTONS VOIX */
       (function () { let lecteurActuel = null, boutonActuel = null; root.querySelectorAll(".voix").forEach((btn) => { btn.addEventListener("click", () => { if (boutonActuel === btn && lecteurActuel && !lecteurActuel.paused) { lecteurActuel.pause(); lecteurActuel.currentTime = 0; btn.classList.remove("joue"); lecteurActuel = null; boutonActuel = null; return; } if (lecteurActuel) lecteurActuel.pause(); if (boutonActuel) boutonActuel.classList.remove("joue"); lecteurActuel = new Audio(btn.dataset.audio); boutonActuel = btn; btn.classList.add("joue"); lecteurActuel.play().catch(() => btn.classList.remove("joue")); lecteurActuel.addEventListener("ended", () => btn.classList.remove("joue")); dbInserer("dadoucherie_journal", { type: "voix", periode: btn.dataset.audio.split("/").pop() }); }); }); })();
 
+      /* VOCAUX PERSONNALISÉS (enregistrés par Mathieu depuis /courrier) */
+      (function () {
+        const vlire = (f) => fetch(DB_URL + "/rest/v1/vocaux?" + f, { headers: { apikey: DB_KEY, Authorization: "Bearer " + DB_KEY } }).then((r) => r.json()).catch(() => []);
+        vlire("slot=eq.bonjour&order=created_at.desc&limit=1").then((r) => { if (r && r[0]) { const b = $("voixBonjour"); if (b) b.dataset.audio = r[0].url; } });
+        vlire("slot=eq.je_taime&order=created_at.desc&limit=1").then((r) => { if (r && r[0]) { const b = $("voixJetaime"); if (b) b.dataset.audio = r[0].url; } });
+        vlire("slot=eq.message&order=created_at.desc").then((rows) => {
+          const z = $("vocauxMessages"); if (!z || !rows || !rows.length) return;
+          const tete = document.createElement("p"); tete.className = "soft"; tete.style.marginTop = "6px"; tete.textContent = "Et quelques mots, avec ma voix :"; z.appendChild(tete);
+          let enCours = null, btnEnCours = null;
+          rows.forEach((v) => {
+            const btn = document.createElement("button"); btn.className = "voix"; btn.style.display = "inline-flex";
+            btn.innerHTML = '<span class="onde"><i></i><i></i><i></i><i></i></span> ' + (v.titre || "un mot pour toi");
+            btn.addEventListener("click", () => {
+              if (btnEnCours === btn && enCours && !enCours.paused) { enCours.pause(); enCours.currentTime = 0; btn.classList.remove("joue"); enCours = null; btnEnCours = null; return; }
+              if (enCours) enCours.pause(); if (btnEnCours) btnEnCours.classList.remove("joue");
+              enCours = new Audio(v.url); btnEnCours = btn; btn.classList.add("joue");
+              enCours.play().catch(() => btn.classList.remove("joue"));
+              enCours.addEventListener("ended", () => btn.classList.remove("joue"));
+              dbInserer("dadoucherie_journal", { type: "voix", periode: "message" });
+            });
+            const wrap = document.createElement("div"); wrap.appendChild(btn); z.appendChild(wrap);
+          });
+        });
+      })();
+
       /* AMBIANCE SONORE */
       const audio = $("audioAmb"), soundBtn = $("soundBtn");
       audio.src = "/musique-" + periode + ".mp3"; audio.volume = 0.55;
@@ -374,7 +399,7 @@ export default function Dadoucherie() {
             <div className="lj-tete" id="ljTete" /><div className="lj-texte" id="ljTexte" /><div className="lj-sign">Ton Mathieu</div>
           </div>
           <div id="greetBody" />
-          <button className="voix" data-audio="/bonjour.mp3"><span className="onde"><i /><i /><i /><i /></span> écoute mon bonjour</button>
+          <button className="voix" id="voixBonjour" data-audio="/bonjour.mp3"><span className="onde"><i /><i /><i /><i /></span> écoute mon bonjour</button>
           <p className="soft" id="visites" hidden />
           <div className="enveloppes" id="enveloppes" />
           <p className="soft">Petit secret : ce site vit à la même heure que toi. Ouvre-le un matin, il sera doux et fleuri. Ouvre-le un soir, il rougit. Ouvre-le en pleine nuit, il allume les étoiles. Comme moi, en fait : je change d&apos;humeur, mais je t&apos;aime à toutes les heures.</p>
@@ -387,7 +412,8 @@ export default function Dadoucherie() {
           <p>Je t&apos;aime. Voilà, c&apos;est dit, et je pourrais m&apos;arrêter là. Mais tu me connais, et surtout je te connais : tu aimes les longs messages, ceux qu&apos;on lit deux fois, ceux qu&apos;on garde. Alors installe-toi.</p>
           <p>Je t&apos;aime, et pas seulement les jours faciles. Je t&apos;aime les jours en désordre, les jours à cent à l&apos;heure, les jours où tout va de travers et où on se comprend quand même d&apos;un regard. Je t&apos;aime quand tu ris tellement fort que tu essaies de te cacher derrière ta main (raté, d&apos;ailleurs, ça marche jamais). Je t&apos;aime quand tu me racontes ta journée dans le désordre le plus total et que je dois reconstituer l&apos;histoire comme un puzzle. Je t&apos;aime même quand tu as raison alors que j&apos;étais sûr d&apos;avoir raison, ce qui, statistiquement, arrive bien trop souvent.</p>
           <p>Sept ans que tu es dans ma vie. Sept ans, tu te rends compte ? Il y a des gens qui ne gardent pas un téléphone aussi longtemps. Et moi, chaque matin, je te choisis encore. Pas par habitude, par évidence. Toi, exactement comme tu es. C&apos;est <em className="big-heart">ça</em> que je choisis.</p>
-          <button className="voix" data-audio="/je-taime.mp3"><span className="onde"><i /><i /><i /><i /></span> écoute-moi te le dire</button>
+          <button className="voix" id="voixJetaime" data-audio="/je-taime.mp3"><span className="onde"><i /><i /><i /><i /></span> écoute-moi te le dire</button>
+          <div id="vocauxMessages" />
           <div className="actions"><button className="btn btn-primary" data-go="2">Continuer</button></div>
           <div className="backrow"><button className="back" data-go="0">← revenir</button></div>
         </section>

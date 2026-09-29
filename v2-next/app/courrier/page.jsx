@@ -65,6 +65,40 @@ export default function Courrier() {
     $("mdjBtn").addEventListener("click", () => { const t = $("mdjTexte").value.trim(); if (!t) return; dbInserer("mot_du_jour", { texte: t }).then(() => { $("mdjTexte").value = ""; const ok = $("mdjOk"); ok.style.display = "block"; setTimeout(() => { ok.style.display = "none"; }, 4000); }); });
     const chargerAnniv = () => { dbLire("anniversaire_lettre", "select=lettre,cadeau&id=eq.1").then((rows) => { const r = rows && rows[0]; if (!r) return; if (r.lettre) $("annLettre").value = r.lettre; if (r.cadeau) $("annCadeau").value = r.cadeau; }); };
     $("annBtn").addEventListener("click", () => { const lettre = $("annLettre").value.trim(); const cadeau = $("annCadeau").value.trim(); dbPatch("anniversaire_lettre", "id=eq.1", { lettre, cadeau, maj: new Date().toISOString() }).then(() => { const ok = $("annOk"); ok.style.display = "block"; setTimeout(() => { ok.style.display = "none"; }, 4000); }); });
+
+    // ===== Vocaux : ta voix pour elle (enregistrement micro) =====
+    const dbSupprimer = (t, f) => fetch(DB_URL + "/rest/v1/" + t + "?" + f, { method: "DELETE", headers: hdrs() }).catch(() => {});
+    const vSel = $("vSlot"), vTitreWrap = $("vTitreWrap"), vTitre = $("vTitre"), vRec = $("vRec"), vStop = $("vStop"), vPreview = $("vPreview"), vSave = $("vSave"), vEtat = $("vEtat"), vOk = $("vOk");
+    let media = null, chunks = [], mimeR = "", blobCourant = null;
+    const majTitre = () => { vTitreWrap.style.display = vSel.value === "message" ? "block" : "none"; };
+    vSel.addEventListener("change", majTitre); majTitre();
+    vRec.addEventListener("click", async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mimeR = (window.MediaRecorder && MediaRecorder.isTypeSupported("audio/webm")) ? "audio/webm" : ((window.MediaRecorder && MediaRecorder.isTypeSupported("audio/mp4")) ? "audio/mp4" : "");
+        media = mimeR ? new MediaRecorder(stream, { mimeType: mimeR }) : new MediaRecorder(stream);
+        chunks = [];
+        media.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+        media.onstop = () => { stream.getTracks().forEach((t) => t.stop()); blobCourant = new Blob(chunks, { type: mimeR || "audio/webm" }); vPreview.src = URL.createObjectURL(blobCourant); vPreview.style.display = "block"; vSave.disabled = false; vEtat.textContent = "Réécoute-toi, puis enregistre si ça te plaît."; };
+        media.start(); vRec.style.display = "none"; vStop.style.display = "inline-block"; vSave.disabled = true; vPreview.style.display = "none"; vEtat.textContent = "🎙️ Enregistrement… parle-lui, puis appuie sur Terminer.";
+      } catch (e) { vEtat.textContent = "Micro indisponible ou refusé. Autorise le micro pour t'enregistrer."; }
+    });
+    vStop.addEventListener("click", () => { if (media && media.state !== "inactive") media.stop(); vStop.style.display = "none"; vRec.style.display = "inline-block"; });
+    vSave.addEventListener("click", async () => {
+      if (!blobCourant) return; vSave.disabled = true; vEtat.textContent = "Envoi en cours…";
+      const slot = vSel.value; const type = blobCourant.type || mimeR || "audio/webm"; const ext = type.indexOf("mp4") > -1 ? "mp4" : "webm"; const chemin = slot + "-" + Date.now() + "." + ext;
+      const up = await fetch(DB_URL + "/storage/v1/object/vocaux/" + chemin, { method: "POST", headers: { apikey: DB_KEY, Authorization: "Bearer " + DB_KEY, "Content-Type": type }, body: blobCourant }).catch(() => null);
+      if (!up || !up.ok) { vEtat.textContent = "Échec de l'envoi, réessaie."; vSave.disabled = false; return; }
+      const url = DB_URL + "/storage/v1/object/public/vocaux/" + chemin;
+      await dbInserer("vocaux", { slot, titre: slot === "message" ? (vTitre.value.trim() || "Un mot pour toi") : null, chemin, url });
+      blobCourant = null; vPreview.style.display = "none"; vTitre.value = ""; vOk.style.display = "block"; setTimeout(() => { vOk.style.display = "none"; }, 4000); vEtat.textContent = ""; chargerVocaux();
+    });
+    const chargerVocaux = () => { dbLire("vocaux", "order=created_at.desc").then((rows) => {
+      const z = $("vListe"); z.innerHTML = ""; if (!rows || !rows.length) { z.innerHTML = '<p class="vide">Aucun vocal pour l\'instant. Enregistre ton premier au-dessus.</p>'; return; }
+      const noms = { bonjour: "☀️ Son bouton « bonjour »", je_taime: "💗 Son bouton « je t'aime »", message: "💌 Message" };
+      rows.forEach((v) => { const d = document.createElement("div"); d.className = "mot"; const t = document.createElement("div"); t.className = "texte"; t.textContent = (noms[v.slot] || v.slot) + (v.titre ? " · " + v.titre : ""); const au = document.createElement("audio"); au.controls = true; au.src = v.url; au.style.cssText = "width:100%;margin-top:8px;"; const meta = document.createElement("div"); meta.className = "meta"; meta.style.marginTop = "6px"; meta.textContent = dateFr(v.created_at) + "  ·  "; const del = document.createElement("button"); del.textContent = "supprimer"; del.style.cssText = "background:none;border:none;color:var(--corail);cursor:pointer;text-decoration:underline;font:inherit;padding:0;"; del.addEventListener("click", async () => { if (!confirm("Supprimer ce vocal ? Elle ne l'entendra plus.")) return; await fetch(DB_URL + "/storage/v1/object/vocaux/" + v.chemin, { method: "DELETE", headers: { apikey: DB_KEY, Authorization: "Bearer " + DB_KEY } }).catch(() => {}); await dbSupprimer("vocaux", "id=eq." + v.id); chargerVocaux(); }); meta.appendChild(del); d.appendChild(t); d.appendChild(au); d.appendChild(meta); z.appendChild(d); });
+    }); };
+    chargerVocaux();
   }, []);
 
   return (
@@ -120,6 +154,29 @@ export default function Courrier() {
             <textarea id="annCadeau" placeholder="Un bon pour… ce que tu veux lui offrir." style={{ minHeight: 100 }} />
             <button className="btn" id="annBtn">Enregistrer sa lettre</button>
             <p className="ok" id="annOk">Enregistré. C&apos;est ça qu&apos;elle lira le 2 octobre. 🎂</p>
+          </div>
+
+          <div className="carte">
+            <h2>Ta voix pour elle 🎙️</h2>
+            <p className="note" style={{ marginBottom: 12 }}>Enregistre-toi directement ici. Choisis un emplacement, appuie sur le micro, parle-lui, puis écoute et enregistre. Sur sa page, tes vrais mots remplacent les voix par défaut. Tu peux en changer ou en supprimer quand tu veux.</p>
+            <label className="note" htmlFor="vSlot" style={{ display: "block", marginBottom: 6 }}>C&apos;est pour :</label>
+            <select id="vSlot" style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "1px solid var(--bord, #e7dced)", background: "#fff", font: "inherit", marginBottom: 12 }}>
+              <option value="message">💌 Un message vocal (liste illimitée)</option>
+              <option value="bonjour">☀️ Son bouton « écoute mon bonjour »</option>
+              <option value="je_taime">💗 Son bouton « écoute-moi te le dire »</option>
+            </select>
+            <div id="vTitreWrap" style={{ display: "block" }}>
+              <input type="text" id="vTitre" placeholder="Titre du message (ex : pour tes coups de mou)" style={{ marginBottom: 12 }} />
+            </div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <button className="btn" id="vRec" style={{ display: "inline-block" }}>🎙️ Enregistrer</button>
+              <button className="btn" id="vStop" style={{ display: "none", background: "var(--corail)" }}>⏹️ Terminer</button>
+              <button className="btn" id="vSave" disabled style={{ display: "inline-block" }}>Enregistrer pour elle</button>
+            </div>
+            <audio id="vPreview" controls style={{ display: "none", width: "100%", marginTop: 12 }} />
+            <p className="note" id="vEtat" style={{ marginTop: 10, minHeight: 20 }} />
+            <p className="ok" id="vOk">Enregistré. Elle l&apos;entendra sur sa page. 🤍</p>
+            <div id="vListe" style={{ marginTop: 16 }} />
           </div>
 
           <div className="carte">
