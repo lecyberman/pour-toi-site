@@ -50,7 +50,7 @@ export default function Courrier() {
     $("bjBtn").addEventListener("click", () => { const t = $("bjTexte").value.trim(); if (!t) return; dbInserer("messages_jour", { type: "bonjour", texte: t, pour_date: auj() }).then(() => { const ok = $("bjOk"); ok.style.display = "block"; setTimeout(() => { ok.style.display = "none"; }, 4000); chargerMessagesJour(); }); });
     $("bnBtn").addEventListener("click", () => { const t = $("bnTexte").value.trim(); if (!t) return; dbInserer("messages_jour", { type: "bonne_nuit", texte: t, pour_date: auj() }).then(() => { const ok = $("bnOk"); ok.style.display = "block"; setTimeout(() => { ok.style.display = "none"; }, 4000); chargerMessagesJour(); }); });
     const charger = () => {
-      chargerMessagesJour(); chargerLettres(); chargerLpm(); chargerChansons(); chargerCompteurs();
+      chargerMessagesJour(); chargerLettres(); chargerLpm(); chargerChansons(); chargerCompteurs(); chargerAnniv();
       dbLire("dadoucherie_mots", "order=created_at.desc").then((rows) => { const z = $("motsZone"); z.innerHTML = ""; if (!rows || !rows.length) { z.innerHTML = '<p class="vide">Rien pour l\'instant. Elle n\'a pas encore écrit, patience, ça viendra.</p>'; return; } rows.forEach((m) => { const d = document.createElement("div"); d.className = "mot"; const t = document.createElement("div"); t.className = "texte"; t.textContent = m.message; const meta = document.createElement("div"); meta.className = "meta"; meta.innerHTML = "reçu le " + dateFr(m.created_at) + (m.lu_le ? ' · <span class="lu">lu ✓</span>' : ""); d.appendChild(t); d.appendChild(meta); z.appendChild(d); }); dbPatch("dadoucherie_mots", "lu_le=is.null", { lu_le: new Date().toISOString() }); });
       Promise.all([dbCompter("dadoucherie_journal", "type=eq.visite"), dbCompter("dadoucherie_journal", "type=eq.coeur"), dbCompter("dadoucherie_journal", "type=eq.billets"), dbLire("tresor", "select=piece")]).then((r) => { const pieces = {}; (r[3] || []).forEach((x) => { pieces[x.piece] = 1; }); const s = $("stats"); const data = [{ n: r[0], l: "visites de sa page" }, { n: r[1], l: "appuis sur ton cœur" }, { n: r[2], l: "pluies de billets" }, { n: Object.keys(pieces).length + "/3", l: "pièces d'or trouvées" }]; s.innerHTML = ""; data.forEach((x) => { const d = document.createElement("div"); d.className = "stat"; d.innerHTML = '<div class="n">' + x.n + '</div><div class="l">' + x.l + "</div>"; s.appendChild(d); }); });
       Promise.all([dbLire("histoire_versions", "order=created_at.desc&limit=5"), dbLire("qds", "auteur=eq.elle&order=created_at.desc&limit=3")]).then((r) => { const z = $("autresZone"); z.innerHTML = ""; let rien = true; (r[0] || []).forEach((v) => { rien = false; const d = document.createElement("div"); d.className = "mot"; d.innerHTML = '<div class="texte"></div><div class="meta">sa version du chapitre « ' + v.etape + " » · " + dateFr(v.created_at) + "</div>"; d.querySelector(".texte").textContent = v.texte; z.appendChild(d); }); (r[1] || []).forEach((v) => { rien = false; const d = document.createElement("div"); d.className = "mot"; d.innerHTML = '<div class="texte"></div><div class="meta">sa réponse du dimanche (' + v.semaine + ") · " + dateFr(v.created_at) + "</div>"; d.querySelector(".texte").textContent = v.texte; z.appendChild(d); }); if (rien) z.innerHTML = '<p class="vide">Rien encore dans la frise ni au jeu du dimanche.</p>'; });
@@ -63,6 +63,8 @@ export default function Courrier() {
     const chargerCompteurs = () => { dbLire("compteurs", "order=date_cible.asc").then((rows) => { const z = $("cptListe"); z.innerHTML = ""; (rows || []).forEach((c) => { const dodos = Math.ceil((new Date(c.date_cible + "T00:00:00") - Date.now()) / 86400000); const d = document.createElement("div"); d.className = "mot"; d.innerHTML = '<div class="texte"></div><div class="meta">' + (dodos >= 0 ? "dans " + dodos + " dodo" + (dodos > 1 ? "s" : "") : "passé, à transformer en souvenir") + "</div>"; d.querySelector(".texte").textContent = "⏳ " + c.label + " · " + c.date_cible; z.appendChild(d); }); }); };
     $("cptBtn").addEventListener("click", () => { const l = $("cptLabel").value.trim(); const dte = $("cptDate").value.trim(); if (!l || !/^\d{4}-\d{2}-\d{2}$/.test(dte)) return; dbInserer("compteurs", { label: l, date_cible: dte }).then(() => { $("cptLabel").value = ""; $("cptDate").value = ""; chargerCompteurs(); }); });
     $("mdjBtn").addEventListener("click", () => { const t = $("mdjTexte").value.trim(); if (!t) return; dbInserer("mot_du_jour", { texte: t }).then(() => { $("mdjTexte").value = ""; const ok = $("mdjOk"); ok.style.display = "block"; setTimeout(() => { ok.style.display = "none"; }, 4000); }); });
+    const chargerAnniv = () => { dbLire("anniversaire_lettre", "select=lettre,cadeau&id=eq.1").then((rows) => { const r = rows && rows[0]; if (!r) return; if (r.lettre) $("annLettre").value = r.lettre; if (r.cadeau) $("annCadeau").value = r.cadeau; }); };
+    $("annBtn").addEventListener("click", () => { const lettre = $("annLettre").value.trim(); const cadeau = $("annCadeau").value.trim(); dbPatch("anniversaire_lettre", "id=eq.1", { lettre, cadeau, maj: new Date().toISOString() }).then(() => { const ok = $("annOk"); ok.style.display = "block"; setTimeout(() => { ok.style.display = "none"; }, 4000); }); });
   }, []);
 
   return (
@@ -107,6 +109,17 @@ export default function Courrier() {
             <textarea id="mdjTexte" placeholder="Une phrase pour elle, là, maintenant…" />
             <button className="btn" id="mdjBtn">Épingler</button>
             <p className="ok" id="mdjOk">Épinglé. Elle le verra à sa prochaine visite. 🤍</p>
+          </div>
+
+          <div className="carte">
+            <h2>Sa lettre d&apos;anniversaire 🎂</h2>
+            <p className="note" style={{ marginBottom: 10 }}>Le 2 octobre, elle découvre une page de fête avec cette lettre et ce cadeau. Laisse vide pour garder la version par défaut. Sépare les paragraphes par une ligne vide.</p>
+            <p style={{ fontWeight: 700, color: "var(--corail)", fontSize: ".85rem", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6 }}>💌 La lettre</p>
+            <textarea id="annLettre" placeholder="Joyeux anniversaire, ma dadoucherie…&#10;&#10;(une ligne vide entre chaque paragraphe)" style={{ minHeight: 200 }} />
+            <p style={{ fontWeight: 700, color: "var(--corail)", fontSize: ".85rem", textTransform: "uppercase", letterSpacing: ".08em", margin: "16px 0 6px" }}>🎁 Le cadeau à ouvrir</p>
+            <textarea id="annCadeau" placeholder="Un bon pour… ce que tu veux lui offrir." style={{ minHeight: 100 }} />
+            <button className="btn" id="annBtn">Enregistrer sa lettre</button>
+            <p className="ok" id="annOk">Enregistré. C&apos;est ça qu&apos;elle lira le 2 octobre. 🎂</p>
           </div>
 
           <div className="carte">

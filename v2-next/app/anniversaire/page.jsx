@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 // Anniversaire de dadoucherie : le 2 octobre.
 const MOIS_ANNIV = 9, JOUR_ANNIV = 2; // 9 = octobre (0-indexé)
 
+const DB_URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
+const DB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
+
 const LETTRE = [
   "Joyeux anniversaire, ma dadoucherie.",
   "Aujourd'hui, c'est ton jour. Le jour où le monde a reçu la plus belle chose qu'il ait jamais faite, et où moi, sans le savoir encore, j'ai gagné à une loterie à laquelle je n'avais même pas joué.",
@@ -20,8 +23,22 @@ export default function Anniversaire() {
   const [voeu, setVoeu] = useState(false);
   const [lettreOuverte, setLettreOuverte] = useState(false);
   const [cadeauOuvert, setCadeauOuvert] = useState(false);
+  const [lettre, setLettre] = useState(LETTRE);
+  const [cadeau, setCadeau] = useState(CADEAU);
   const canvasRef = useRef(null);
   const confettiRef = useRef(null);
+
+  // Lettre/cadeau personnalisables par Mathieu depuis /courrier (repli sur le défaut).
+  useEffect(() => {
+    fetch(DB_URL + "/rest/v1/anniversaire_lettre?select=lettre,cadeau&id=eq.1", { headers: { apikey: DB_KEY, Authorization: "Bearer " + DB_KEY } })
+      .then((r) => r.json())
+      .then((rows) => {
+        const row = rows && rows[0]; if (!row) return;
+        if (row.lettre && row.lettre.trim()) setLettre(row.lettre.trim().split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean));
+        if (row.cadeau && row.cadeau.trim()) setCadeau(row.cadeau.trim());
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const now = new Date();
@@ -102,7 +119,7 @@ export default function Anniversaire() {
               <div><button onClick={() => setLettreOuverte(true)} style={{ ...btn(true), marginTop: 10 }}>Lire ta lettre 💌</button></div>
             ) : (
               <div style={{ margin: "12px auto 0", maxWidth: 500, background: "var(--carte)", border: "1px solid var(--bord)", borderRadius: 20, padding: "24px 22px", textAlign: "left" }}>
-                {LETTRE.map((p, i) => <p key={i} style={{ fontSize: i === 0 ? "1.25rem" : "1.04rem", fontFamily: i === 0 ? "var(--serif)" : "inherit", fontStyle: i === 0 ? "italic" : "normal", color: i === 0 ? "var(--accent)" : "var(--texte)", lineHeight: 1.8, margin: "0 0 14px" }}>{p}</p>)}
+                {lettre.map((p, i) => <p key={i} style={{ fontSize: i === 0 ? "1.25rem" : "1.04rem", fontFamily: i === 0 ? "var(--serif)" : "inherit", fontStyle: i === 0 ? "italic" : "normal", color: i === 0 ? "var(--accent)" : "var(--texte)", lineHeight: 1.8, margin: "0 0 14px" }}>{p}</p>)}
                 <p style={{ textAlign: "right", fontFamily: "var(--serif)", fontStyle: "italic", color: "var(--accent)" }}>Ton Mathieu</p>
               </div>
             )}
@@ -112,7 +129,7 @@ export default function Anniversaire() {
                 <button onClick={ouvrirCadeau} style={btn(false)}>🎁 Ouvrir ton cadeau</button>
               ) : (
                 <div style={{ margin: "0 auto", maxWidth: 460, background: "linear-gradient(180deg, rgba(142,111,191,.16), rgba(142,111,191,.05))", border: "1px solid rgba(199,178,230,.4)", borderRadius: 18, padding: "20px 20px" }}>
-                  <p style={{ fontSize: "1.04rem", lineHeight: 1.8, color: "var(--texte)", margin: 0 }}>{CADEAU}</p>
+                  <p style={{ fontSize: "1.04rem", lineHeight: 1.8, color: "var(--texte)", margin: 0, whiteSpace: "pre-wrap" }}>{cadeau}</p>
                 </div>
               )}
             </div>
