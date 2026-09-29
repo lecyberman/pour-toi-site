@@ -3,6 +3,7 @@ import CursorStar from "@/components/CursorStar";
 import ThemeToggle from "@/components/ThemeToggle";
 import PushSync from "@/components/PushSync";
 import InstallPrompt from "@/components/InstallPrompt";
+import Presence from "@/components/Presence";
 
 // Applique le thème avant le premier rendu (évite le flash).
 const themeInit = `(function(){try{var t=localStorage.getItem('theme_pref_v1')||'sombre';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         {children}
+        <Presence />
         <ThemeToggle />
         <CursorStar />
         <PushSync />
