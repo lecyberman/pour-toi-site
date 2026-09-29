@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  transpilePackages: ["three"],
   // On ne veut pas qu'un simple avertissement de lint fasse échouer le build Vercel.
   eslint: { ignoreDuringBuilds: true },
   images: {
