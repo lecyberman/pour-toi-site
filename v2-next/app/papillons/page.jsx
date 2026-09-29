@@ -14,7 +14,6 @@ export default function Papillons() {
       </div>
       <p style={{ position: "fixed", bottom: "max(20px,env(safe-area-inset-bottom))", left: 0, right: 0, textAlign: "center", color: "rgba(237,233,243,.6)", fontSize: ".82rem", zIndex: 2, pointerEvents: "none", padding: "0 20px" }}>
         Bouge le doigt : ils t&apos;évitent. Reste tranquille : ils se posent.
-        <br /><span style={{ fontSize: ".7rem", opacity: .7 }}>papillon 3D : « Monarch Butterfly » de Paul Spooner (CC-BY)</span>
       </p>
     </main>
   );

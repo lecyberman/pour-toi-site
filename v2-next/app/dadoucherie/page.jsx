@@ -200,6 +200,16 @@ export default function Dadoucherie() {
       const auj0 = new Date(); const jourSpecial = $("jourSpecial");
       if (auj0.getMonth() === 0 && auj0.getDate() === 1) { jourSpecial.textContent = "Au fait… bonne année. Et surtout : joyeux anniversaire de nous. Un 1er janvier exactement comme aujourd'hui, à Lyon, je te voyais pour la toute première fois. Je n'ai jamais retrouvé une meilleure façon de commencer une année, et pourtant j'ai eu " + (auj0.getFullYear() - 2020) + " essais depuis. 🥂"; jourSpecial.hidden = false; }
       else if (auj0.getMonth() === 6 && auj0.getDate() === 15) { jourSpecial.textContent = "Au fait… on est le 15 juillet. Notre nuit. Celle où on a parlé jusqu'au lever du soleil et où tout a vraiment commencé. Bon anniversaire à nous, mon amour. 🌙"; jourSpecial.hidden = false; }
+      else if (auj0.getMonth() === 9 && auj0.getDate() === 2) {
+        jourSpecial.textContent = "Au fait… c'est ton anniversaire aujourd'hui. 🎂 Joyeux anniversaire, ma dadoucherie. Je t'ai préparé quelque chose, rien que pour toi.";
+        jourSpecial.hidden = false;
+        try {
+          const a = document.createElement("a"); a.href = "/anniversaire"; a.textContent = "Ouvrir ta surprise d'anniversaire 🎁";
+          a.style.cssText = "display:inline-block;margin:2px 0 15px;padding:12px 22px;border-radius:100px;font-weight:700;text-decoration:none;color:#1a1430;background:linear-gradient(135deg,#CBB4EC,#A886DA);";
+          jourSpecial.insertAdjacentElement("afterend", a);
+        } catch (e) {}
+      }
+      else if (auj0.getMonth() === 9 && auj0.getDate() <= 1) { const reste = 2 - auj0.getDate(); jourSpecial.textContent = reste === 1 ? "Au fait… demain, c'est ton anniversaire. Je compte les heures. 🤍" : "Au fait… dans deux jours, c'est ton anniversaire. Quelque chose t'attend. 🎁"; jourSpecial.hidden = false; }
 
       const DB_URL = "https://jnqyjpgbmjclxbjxbnft.supabase.co";
       const DB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucXlqcGdibWpjbHhianhibmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTg0ODIsImV4cCI6MjA5MjYzNDQ4Mn0.zr0iYxqubZwH34Lj61QGo4yS7ScldKNVxrK7rnMw9E8";
