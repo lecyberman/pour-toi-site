@@ -12,7 +12,7 @@ const nextConfig = {
   },
   // Pages héritées servies telles quelles depuis public/ (routes propres → .html)
   async rewrites() {
-    const legacy = ["admin", "portrait", "univers", "demande", "recu", "moi", "fil", "bonne-nuit", "coffret", "avent"];
+    const legacy = ["portrait", "univers", "demande", "recu", "moi", "fil", "bonne-nuit", "coffret", "avent"];
     return legacy.map((p) => ({ source: "/" + p, destination: "/" + p + ".html" }));
   }
 };

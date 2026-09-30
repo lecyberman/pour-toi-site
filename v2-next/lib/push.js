@@ -23,7 +23,9 @@ async function souscrire(reg) {
   if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(VAPID_PUBLIC) });
   if (!sub) return null;
   const j = sub.toJSON();
-  try { await supabase.from("push_subs").insert({ endpoint: sub.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, role: roleLocal() }); } catch (e) {}
+  const row = { endpoint: sub.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth };
+  const r = roleLocal(); if (r) row.role = r; // ne pas écraser un rôle déjà connu par null
+  try { await supabase.from("push_subs").upsert(row, { onConflict: "endpoint" }); } catch (e) {}
   return sub;
 }
 

@@ -12,6 +12,8 @@ export const EXPERIENCES = [
   { id:"ciel", title:"Notre ciel partagé", journey:"besoin", route:"/ciel", icon:"🌤️", desc:"La météo de nos deux villes." },
   { id:"calin", title:"Boîte à câlins", journey:"besoin", route:"/calin", icon:"🤍", desc:"Un câlin, même de loin." },
   { id:"pour-lui", title:"Pour lui", journey:"besoin", route:"/pour-lui", icon:"💗", desc:"Quand tu ne sais pas comment le dire." },
+  { id:"raisons", title:"Pourquoi je t'aime", journey:"besoin", route:"/raisons", icon:"💌", desc:"Une nouvelle raison chaque jour." },
+  { id:"tumanques", title:"Tu me manques", journey:"besoin", route:"/tumanques", icon:"🤍", desc:"Appuie, il le saura aussitôt." },
 
   // Parcours 2 — Retrouver notre histoire
   { id:"histoire", title:"Notre histoire", journey:"histoire", route:"/histoire", icon:"✨", desc:"De Snap à nous, en dates." },
@@ -29,6 +31,7 @@ export const EXPERIENCES = [
 
   // Parcours 3 — Surprends-moi
   { id:"le-15", title:"Le 15", journey:"surprise", route:"/le-15", icon:"🎁", event:"le15", desc:"Notre jour, chaque mois." },
+  { id:"gratter", title:"À gratter", journey:"surprise", route:"/gratter", icon:"🪙", desc:"Une carte surprise chaque jour." },
   { id:"capsules", title:"Nos capsules", journey:"surprise", route:"/capsules", icon:"✉️", desc:"À ouvrir plus tard." },
   { id:"retrouvailles", title:"Nos retrouvailles", journey:"surprise", route:"/retrouvailles", icon:"⏳", desc:"Le décompte jusqu'à toi." },
   { id:"souhaits", title:"Nos rêves à deux", journey:"surprise", route:"/souhaits", icon:"🗺️", desc:"Ce qu'on veut vivre, ensemble." },
