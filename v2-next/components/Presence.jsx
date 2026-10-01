@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-// Badge d'identité + présence de l'autre, en haut de chaque page.
+// Badge d'identité + présence de l'autre, en haut de chaque page (compact).
 // Tu choisis qui tu es (Mathieu / dadoucherie), puis tu vois en temps réel
 // si l'autre est connecté. Sur /ensemble on ne l'affiche pas (cette page
 // gère déjà sa propre présence).
@@ -42,9 +42,9 @@ export default function Presence() {
   const choisir = (r) => { try { localStorage.setItem("moi_role", r); } catch (e) {} setRole(r); };
   const changer = () => { try { const c = canalRef.current; if (c) c.untrack(); } catch (e) {} try { localStorage.removeItem("moi_role"); } catch (e) {} setSouscrit(false); setAutreEnLigne(false); setRole(null); };
 
-  const wrap = { position: "fixed", top: "calc(10px + env(safe-area-inset-top,0px))", left: "50%", transform: "translateX(-50%)", zIndex: 9998, display: "flex", alignItems: "center", gap: 8, background: "rgba(24,22,46,.92)", border: "1px solid rgba(180,155,218,.4)", color: "#EDE9F3", fontFamily: "'Nunito Sans',system-ui,sans-serif", fontWeight: 700, fontSize: ".83rem", padding: "7px 13px", borderRadius: 100, boxShadow: "0 8px 24px -10px rgba(0,0,0,.7)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", maxWidth: "94vw", whiteSpace: "nowrap" };
-  const dot = (c) => <span style={{ width: 8, height: 8, borderRadius: "50%", background: c, boxShadow: "0 0 8px " + c, flex: "none" }} />;
-  const lienChanger = <a href="#" onClick={(e) => { e.preventDefault(); changer(); }} style={{ color: "#B49BDA", textDecoration: "none", fontWeight: 600, opacity: .7, marginLeft: 2 }}>changer</a>;
+  const wrap = { position: "fixed", top: "calc(8px + env(safe-area-inset-top,0px))", left: "50%", transform: "translateX(-50%)", zIndex: 9998, display: "flex", alignItems: "center", gap: 6, background: "rgba(24,22,46,.9)", border: "1px solid rgba(180,155,218,.35)", color: "#EDE9F3", fontFamily: "'Nunito Sans',system-ui,sans-serif", fontWeight: 600, fontSize: ".7rem", padding: "4px 10px", borderRadius: 100, boxShadow: "0 6px 18px -10px rgba(0,0,0,.6)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", maxWidth: "70vw", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" };
+  const dot = (c) => <span style={{ width: 6, height: 6, borderRadius: "50%", background: c, boxShadow: "0 0 6px " + c, flex: "none" }} />;
+  const lienChanger = <a href="#" onClick={(e) => { e.preventDefault(); changer(); }} style={{ color: "#B49BDA", textDecoration: "none", fontWeight: 600, opacity: .65, marginLeft: 2, fontSize: ".92em" }}>changer</a>;
 
   if (!role) {
     return (
@@ -57,12 +57,11 @@ export default function Presence() {
   }
 
   const autre = NOMS[AUTRE[role]];
-  const accord = AUTRE[role] === "elle" ? "connectée" : "connecté";
   return (
     <div style={wrap}>
-      {!souscrit ? (<>{dot("#c9a86a")}<span>connexion…</span>{lienChanger}</>)
-        : autreEnLigne ? (<><a href="/ensemble" style={{ color: "inherit", textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>{dot("#8ee6a0")}<span>{autre} est là, en ce moment 🤍</span></a>{lienChanger}</>)
-        : (<>{dot("#6f6a80")}<span style={{ opacity: .9 }}>{autre} n&apos;est pas {accord}</span>{lienChanger}</>)}
+      {!souscrit ? (<>{dot("#c9a86a")}<span>…</span>{lienChanger}</>)
+        : autreEnLigne ? (<><a href="/ensemble" style={{ color: "inherit", textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>{dot("#8ee6a0")}<span>{autre} est là 🤍</span></a>{lienChanger}</>)
+        : (<>{dot("#6f6a80")}<span style={{ opacity: .85 }}>{autre} hors ligne</span>{lienChanger}</>)}
     </div>
   );
 }
